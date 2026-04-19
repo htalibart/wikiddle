@@ -2,9 +2,13 @@ import os
 import duckdb
 from datetime import date
 
-from fastapi import FastAPI, HTTPException, Query, APIRouter
+from fastapi import FastAPI, HTTPException, Query, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 MIN_NB_LINKS = 20
 
@@ -18,6 +22,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 def get_con() -> duckdb.DuckDBPyConnection:
     db_path = os.environ.get("WIKI_DB_PATH")
@@ -25,7 +33,8 @@ def get_con() -> duckdb.DuckDBPyConnection:
 
 
 @router.get("/daily-article")
-def get_daily_article():
+@limiter.limit("10/minute")
+def get_daily_article(request: Request):
     seed = int(date.today().strftime("%Y%m%d"))
     con = get_con()
     count = con.execute(f"SELECT COUNT(*) FROM articles WHERE nb_links >= {MIN_NB_LINKS}").fetchone()[0]
@@ -41,7 +50,8 @@ def get_daily_article():
 
 
 @router.get("/article-id")
-def get_article_id(title: str = Query(...)):
+@limiter.limit("30/minute")
+def get_article_id(request: Request, title: str = Query(...)):
     con = get_con()
     row = con.execute(
         "SELECT id FROM articles WHERE title = ?", [title]
@@ -55,7 +65,8 @@ def get_article_id(title: str = Query(...)):
 
 
 @router.get("/article-title")
-def get_article_title(id: int = Query(...)):
+@limiter.limit("300/minute")
+def get_article_title(request: Request, id: int = Query(...)):
     con = get_con()
     row = con.execute(
         "SELECT title FROM articles WHERE id = ?", [id]
@@ -77,7 +88,8 @@ def get_neighbors(article_id: int):
 
 
 @router.get("/common-neighbors")
-def get_common_neighbors(id1: int = Query(...), id2: int = Query(...)):
+@limiter.limit("30/minute")
+def get_common_neighbors(request: Request, id1: int = Query(...), id2: int = Query(...)):
     n1 = get_neighbors(id1)
     n2 = get_neighbors(id2)
     c = n1 & n2
@@ -85,11 +97,12 @@ def get_common_neighbors(id1: int = Query(...), id2: int = Query(...)):
         jaccard = 0.0
     else:
         jaccard = len(c) / len(n1 | n2)
-    return {"common": [get_article_title(id_)["title"] for id_ in c], "jaccard": jaccard}
+    return {"common": [get_article_title(request, id_)["title"] for id_ in c], "jaccard": jaccard}
 
 
 @router.get("/articles")
-def search_articles(query: str = Query(...)):
+@limiter.limit("300/minute")
+def search_articles(request: Request, query: str = Query(...)):
     con = get_con()
     rows = con.execute(
     f"""SELECT id, title FROM articles 
