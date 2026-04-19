@@ -107,4 +107,4 @@ def search_articles(query: str = Query(...)):
     return [{"id": row[0], "title": row[1]} for row in rows]
 
 
-app.mount("/", StaticFiles(directory=str(MAIN_DIR / "frontend"), html=True), name="frontend")
+#app.mount("/", StaticFiles(directory=str(MAIN_DIR / "frontend"), html=True), name="frontend")
