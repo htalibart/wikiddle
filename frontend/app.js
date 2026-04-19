@@ -89,8 +89,6 @@ async function main() {
   const target = await fetch(`${API_URL}/daily-article`)
     .then(res => res.json());
   
-  console.log("target:", target);
-
   const state = {
     linksVisible: false,
     guesses: [],
