@@ -1,4 +1,4 @@
-const API_URL = "";
+const API_URL = "/api";
 
 function scoreToColor(score, maxScore = 20) {
   const normalized = score / maxScore;

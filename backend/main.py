@@ -1,16 +1,15 @@
-from pathlib import Path
 import os
 import duckdb
 from datetime import date
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-MAIN_DIR = Path(__file__).parent.parent
 MIN_NB_LINKS = 20
 
 app = FastAPI()
+router = APIRouter(prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,7 +24,7 @@ def get_con() -> duckdb.DuckDBPyConnection:
     return duckdb.connect(db_path, read_only=True)
 
 
-@app.get("/daily-article")
+@router.get("/daily-article")
 def get_daily_article():
     seed = int(date.today().strftime("%Y%m%d"))
     con = get_con()
@@ -41,7 +40,7 @@ def get_daily_article():
     return {"id": row[0], "title": row[1]}
 
 
-@app.get("/article-id")
+@router.get("/article-id")
 def get_article_id(title: str = Query(...)):
     con = get_con()
     row = con.execute(
@@ -55,7 +54,7 @@ def get_article_id(title: str = Query(...)):
     return {"id": row[0], "title": title}
 
 
-@app.get("/article-title")
+@router.get("/article-title")
 def get_article_title(id: int = Query(...)):
     con = get_con()
     row = con.execute(
@@ -77,7 +76,7 @@ def get_neighbors(article_id: int):
     return set(row[0] for row in rows)
 
 
-@app.get("/common-neighbors")
+@router.get("/common-neighbors")
 def get_common_neighbors(id1: int = Query(...), id2: int = Query(...)):
     n1 = get_neighbors(id1)
     n2 = get_neighbors(id2)
@@ -89,7 +88,7 @@ def get_common_neighbors(id1: int = Query(...), id2: int = Query(...)):
     return {"common": [get_article_title(id_)["title"] for id_ in c], "jaccard": jaccard}
 
 
-@app.get("/articles")
+@router.get("/articles")
 def search_articles(query: str = Query(...)):
     con = get_con()
     rows = con.execute(
@@ -106,5 +105,5 @@ def search_articles(query: str = Query(...)):
     con.close()
     return [{"id": row[0], "title": row[1]} for row in rows]
 
-
+app.include_router(router)
 #app.mount("/", StaticFiles(directory=str(MAIN_DIR / "frontend"), html=True), name="frontend")
