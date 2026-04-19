@@ -82,7 +82,7 @@ def get_common_neighbors(id1: int = Query(...), id2: int = Query(...)):
     n2 = get_neighbors(id2)
     c = n1 & n2
     if not n1 or not n2:
-        score = 0.0
+        jaccard = 0.0
     else:
         jaccard = len(c) / len(n1 | n2)
     return {"common": [get_article_title(id_)["title"] for id_ in c], "jaccard": jaccard}
