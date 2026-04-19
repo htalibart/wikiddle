@@ -1,0 +1,157 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: Georgia, serif;
+  background-color: #f9f9f9;
+  color: #333333;
+}
+#top-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #dddddd;
+}
+#top-panel h1 {
+  font-size: 30px;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+}
+#input-area {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+#input-area .ts-wrapper {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+#guess-input {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-family: Georgia, serif;
+  border: 1px solid #cccccc;
+  background-color: #ffffff;
+  color: #333333;
+  outline: none;
+}
+#guess-input:focus {
+  border-color: #333333;
+}
+#guess-btn {
+  padding: 6px 16px;
+  font-size: 14px;
+  font-family: Georgia, serif;
+  background-color: #333333;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+#guess-btn:hover,
+#guess-btn:focus {
+  background-color: #555555;
+}
+#guesses-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+#guesses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.guess-card {
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  padding: 12px 16px;
+}
+
+.guess-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.guess-card-title {
+  font-weight: bold;
+}
+
+.guess-card-links {
+  display: none;
+}
+
+.guess-card-links a {
+  font-size: 12px;
+  color: #666666;
+  text-decoration: none;
+}
+
+.guess-card-links a:hover {
+  font-size: 12px;
+  color: #333333;
+  text-decoration: none;
+}
+
+.guess-card-title a {
+  color: #333333;
+  text-decoration: none;
+}
+
+.guess-card-title a:hover {
+  text-decoration: underline;
+}
+
+.target-guess-card {
+  border: 2px solid #333333;
+  background-color: #f0f0f0;
+}
+
+#toggle-links-btn {
+  padding: 6px 16px;
+  font-size: 14px;
+  font-family: Georgia, serif;
+  background-color: #e3e3e3;
+  color: #333333;
+  border: none;
+  cursor: pointer;
+}
+#toggle-links-btn:hover,
+#toggle-links-btn:focus {
+  background-color: #bababa;
+}
+
+#win-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#win-box {
+  background-color: #ffffff;
+  padding: 32px 48px;
+  text-align: center;
+  font-size: 24px;
+  position: relative;
+}
+
+#win-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #333333;
+}
