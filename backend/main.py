@@ -15,9 +15,14 @@ MIN_NB_LINKS = 20
 app = FastAPI()
 router = APIRouter(prefix="/api")
 
+
+origins = ["https://wikiddle.com", "http://wikiddle.com", "http://116.203.197.234"]
+if os.environ.get("ENV") == "dev":
+    origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
