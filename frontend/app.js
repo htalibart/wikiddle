@@ -1,4 +1,6 @@
-const API_URL = "/api";
+const API_URL = window.location.hostname === "localhost"
+  ? "http://localhost:8000/api"
+  : "/api";
 
 function scoreToColor(score, maxScore = 20) {
   const normalized = score / maxScore;
