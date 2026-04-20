@@ -75,16 +75,16 @@ async function handleGuessInput(state, tomSelect) {
         common: data.common,
         score: data.common.length,
         visible: state.linksVisible,
-        isTarget: data.isTarget,
+        isTarget: data.is_target,
       };
       insertSorted(guess, state);
       renderCards(state);
+
+      if (guess.isTarget) {
+        confetti();
+        document.getElementById("win-overlay").style.display = "flex";
+      }
     });
-  
-    if (guess.isTarget) {
-      confetti();
-      document.getElementById("win-overlay").style.display = "flex";
-    }
   }
 
 async function main() {
