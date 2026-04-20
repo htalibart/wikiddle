@@ -15,7 +15,6 @@ MIN_NB_LINKS = 20
 app = FastAPI()
 router = APIRouter(prefix="/api")
 
-
 origins = ["https://wikiddle.com", "http://wikiddle.com", "http://116.203.197.234"]
 if os.environ.get("ENV") == "dev":
     origins = ["*"]
@@ -31,27 +30,34 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+_cached_daily_target = {"id": None, "title": None, "date": None}
 
 def get_con() -> duckdb.DuckDBPyConnection:
     db_path = os.environ.get("WIKI_DB_PATH")
     return duckdb.connect(db_path, read_only=True)
 
+def get_daily_article_cached():
+    today = date.today()
+    if _cached_daily_target["date"] != today:
+        seed = int(today.strftime("%Y%m%d"))
+        con = get_con()
+        count = con.execute(f"SELECT COUNT(*) FROM articles WHERE nb_links >= {MIN_NB_LINKS}").fetchone()[0]
+        offset = seed % count
+        row = con.execute(
+            "SELECT id, title FROM articles ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
+            [seed, offset]
+        ).fetchone()
+        con.close()
+        _cached_daily_target.update({"date": today, "id": row[0], "title": row[1]})
+    return _cached_daily_target
+
 
 @router.get("/daily-article")
 @limiter.limit("10/minute")
 def get_daily_article(request: Request):
-    seed = int(date.today().strftime("%Y%m%d"))
-    con = get_con()
-    count = con.execute(f"SELECT COUNT(*) FROM articles WHERE nb_links >= {MIN_NB_LINKS}").fetchone()[0]
-    offset = seed % count
-    row = con.execute(
-        "SELECT id, title FROM articles ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
-            [seed, offset]
-    ).fetchone()
-    con.close()
-    if row is None:
-        raise HTTPException(status_code=404, detail="No articles found")
-    return {"id": row[0], "title": row[1]}
+    # for debugging purposes: will be deleted
+    article = get_daily_article_cached()
+    return {"id": article["id"], "title": article["title"]}
 
 
 @router.get("/article-id")
@@ -93,16 +99,18 @@ def get_neighbors(article_id: int):
 
 
 @router.get("/common-neighbors")
-@limiter.limit("30/minute")
-def get_common_neighbors(request: Request, id1: int = Query(...), id2: int = Query(...)):
-    n1 = get_neighbors(id1)
-    n2 = get_neighbors(id2)
-    c = n1 & n2
-    if not n1 or not n2:
-        jaccard = 0.0
-    else:
-        jaccard = len(c) / len(n1 | n2)
-    return {"common": [get_article_title(request, id_)["title"] for id_ in c], "jaccard": jaccard}
+@limiter.limit("60/minute")
+def get_common_neighbors_with_target(request: Request, id: int = Query(...)):
+    article = get_daily_article_cached()
+    n1 = get_neighbors(article["id"])
+    n2 = get_neighbors(id)
+    common = n1 & n2
+    is_target = (article["id"] == id)
+    return {
+        "common": [get_article_title(request, i)["title"] for i in common],
+        "is_target": is_target,
+    }
+
 
 
 @router.get("/articles")

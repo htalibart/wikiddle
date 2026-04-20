@@ -1,5 +1,5 @@
-const API_URL = window.location.hostname === "localhost"
-  ? "http://localhost:8000/api"
+const API_URL = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+  ? "http://127.0.0.1:8000/api"
   : "/api";
 
 function scoreToColor(score, maxScore = 20) {
@@ -58,7 +58,7 @@ function insertSorted(guess, state) {
   state.guesses.splice(low, 0, guess);
 }
 
-async function handleGuessInput(target, state, tomSelect) {
+async function handleGuessInput(state, tomSelect) {
   const guessId = tomSelect.getValue();
   const guessTitle = tomSelect.getOption(guessId)?.textContent?.trim();
   if (!guessId) return;
@@ -66,7 +66,7 @@ async function handleGuessInput(target, state, tomSelect) {
   tomSelect.clear();
   tomSelect.clearOptions();
   
-  fetch(`${API_URL}/common-neighbors?id1=${target.id}&id2=${guessId}`)
+  fetch(`${API_URL}/common-neighbors?id=${guessId}`)
     .then(res => res.json())
     .then(data => {
       const guess = {
@@ -75,21 +75,19 @@ async function handleGuessInput(target, state, tomSelect) {
         common: data.common,
         score: data.common.length,
         visible: state.linksVisible,
-        isTarget: (guessId == target.id),
+        isTarget: data.isTarget,
       };
       insertSorted(guess, state);
       renderCards(state);
     });
   
-    if (guessId == target.id) {
+    if (guess.isTarget) {
       confetti();
       document.getElementById("win-overlay").style.display = "flex";
     }
   }
 
 async function main() {
-  const target = await fetch(`${API_URL}/daily-article`)
-    .then(res => res.json());
   
   const state = {
     linksVisible: false,
@@ -111,11 +109,11 @@ async function main() {
           .catch(() => callback());
       },
       onItemAdd: function() {
-        handleGuessInput(target, state, tomSelect);
+        handleGuessInput(state, tomSelect);
       }
     });
 
-  document.getElementById("guess-btn").addEventListener("click", () => handleGuessInput(target, state, tomSelect));
+  document.getElementById("guess-btn").addEventListener("click", () => handleGuessInput(state, tomSelect));
   
   const toggleBtn = document.getElementById("toggle-links-btn");
 
