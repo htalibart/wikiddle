@@ -44,7 +44,7 @@ def get_daily_article_cached():
         count = con.execute(f"SELECT COUNT(*) FROM articles WHERE nb_links >= {MIN_NB_LINKS}").fetchone()[0]
         offset = seed % count
         row = con.execute(
-            "SELECT id, title FROM articles ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
+            f"SELECT id, title FROM articles WHERE nb_links >= {MIN_NB_LINKS} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
             [seed, offset]
         ).fetchone()
         con.close()
