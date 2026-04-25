@@ -90,7 +90,7 @@ async function handleGuessInput(state, tomSelect) {
 async function main() {
   
   const state = {
-    linksVisible: false,
+    linksVisible: true,
     guesses: [],
   };
 
