@@ -32,7 +32,7 @@ Serve the frontend locally:
 
 ```bash
 cd frontend/
-python3 -m http.server
+python3 -m http.server 3000
 ```
 
 ## Tests
