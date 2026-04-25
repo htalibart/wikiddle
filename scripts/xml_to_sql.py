@@ -7,6 +7,7 @@ import duckdb
 import csv
 import time
 import json
+import argparse
 
 THIS_DIR = Path(__file__).parent
 MAIN_DIR = THIS_DIR.parent
@@ -113,14 +114,22 @@ def read_nodes_and_edges(xml_file: Path, articles_writer, links_writer):
             print(f"{page_count} pages in {elapsed:.1f}s ({page_count/elapsed:.0f} pages/s)")
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("language", type=str, default='en')
+    args = parser.parse_args()
+
+    language = args.language
+
     data_dir = MAIN_DIR / 'data'
-    xml_dir = data_dir / 'xml'
-    xml_files = sorted(xml_dir.glob('enwiki-*.xml*.bz2'))
+    xml_dir = data_dir / 'xml' / language 
+    xml_files = sorted(xml_dir.glob(f'{language}wiki-*.xml*.bz2'))
     assert xml_files, "No XML files found in data_dir"
 
-    db_file = data_dir / 'wiki.db'
-    articles_file = data_dir / 'articles.csv'
-    links_file = data_dir / 'links_raw.csv'
+    output_dir = data_dir / 'db' / language
+    output_dir.mkdir(parents=True, exist_ok=True)
+    db_file = output_dir / 'wiki.db'
+    articles_file = output_dir / 'articles.csv'
+    links_file = output_dir / 'links_raw.csv'
 
     with open(articles_file, 'w', newline='') as af, open(links_file, 'w', newline='') as lf:
         articles_writer = csv.writer(af, delimiter='\t')
