@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
     con.execute("""
         CREATE TABLE articles (
-            id INTEGER,
+            id BIGINT,
             title TEXT NOT NULL,
             article_length INTEGER,
             nb_links INTEGER,
@@ -155,7 +155,7 @@ if __name__ == "__main__":
     """)
     con.execute("""
         CREATE TABLE links_raw (
-            source_id INTEGER,
+            source_id BIGINT,
             target_title TEXT
         )
     """)
