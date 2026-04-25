@@ -258,6 +258,9 @@ venv/bin/pip install -r backend/requirements.txt  # only if dependencies changed
 sudo systemctl restart wikiddle
 ```
 
+
+If changes are not reflected immediately, purge the Cloudflare cache: in the Cloudflare dashboard, click on `wikiddle.com`, then **Caching -> Configuration -> Purge Everything**.
+
 ---
 
 ## Useful commands
