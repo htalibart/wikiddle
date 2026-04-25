@@ -9,8 +9,8 @@ function scoreToColor(score, maxScore = 20) {
   return `rgb(${r}, 0, ${b})`;
 }
 
-function titleToUrl(title) {
-  return `https://en.wikipedia.org/wiki/${title.replaceAll(" ", "_")}`;
+function titleToUrl(title, lang) {
+  return `https://${lang}.wikipedia.org/wiki/${title.replaceAll(" ", "_")}`;
 }
 
 function renderCards(state) {
@@ -24,10 +24,10 @@ function renderCards(state) {
     }
     card.innerHTML = `
       <div class="guess-card-header">
-        <div class="guess-card-title"><a href=${titleToUrl(guess.title)} target="_blank">${guess.title}</a></div>
+        <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a></div>
         <div class="guess-card-score" style="color: ${scoreToColor(guess.score)}">${guess.score}</div>
       </div>
-      <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title)}" target="_blank">${title}</a>`).join(" · ")}</div>
+      <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
     `;
     card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
     card.querySelector(".guess-card-links").addEventListener("click", e => e.stopPropagation()); // prevents click on Wikipedia page to propagate to visibility
@@ -66,7 +66,7 @@ async function handleGuessInput(state, tomSelect) {
   tomSelect.clear();
   tomSelect.clearOptions();
   
-  fetch(`${API_URL}/common-neighbors?id=${guessId}`)
+  fetch(`${API_URL}/${state.lang}/common-neighbors?id=${guessId}`)
     .then(res => res.json())
     .then(data => {
       const guess = {
@@ -87,9 +87,17 @@ async function handleGuessInput(state, tomSelect) {
     });
   }
 
+
+function getLang() {
+  const params = new URLSearchParams(window.location.search);
+  const lang = params.get("lang");
+  return ["en", "fr"].includes(lang) ? lang : "en";
+}
+
 async function main() {
   
   const state = {
+    lang: getLang(),
     linksVisible: true,
     guesses: [],
   };
@@ -102,7 +110,7 @@ async function main() {
       maxItems: 1,
       closeAfterSelect: true,
       load: function(query, callback) {
-        fetch(`${API_URL}/articles?query=${encodeURIComponent(query)}`)
+        fetch(`${API_URL}/${state.lang}/articles?query=${encodeURIComponent(query)}`)
           .then(res => res.json())
           .then(data => data.filter(article => !state.guesses.some(g => g.id == article.id)))
           .then(data => callback(data))
