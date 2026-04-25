@@ -117,10 +117,10 @@ venv/bin/pip install -r backend/requirements.txt
 The database is not in the repo (too large). It is generated from Wikipedia dumps using two scripts in `scripts/`:
 
 ```bash
-bash scripts/download_wikipedia.sh
+bash scripts/download_wikipedia.sh ${LANGUAGE}
 ```
 
-This downloads Wikipedia dump files.
+This downloads Wikipedia dump files. Replace `${LANGUAGE}` with `en` for English, `fr` for French, etc.
 
 ```bash
 python3 scripts/xml_to_sql.py
