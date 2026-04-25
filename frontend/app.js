@@ -2,6 +2,8 @@ const API_URL = ["localhost", "127.0.0.1"].includes(window.location.hostname)
   ? "http://127.0.0.1:8000/api"
   : "/api";
 
+const LANGUAGES = ["en", "fr"];
+
 function scoreToColor(score, maxScore = 20) {
   const normalized = score / maxScore;
   const r = Math.round(normalized * 255);
@@ -91,7 +93,7 @@ async function handleGuessInput(state, tomSelect) {
 function getLang() {
   const params = new URLSearchParams(window.location.search);
   const lang = params.get("lang");
-  return ["en", "fr"].includes(lang) ? lang : "en";
+  return LANGUAGES.includes(lang) ? lang : "en";
 }
 
 async function main() {
