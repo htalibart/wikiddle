@@ -231,7 +231,7 @@ After=network.target
 [Service]
 User=deploy
 WorkingDirectory=/var/www/wikiddle/backend
-Environment="WIKI_DB_PATH=/var/www/wikiddle/data/wiki.db"
+Environment="WIKI_DB_DIR=/var/www/wikiddle/data/db"
 ExecStart=/var/www/wikiddle/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
 Restart=always
 
