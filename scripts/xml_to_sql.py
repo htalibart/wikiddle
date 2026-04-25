@@ -102,6 +102,8 @@ def read_nodes_and_edges(xml_file: Path, articles_writer, links_writer):
         links = set()
         for link in LINK_RE.findall(text):
             link = link.strip('\n\r')
+            if not link:
+                continue
             link = link[0].upper() + link[1:]
             if keep_title(link):
                 links.add(link)
