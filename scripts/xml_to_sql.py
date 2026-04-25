@@ -161,7 +161,7 @@ if __name__ == "__main__":
     """)
 
     con.execute(f"COPY articles FROM '{articles_file}' (DELIMITER '\t')")
-    con.execute(f"COPY links_raw FROM '{links_file}' (DELIMITER '\t')")
+    con.execute(f"COPY links_raw FROM '{links_file}' (DELIMITER '\t', QUOTE '\"')")
 
     print("Resolving link targets...")
     con.execute("""
