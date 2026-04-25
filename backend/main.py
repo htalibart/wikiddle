@@ -10,7 +10,8 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-MIN_NB_LINKS = 20
+MIN_NB_LINKS_FOR_TARGET = 20
+MAX_NB_SEARCH_RESULTS = 30
 
 app = FastAPI()
 router = APIRouter(prefix="/api")
@@ -41,10 +42,10 @@ def get_daily_article_cached():
     if _cached_daily_target["date"] != today:
         seed = int(today.strftime("%Y%m%d"))
         con = get_con()
-        count = con.execute(f"SELECT COUNT(*) FROM articles WHERE nb_links >= {MIN_NB_LINKS}").fetchone()[0]
+        count = con.execute(f"SELECT COUNT(*) FROM articles WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET}").fetchone()[0]
         offset = seed % count
         row = con.execute(
-            f"SELECT id, title FROM articles WHERE nb_links >= {MIN_NB_LINKS} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
+            f"SELECT id, title FROM articles WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
             [seed, offset]
         ).fetchone()
         con.close()
@@ -119,13 +120,13 @@ def search_articles(request: Request, query: str = Query(...)):
     con = get_con()
     rows = con.execute(
     f"""SELECT id, title FROM articles 
-        WHERE nb_links >= {MIN_NB_LINKS} AND title ILIKE ?
+        WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND title ILIKE ?
         ORDER BY CASE 
             WHEN title ILIKE ? THEN 0
             WHEN title ILIKE ? THEN 1
             ELSE 2
         END, nb_links DESC, LENGTH(title)
-        LIMIT 30""",
+        LIMIT {MAX_NB_SEARCH_RESULTS}""",
     [f"%{query}%", query, f"{query}%"]
     ).fetchall()
     con.close()
