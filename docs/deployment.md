@@ -126,7 +126,11 @@ This downloads Wikipedia dump files. Replace `${LANGUAGE}` with `en` for English
 python3 scripts/xml_to_sql.py
 ```
 
-This reads the XML dump files and generates a SQLite database.
+This reads the XML dump files and generates a SQLite database. It requires "disambiguation templates" than can be fetched from Wikipedia API with:
+
+```bash
+python3 scripts/get_disambiguation_templates.py
+```
 
 ### 7. Set up Caddy and HTTPS
 
