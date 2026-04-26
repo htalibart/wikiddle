@@ -81,19 +81,30 @@ def get_article_id(request: Request, lang: str, title: str = Query(...)):
     return {"id": row[0], "title": title}
 
 
+def get_article_titles(lang: str, ids: set[int]):
+    if not ids:
+        return []
+
+    con = get_con(lang)
+    try:
+        rows = con.execute(
+            "SELECT title FROM articles WHERE id IN (SELECT * FROM UNNEST(?))",
+            [list(ids)]
+        ).fetchall()
+        return [row[0] for row in rows]
+    finally:
+        con.close()
+
+
+
 @router.get("/{lang}/article-title")
 @limiter.limit("300/minute")
 def get_article_title(request: Request, lang: str, id: int = Query(...)):
-    con = get_con(lang)
-    row = con.execute(
-        "SELECT title FROM articles WHERE id = ?", [id]
-    ).fetchone()
-    con.close()
-
-    if row is None:
+    titles = get_article_titles(lang, {id})
+    if not titles:
         raise HTTPException(status_code=404, detail="Article not found")
-    
-    return {"id": id, "title": row[0]}
+    return {"id": id, "title": titles[0]}
+
 
 
 def get_neighbors(lang: str, article_id: int):
@@ -114,7 +125,7 @@ def get_common_neighbors_with_target(request: Request, lang: str, id: int = Quer
     common = n1 & n2
     is_target = (article["id"] == id)
     return {
-        "common": [get_article_title(request, lang, i)["title"] for i in common],
+        "common": get_article_titles(lang, common),
         "is_target": is_target,
     }
 

@@ -31,7 +31,7 @@ def client():
 
 class TestNotFound:
     def test_article_title_not_found(self, client):
-        with patch("main.get_con", return_value=make_con_mock(fetchone=None)):
+        with patch("main.get_article_titles", return_value=[]):
             res = client.get("/api/en/article-title?id=99999")
         assert res.status_code == 404
 
@@ -66,25 +66,25 @@ class TestCommonNeighbors:
         def neighbors_side_effect(lang, article_id):
             return daily_neighbors if article_id == daily_id else guess_neighbors
 
-        def title_side_effect(request, lang, id):
-            return {"id": id, "title": f"Article {id}"}
+        def titles_side_effect(lang, ids):
+            return [f"Article {id}" for id in ids]
 
         return (
             patch("main.get_daily_article_cached", return_value=article),
             patch("main.get_neighbors", side_effect=neighbors_side_effect),
-            patch("main.get_article_title", side_effect=title_side_effect),
+            patch("main.get_article_titles", side_effect=titles_side_effect),
         )
 
     def test_correct_guess(self, client):
-        daily_patch, neighbors_patch, title_patch = self._patches(42, {1, 2, 3}, {1, 2, 3})
-        with daily_patch, neighbors_patch, title_patch:
+        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1, 2, 3}, {1, 2, 3})
+        with daily_patch, neighbors_patch, titles_patch:
             res = client.get("/api/en/common-neighbors?id=42")
         assert res.status_code == 200
         assert res.json()["is_target"] is True
 
     def test_wrong_guess(self, client):
-        daily_patch, neighbors_patch, title_patch = self._patches(42, {1, 2, 3}, {2, 3, 4})
-        with daily_patch, neighbors_patch, title_patch:
+        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1, 2, 3}, {2, 3, 4})
+        with daily_patch, neighbors_patch, titles_patch:
             res = client.get("/api/en/common-neighbors?id=12")
         assert res.status_code == 200
         data = res.json()
@@ -92,8 +92,8 @@ class TestCommonNeighbors:
         assert len(data["common"]) == 2
 
     def test_no_common_neighbors(self, client):
-        daily_patch, neighbors_patch, title_patch = self._patches(42, {1, 2}, {3, 4})
-        with daily_patch, neighbors_patch, title_patch:
+        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1, 2}, {3, 4})
+        with daily_patch, neighbors_patch, titles_patch:
             res = client.get("/api/en/common-neighbors?id=200")
         assert res.status_code == 200
         assert res.json()["common"] == []
