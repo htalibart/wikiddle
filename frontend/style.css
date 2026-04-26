@@ -271,6 +271,19 @@ body {
     align-items: stretch;
   }
 
+  #input-area {
+    flex-wrap: wrap;
+  }
+
+  #input-area .ts-wrapper {
+    flex: 1 1 100%;
+  }
+
+  #input-area .ts-control {
+    min-width: 0 !important;
+  }
+
+
   #win-box {
     padding: 2rem 1.5rem;
     margin: 1rem;
