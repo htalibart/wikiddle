@@ -9,22 +9,22 @@
 </head>
 <body>
 <div id="top-panel">
-  <h1>Wikiddle</h1>
-  <div id="input-area">
-    <input type="text" id="guess-input" placeholder="Guess an article..." />
-    <button id="guess-btn">Guess</button>
-    <button id="toggle-links-btn">Hide links</button>
-  </div>
+<h1>Wikiddle</h1>
+<div id="input-area">
+<input type="text" id="guess-input" placeholder="" />
+<button id="guess-btn"></button>
+<button id="toggle-links-btn"></button>
+</div>
 </div>
 <div id="guesses-panel">
-  <div id="guesses-list">
-  </div>
+<div id="guesses-list">
+</div>
 </div>
 <div id="win-overlay" style="display:none">
-  <div id="win-box">
-    <span id="win-close-btn">×</span>
-    <p>You found the target article!</p>
-  </div>
+<div id="win-box">
+<span id="win-close-btn">×</span>
+<p id="win-message"></p>
+</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>

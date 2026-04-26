@@ -95,6 +95,11 @@ function getLang() {
   return LANGUAGES.includes(lang) ? lang : "en";
 }
 
+async function loadTranslations(lang) {
+  const res = await fetch(`/i18n/${lang}.json`);
+  return res.json();
+}
+
 async function main() {
   
   const state = {
@@ -103,7 +108,12 @@ async function main() {
     guesses: [],
   };
 
-    const tomSelect = new TomSelect("#guess-input", {
+  const translations = await loadTranslations(state.lang);
+  document.getElementById("guess-btn").textContent = translations.guess;
+  document.getElementById("guess-input").placeholder = translations.input_placeholder;
+  document.getElementById("win-message").textContent = translations.win_message;
+
+  const tomSelect = new TomSelect("#guess-input", {
       valueField: "id",
       labelField: "title",
       searchField: "title",
@@ -130,11 +140,15 @@ async function main() {
     state.linksVisible = !state.linksVisible;
     state.guesses.forEach(g => g.visible = state.linksVisible);
     renderCards(state);
-    document.getElementById("toggle-links-btn").textContent = state.linksVisible ? "Hide links" : "Show links";
+    document.getElementById("toggle-links-btn").textContent = state.linksVisible ? translations.toggle_hide : translations.toggle_show;
     toggleBtn.blur();
   });
 
-  toggleBtn.style.minWidth = toggleBtn.offsetWidth + "px";
+  [translations.toggle_hide, translations.toggle_show].forEach(text => {
+    toggleBtn.textContent = text;
+    toggleBtn.style.minWidth = Math.max(toggleBtn.offsetWidth, parseInt(toggleBtn.style.minWidth) || 0) + "px";
+    });
+  toggleBtn.textContent = translations.toggle_hide;
 
   document.getElementById("win-overlay").addEventListener("click", () => {
     document.getElementById("win-overlay").style.display = "none";

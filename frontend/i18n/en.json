@@ -1,0 +1,7 @@
+{
+  "toggle_show": "Show links",
+  "toggle_hide": "Hide links",
+  "guess": "Guess",
+  "input_placeholder": "Guess an article...",
+  "win_message": "You found the target article!"
+}
