@@ -101,6 +101,7 @@ def get_neighbors(lang: str, article_id: int):
     rows = con.execute(
         "SELECT target_id FROM links WHERE source_id = ?", [article_id]
     ).fetchall()
+    con.close()
     return set(row[0] for row in rows)
 
 
