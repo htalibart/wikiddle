@@ -35,6 +35,8 @@ _cached_daily_target = {"id": None, "title": None, "date": None}
 
 def get_con() -> duckdb.DuckDBPyConnection:
     db_path = os.environ.get("WIKI_DB_PATH")
+    if not os.path.isfile(db_path):
+        raise HTTPException(status_code=500, detail=f"Database not found: {db_path}")
     return duckdb.connect(db_path, read_only=True)
 
 def get_daily_article_cached():
