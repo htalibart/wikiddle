@@ -37,11 +37,13 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 _cached_daily_targets = {lang: {"id": None, "title": None, "date": None} for lang in LANGUAGES}
 
 def valid_lang(lang: str) -> str:
+    """ validates that @lang is a supported language, raises 400 if not, otherwise returns the language """
     if lang not in LANGUAGES:
         raise HTTPException(status_code=400, detail=f"Language not supported: {lang}")
     return lang
 
 def open_con(lang: str) -> duckdb.DuckDBPyConnection:
+    """ opens a DuckDB connection connection to the appropriate database depending on language, raises 500 if database file is not found """
     db_dir = Path(os.environ.get("WIKI_DB_DIR"))
     db_path = db_dir / lang / 'wiki.db'
     if not db_path.is_file():
@@ -49,6 +51,7 @@ def open_con(lang: str) -> duckdb.DuckDBPyConnection:
     return duckdb.connect(db_path, read_only=True)
 
 def get_con(lang: str = Depends(valid_lang)):
+    """ FastAPI dependency to yield a DuckDB connection to the database for the given language, closes it after the request """
     con = open_con(lang)
     try:
         yield con
@@ -56,6 +59,7 @@ def get_con(lang: str = Depends(valid_lang)):
         con.close()
 
 def get_daily_article_cached(lang: str):
+    """ returns today's daily article for the given language, refreshes the cache if needed """
     today = date.today()
     if _cached_daily_targets[lang]["date"] != today:
         seed = int(today.strftime("%Y%m%d"))
@@ -95,6 +99,7 @@ def get_article_id(request: Request, con = Depends(get_con), title: str = Query(
 
 
 def get_article_titles(lang: str, ids: set[int]):
+    """ returns the titles of the articles for language @lang with given ids @ids """
     if not ids:
         return []
     con = open_con(lang)
@@ -120,6 +125,7 @@ def get_article_title(request: Request, lang: str = Depends(valid_lang), id: int
 
 
 def get_neighbors(lang: str, article_id: int):
+    """ returns the set of article ids that article with id @article_id links to in language @lang """
     con = open_con(lang)
     try:
         rows = con.execute(
@@ -133,6 +139,7 @@ def get_neighbors(lang: str, article_id: int):
 @router.get("/{lang}/common-neighbors")
 @limiter.limit("60/minute")
 def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)):
+    """ API route to get the links that are common to the user guess and the target article """
     article = get_daily_article_cached(lang)
     n1 = get_neighbors(lang, article["id"])
     n2 = get_neighbors(lang, id)
@@ -148,6 +155,7 @@ def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid
 @router.get("/{lang}/articles")
 @limiter.limit("300/minute")
 def search_articles(request: Request, con = Depends(get_con), query: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
+    """ API route to search in the database (called by TomSelect) """
     rows = con.execute(
     f"""SELECT id, title FROM articles 
         WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND title ILIKE ?
