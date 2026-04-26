@@ -20,6 +20,7 @@ body {
 #top-panel {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem 1.5rem;
   background-color: #ffffff;
@@ -40,14 +41,15 @@ body {
 
 #input-area {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   flex: 1;
+  min-width: 0;
 }
 
 #input-area .ts-wrapper {
   flex: 1;
-  min-width: 0;
-  width: 100%;
+  min-width: 200px;
 }
 
 #guess-input {
@@ -184,6 +186,8 @@ body {
   text-align: center;
   font-size: 1.5rem;
   position: relative;
+  max-width: calc(100% - 2rem);
+  word-break: break-word;
 }
 
 #win-close-btn {
@@ -231,8 +235,9 @@ body {
   background-color: #ffffff;
   padding: 2rem 3rem;
   position: relative;
-  max-width: calc(100% - 4rem);
-} 
+  max-width: calc(100% - 2rem);
+  word-break: break-word;
+}
 
 #howto-close-btn {
   position: absolute;
@@ -242,7 +247,6 @@ body {
   cursor: pointer;
   color: #333333;
 }
-
 
 #howto-example {
   border-top: 1px solid #dddddd;
@@ -264,15 +268,9 @@ body {
   font-weight: bold;
 }
 
-
 @media (max-width: 600px) {
-  #top-panel {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  #input-area {
-    flex-wrap: wrap;
+  #title-area {
+    width: 100%;
   }
 
   #input-area .ts-wrapper {
@@ -283,6 +281,10 @@ body {
     min-width: 0 !important;
   }
 
+  #guess-btn,
+  #toggle-links-btn {
+    flex: 1;
+  }
 
   #win-box {
     padding: 2rem 1.5rem;
@@ -292,5 +294,5 @@ body {
   #howto-box {
     padding: 2rem 1.5rem;
     margin: 1rem;
-}
+  }
 }
