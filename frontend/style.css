@@ -217,6 +217,54 @@ body {
   text-decoration: underline;
 }
 
+#howto-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+#howto-box {
+  background-color: #ffffff;
+  padding: 2rem 3rem;
+  position: relative;
+  max-width: calc(100% - 4rem);
+} 
+
+#howto-close-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #333333;
+}
+
+
+#howto-example {
+  border-top: 1px solid #dddddd;
+  padding-top: 1rem;
+}
+
+#howto-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  font-size: 0.7rem;
+  color: #666666;
+  padding: 0;
+  text-decoration: none;
+}
+
+#howto-btn:hover {
+  font-weight: bold;
+}
+
+
 @media (max-width: 600px) {
   #top-panel {
     flex-direction: column;
@@ -227,4 +275,9 @@ body {
     padding: 2rem 1.5rem;
     margin: 1rem;
   }
+
+  #howto-box {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+}
 }

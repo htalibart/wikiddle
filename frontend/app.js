@@ -104,6 +104,25 @@ async function loadTranslations(lang) {
   return res.json();
 }
 
+function buildHowtoExample(translations, lang) {
+  const card = document.createElement("div");
+  card.classList.add("guess-card");
+  card.innerHTML = `
+    <div class="guess-card-header">
+      <div class="guess-card-title">
+        <a href="${titleToUrl(translations.howto_example_title, lang)}" target="_blank">${translations.howto_example_title}</a>
+      </div>
+      <div class="guess-card-score" style="color: ${scoreToColor(translations.howto_example_score)}">
+        ${translations.howto_example_score}
+      </div>
+    </div>
+    <div class="guess-card-links" style="display:block">
+      ${translations.howto_example_links.map(title => `<a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>`).join(" · ")}
+    </div>
+  `;
+  return card;
+}
+
 async function main() {
   
   const state = {
@@ -115,10 +134,27 @@ async function main() {
 
   // Translations
   const translations = await loadTranslations(state.lang);
+  document.querySelector(`#lang-switcher a[href="/${state.lang}"]`).classList.add("active");
   document.getElementById("guess-btn").textContent = translations.guess;
   document.getElementById("guess-input").placeholder = translations.input_placeholder;
   document.getElementById("win-message").textContent = translations.win_message;
-  document.querySelector(`#lang-switcher a[href="/${state.lang}"]`).classList.add("active");
+  document.getElementById("howto-btn").textContent = translations.howto_btn;
+
+  // How to play
+  document.getElementById("howto-title").textContent = translations.howto_btn;
+  document.getElementById("howto-text-before").innerHTML = translations.howto_text_before.replaceAll("\n\n", "<br><br>");
+  document.getElementById("howto-text-after").innerHTML = translations.howto_text_after.replaceAll("\n\n", "<br><br>");
+  document.getElementById("howto-example").appendChild(buildHowtoExample(translations, state.lang));
+
+  const howtoBtn = document.getElementById("howto-btn");
+  const howtoOverlay = document.getElementById("howto-overlay");
+  howtoBtn.addEventListener("click", () => howtoOverlay.style.display = "flex");
+  howtoOverlay.addEventListener("click", () => howtoOverlay.style.display = "none");
+  document.getElementById("howto-box").addEventListener("click", e => e.stopPropagation());
+  document.getElementById("howto-close-btn").addEventListener("click", () => howtoOverlay.style.display = "none");
+  document.addEventListener("keydown", e => {
+  if (e.key === "Escape") howtoOverlay.style.display = "none";
+});
 
   const tomSelect = new TomSelect("#guess-input", {
       valueField: "id",

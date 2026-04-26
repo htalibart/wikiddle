@@ -13,6 +13,7 @@
   <div id="top-panel">
     <div id="title-area">
       <h1>Wikiddle</h1>
+      <button id="howto-btn"></button>
       <div id="lang-switcher">
         <a href="/en">EN</a>
         <a href="/fr">FR</a>
@@ -30,8 +31,17 @@
   </div>
   <div id="win-overlay" style="display:none">
     <div id="win-box">
-    <span id="win-close-btn">×</span>
-    <p id="win-message"></p>
+      <span id="win-close-btn">×</span>
+      <p id="win-message"></p>
+    </div>
+  </div>
+  <div id="howto-overlay" style="display:none">
+    <div id="howto-box">
+      <span id="howto-close-btn">×</span>
+      <h2 id="howto-title"></h2>
+      <p id="howto-text-before"></p>
+      <div id="howto-example"></div>
+      <p id="howto-text-after"></p>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>

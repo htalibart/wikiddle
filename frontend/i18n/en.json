@@ -3,5 +3,11 @@
   "toggle_hide": "Hide links",
   "guess": "Guess",
   "input_placeholder": "Guess an article...",
-  "win_message": "You found the target article!"
+  "win_message": "You found the target article!",
+  "howto_btn": "How to play?",
+"howto_text_before": "Every day, a Wikipedia article is chosen as the <strong>mystery article</strong>. Your goal is to find it.\n\nType any Wikipedia article title to make a guess. For example, if you guess <strong>Marie Curie</strong>, you might see:",
+"howto_text_after": "\nThe number <strong>6</strong> means Marie Curie and the mystery article have <strong>6 links in common</strong>.\n\nYour guesses are sorted from most to least common links: the higher a guess is in the list, the closer it is to the mystery article.",
+  "howto_example_title": "Marie Curie",
+  "howto_example_score": 6,
+  "howto_example_links": ["France", "Poland", "Nobel Prize in Physics", "University of Paris", "World War I", "Radioactivity"]
 }
