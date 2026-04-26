@@ -2,20 +2,9 @@
     handle /api/* {
         reverse_proxy localhost:8000
     }
-    handle /fr* {
-        rewrite * /index.html
-        file_server {
-            root frontend
-        }
-    }
-    handle /en* {
-        rewrite * /index.html
-        file_server {
-            root frontend
-        }
-    }
     handle {
         root * frontend
+        try_files {path} /index.html
         file_server
     }
 }
