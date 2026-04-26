@@ -146,7 +146,7 @@ if __name__ == "__main__":
     language = args.language
 
     data_dir = MAIN_DIR / 'data'
-    lang_data_dir = data_dir / language
+    lang_data_dir = data_dir / 'metadata' / language
     lang_data_dir.mkdir(parents=True, exist_ok=True)
 
     print("Loading namespaces...")
