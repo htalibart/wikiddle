@@ -16,7 +16,7 @@ MAX_NB_SEARCH_RESULTS = 30
 app = FastAPI()
 router = APIRouter(prefix="/api")
 
-origins = ["https://wikiddle.com", "http://wikiddle.com", "http://116.203.197.234"]
+origins = ["https://wikiddle.com", "http://wikiddle.com"]
 if os.environ.get("ENV") == "dev":
     origins = ["*"]
 
