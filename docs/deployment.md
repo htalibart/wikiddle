@@ -208,26 +208,10 @@ sudo systemctl restart caddy
 
 ### 8. Configure the systemd service
 
+The service file is versioned in the repo at `config/wikiddle.service`. Create a symlink so systemd picks it up:
+
 ```bash
-sudo vim /etc/systemd/system/wikiddle.service
-```
-
-Contents:
-
-```ini
-[Unit]
-Description=Wikiddle backend
-After=network.target
-
-[Service]
-User=deploy
-WorkingDirectory=/var/www/wikiddle/backend
-Environment="WIKI_DB_DIR=/var/www/wikiddle/data/db"
-ExecStart=/var/www/wikiddle/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
+sudo ln -s /var/www/wikiddle/config/wikiddle.service /etc/systemd/system/wikiddle.service
 ```
 
 Enable and start the service:
