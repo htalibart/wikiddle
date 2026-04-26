@@ -91,8 +91,12 @@ async function handleGuessInput(state, tomSelect) {
 
 
 function getLang() {
-  const lang = window.location.pathname.split("/")[1];
-  return LANGUAGES.includes(lang) ? lang : "en";
+    const pathLang = window.location.pathname.split("/")[1];
+    if (LANGUAGES.includes(pathLang)) {
+      return pathLang;
+    }
+    const browserLang = navigator.language.split("-")[0];
+    return LANGUAGES.includes(browserLang) ? browserLang : "en";
 }
 
 async function loadTranslations(lang) {
