@@ -108,10 +108,13 @@ async function main() {
     guesses: [],
   };
 
+
+  // Translations
   const translations = await loadTranslations(state.lang);
   document.getElementById("guess-btn").textContent = translations.guess;
   document.getElementById("guess-input").placeholder = translations.input_placeholder;
   document.getElementById("win-message").textContent = translations.win_message;
+  document.querySelector(`#lang-switcher a[href="/${state.lang}"]`).classList.add("active");
 
   const tomSelect = new TomSelect("#guess-input", {
       valueField: "id",
