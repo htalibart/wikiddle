@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 
 from datetime import date, timedelta
 
-from main import app, get_daily_article_cached, _cached_daily_target, MIN_NB_LINKS
+from main import app, get_daily_article_cached, _cached_daily_target, MIN_NB_LINKS_FOR_TARGET
 
 
 def make_con_mock(fetchone=None, fetchall=None):
