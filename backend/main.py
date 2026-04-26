@@ -14,6 +14,7 @@ from slowapi.errors import RateLimitExceeded
 LANGUAGES = {'en', 'fr'}
 MIN_NB_LINKS_FOR_TARGET = 20
 MAX_NB_SEARCH_RESULTS = 30
+MAX_TITLE_LENGTH = 300
 
 app = FastAPI()
 router = APIRouter(prefix="/api")
@@ -73,7 +74,7 @@ def get_daily_article(request: Request, lang: str = Depends(valid_lang)):
 
 @router.get("/{lang}/article-id")
 @limiter.limit("30/minute")
-def get_article_id(request: Request, lang: str = Depends(valid_lang), title: str = Query(...)):
+def get_article_id(request: Request, lang: str = Depends(valid_lang), title: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
     con = get_con(lang)
     row = con.execute(
         "SELECT id FROM articles WHERE title = ?", [title]
@@ -138,7 +139,7 @@ def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid
 
 @router.get("/{lang}/articles")
 @limiter.limit("300/minute")
-def search_articles(request: Request, lang: str = Depends(valid_lang), query: str = Query(...)):
+def search_articles(request: Request, lang: str = Depends(valid_lang), query: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
     con = get_con(lang)
     rows = con.execute(
     f"""SELECT id, title FROM articles 

@@ -134,3 +134,45 @@ class TestDailyArticleCached:
         assert result_en["title"] == "Toto"
         assert result_fr["id"] == 84
         assert result_fr["title"] == "Bonjour"
+
+
+class TestInvalidLang:
+    def test_daily_article_invalid_lang(self, client):
+        res = client.get("/api/xx/daily-article")
+        assert res.status_code == 400
+
+    def test_article_id_invalid_lang(self, client):
+        res = client.get("/api/xx/article-id?title=Toto")
+        assert res.status_code == 400
+
+    def test_article_title_invalid_lang(self, client):
+        res = client.get("/api/xx/article-title?id=42")
+        assert res.status_code == 400
+
+    def test_common_neighbors_invalid_lang(self, client):
+        res = client.get("/api/xx/common-neighbors?id=42")
+        assert res.status_code == 400
+
+    def test_articles_invalid_lang(self, client):
+        res = client.get("/api/xx/articles?query=foo")
+        assert res.status_code == 400
+
+
+class TestQueryValidation:
+    def test_articles_query_too_long(self, client):
+        long_query = 'a' * 301
+        res = client.get(f"/api/en/articles?query={long_query}")
+        assert res.status_code == 422
+
+    def test_articles_query_empty(self, client):
+        res = client.get("/api/en/articles?query=")
+        assert res.status_code == 422
+
+    def test_article_id_title_too_long(self, client):
+        long_query = 'a' * 301
+        res = client.get(f"/api/en/article-id?title={long_query}")
+        assert res.status_code == 422
+
+    def test_article_id_title_empty(self, client):
+        res = client.get("/api/en/article-id?title=")
+        assert res.status_code == 422
