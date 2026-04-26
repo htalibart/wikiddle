@@ -41,25 +41,34 @@ def valid_lang(lang: str) -> str:
         raise HTTPException(status_code=400, detail=f"Language not supported: {lang}")
     return lang
 
-def get_con(lang: str) -> duckdb.DuckDBPyConnection:
+def open_con(lang: str) -> duckdb.DuckDBPyConnection:
     db_dir = Path(os.environ.get("WIKI_DB_DIR"))
     db_path = db_dir / lang / 'wiki.db'
     if not db_path.is_file():
         raise HTTPException(status_code=500, detail=f"Database not found: {db_path}")
     return duckdb.connect(db_path, read_only=True)
 
+def get_con(lang: str = Depends(valid_lang)):
+    con = open_con(lang)
+    try:
+        yield con
+    finally:
+        con.close()
+
 def get_daily_article_cached(lang: str):
     today = date.today()
     if _cached_daily_targets[lang]["date"] != today:
         seed = int(today.strftime("%Y%m%d"))
-        con = get_con(lang)
-        count = con.execute(f"SELECT COUNT(*) FROM articles WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET}").fetchone()[0]
-        offset = seed % count
-        row = con.execute(
-            f"SELECT id, title FROM articles WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
-            [seed, offset]
-        ).fetchone()
-        con.close()
+        con = open_con(lang)
+        try:
+            count = con.execute(f"SELECT COUNT(*) FROM articles WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET}").fetchone()[0]
+            offset = seed % count
+            row = con.execute(
+                f"SELECT id, title FROM articles WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
+                [seed, offset]
+            ).fetchone()
+        finally:
+            con.close()
         _cached_daily_targets[lang].update({"date": today, "id": row[0], "title": row[1]})
     return _cached_daily_targets[lang]
 
@@ -74,12 +83,10 @@ def get_daily_article(request: Request, lang: str = Depends(valid_lang)):
 
 @router.get("/{lang}/article-id")
 @limiter.limit("30/minute")
-def get_article_id(request: Request, lang: str = Depends(valid_lang), title: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
-    con = get_con(lang)
+def get_article_id(request: Request, con = Depends(get_con), title: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
     row = con.execute(
         "SELECT id FROM articles WHERE title = ?", [title]
     ).fetchone()
-    con.close()
 
     if row is None:
         raise HTTPException(status_code=404, detail="Article not found")
@@ -90,8 +97,7 @@ def get_article_id(request: Request, lang: str = Depends(valid_lang), title: str
 def get_article_titles(lang: str, ids: set[int]):
     if not ids:
         return []
-
-    con = get_con(lang)
+    con = open_con(lang)
     try:
         rows = con.execute(
             "SELECT title FROM articles WHERE id IN (SELECT * FROM UNNEST(?))",
@@ -114,12 +120,14 @@ def get_article_title(request: Request, lang: str = Depends(valid_lang), id: int
 
 
 def get_neighbors(lang: str, article_id: int):
-    con = get_con(lang)
-    rows = con.execute(
-        "SELECT target_id FROM links WHERE source_id = ?", [article_id]
-    ).fetchall()
-    con.close()
-    return set(row[0] for row in rows)
+    con = open_con(lang)
+    try:
+        rows = con.execute(
+            "SELECT target_id FROM links WHERE source_id = ?", [article_id]
+        ).fetchall()
+        return set(row[0] for row in rows)
+    finally:
+        con.close()
 
 
 @router.get("/{lang}/common-neighbors")
@@ -139,8 +147,7 @@ def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid
 
 @router.get("/{lang}/articles")
 @limiter.limit("300/minute")
-def search_articles(request: Request, lang: str = Depends(valid_lang), query: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
-    con = get_con(lang)
+def search_articles(request: Request, con = Depends(get_con), query: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
     rows = con.execute(
     f"""SELECT id, title FROM articles 
         WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND title ILIKE ?
@@ -152,7 +159,6 @@ def search_articles(request: Request, lang: str = Depends(valid_lang), query: st
         LIMIT {MAX_NB_SEARCH_RESULTS}""",
     [f"%{query}%", query, f"{query}%"]
     ).fetchall()
-    con.close()
     return [{"id": row[0], "title": row[1]} for row in rows]
 
 app.include_router(router)

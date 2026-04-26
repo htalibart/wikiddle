@@ -36,7 +36,7 @@ class TestNotFound:
         assert res.status_code == 404
 
     def test_article_id_not_found(self, client):
-        with patch("main.get_con", return_value=make_con_mock(fetchone=None)):
+        with patch("main.open_con", return_value=make_con_mock(fetchone=None)):
             res = client.get("/api/en/article-id?title=Toto")
         assert res.status_code == 404
 
@@ -106,7 +106,7 @@ class TestDailyArticleCached:
 
     def test_uses_cache_on_second_call(self):
         con = make_db_mock()
-        with patch("main.get_con", return_value=con):
+        with patch("main.open_con", return_value=con):
             get_daily_article_cached("en")
             get_daily_article_cached("en")
         assert con.execute.call_count == 2
@@ -116,7 +116,7 @@ class TestDailyArticleCached:
         _cached_daily_targets["en"].update({"id": 12, "title": "Titi", "date": yesterday})
 
         con = make_db_mock(title="Toto")
-        with patch("main.get_con", return_value=con):
+        with patch("main.open_con", return_value=con):
             result = get_daily_article_cached("en")
 
         assert result["date"] == date.today()
@@ -126,7 +126,7 @@ class TestDailyArticleCached:
         con_en = make_db_mock(article_id=42, title="Toto")
         con_fr = make_db_mock(article_id=84, title="Bonjour")
 
-        with patch("main.get_con", side_effect=[con_en, con_fr]):
+        with patch("main.open_con", side_effect=[con_en, con_fr]):
             result_en = get_daily_article_cached("en")
             result_fr = get_daily_article_cached("fr")
 
