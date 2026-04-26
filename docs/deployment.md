@@ -193,7 +193,11 @@ Add the following:
 [Service]
 ExecStart=
 ExecStart=/usr/bin/caddy run --environ --config /var/www/wikiddle/config/Caddyfile.prod
+ExecReload=
+ExecReload=/usr/bin/caddy reload --config /var/www/wikiddle/config/Caddyfile.prod
 ```
+
+The empty `ExecStart=` and `ExecReload=` lines clear the defaults defined by Caddy's systemd service before setting the new ones.
 
 Then reload and restart Caddy:
 
