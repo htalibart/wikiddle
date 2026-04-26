@@ -27,7 +27,7 @@ sudo systemctl stop caddy
 ```
 Then serve the frontend with the local Caddy config from the project root:
 ```bash
-caddy run --config Caddyfile.dev
+caddy run --config config/Caddyfile.dev
 ```
 The site will be available at `http://localhost:8080`.
 
