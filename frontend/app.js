@@ -153,8 +153,8 @@ async function main() {
   document.getElementById("howto-box").addEventListener("click", e => e.stopPropagation());
   document.getElementById("howto-close-btn").addEventListener("click", () => howtoOverlay.style.display = "none");
   document.addEventListener("keydown", e => {
-  if (e.key === "Escape") howtoOverlay.style.display = "none";
-});
+    if (e.key === "Escape") howtoOverlay.style.display = "none";
+  });
 
   const tomSelect = new TomSelect("#guess-input", {
       valueField: "id",
@@ -199,6 +199,12 @@ async function main() {
   document.getElementById("win-box").addEventListener("click", e => e.stopPropagation());
   document.getElementById("win-close-btn").addEventListener("click", () => {
   document.getElementById("win-overlay").style.display = "none";
+});
+
+  document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    document.getElementById("win-overlay").style.display = "none";
+  }
 });
 }
 
