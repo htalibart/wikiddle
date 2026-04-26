@@ -1,39 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Wikiddle</title>
-<link rel="stylesheet" href="style.css" />
-<link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wikiddle</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
 </head>
+
 <body>
-<div id="top-panel">
-<div id="title-area">
-  <h1>Wikiddle</h1>
-  <div id="lang-switcher">
-    <a href="/en">EN</a>
-    <a href="/fr">FR</a>
+  <div id="top-panel">
+    <div id="title-area">
+      <h1>Wikiddle</h1>
+      <div id="lang-switcher">
+        <a href="/en">EN</a>
+        <a href="/fr">FR</a>
+      </div>
+    </div>
+    <div id="input-area">
+      <input type="text" id="guess-input" placeholder="" />
+      <button id="guess-btn"></button>
+      <button id="toggle-links-btn"></button>
+    </div>
   </div>
-</div>
-<div id="input-area">
-<input type="text" id="guess-input" placeholder="" />
-<button id="guess-btn"></button>
-<button id="toggle-links-btn"></button>
-</div>
-</div>
-<div id="guesses-panel">
-<div id="guesses-list">
-</div>
-</div>
-<div id="win-overlay" style="display:none">
-<div id="win-box">
-<span id="win-close-btn">×</span>
-<p id="win-message"></p>
-</div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
-<script src="app.js"></script>
+  <div id="guesses-panel">
+    <div id="guesses-list">
+    </div>
+  </div>
+  <div id="win-overlay" style="display:none">
+    <div id="win-box">
+    <span id="win-close-btn">×</span>
+    <p id="win-message"></p>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
