@@ -123,14 +123,11 @@ bash scripts/download_wikipedia.sh ${LANGUAGE}
 This downloads Wikipedia dump files. Replace `${LANGUAGE}` with `en` for English, `fr` for French, etc.
 
 ```bash
-python3 scripts/xml_to_sql.py
+python3 scripts/xml_to_sql.py ${LANGUAGE}
 ```
 
-This reads the XML dump files and generates a SQLite database. It requires "disambiguation templates" that can be fetched from the Wikipedia API with:
+This reads the XML dump files and generates a SQLite database.
 
-```bash
-python3 scripts/get_disambiguation_templates.py
-```
 
 ### 7. Set up Caddy and HTTPS
 
