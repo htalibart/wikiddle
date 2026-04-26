@@ -12,7 +12,7 @@ function scoreToColor(score, maxScore = 20) {
 }
 
 function titleToUrl(title, lang) {
-  return `https://${lang}.wikipedia.org/wiki/${title.replaceAll(" ", "_")}`;
+  return `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title.replaceAll(" ", "_"))}`;
 }
 
 function renderCards(state) {

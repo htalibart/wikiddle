@@ -126,7 +126,7 @@ This downloads Wikipedia dump files. Replace `${LANGUAGE}` with `en` for English
 python3 scripts/xml_to_sql.py
 ```
 
-This reads the XML dump files and generates a SQLite database. It requires "disambiguation templates" than can be fetched from Wikipedia API with:
+This reads the XML dump files and generates a SQLite database. It requires "disambiguation templates" that can be fetched from the Wikipedia API with:
 
 ```bash
 python3 scripts/get_disambiguation_templates.py
@@ -181,37 +181,28 @@ sudo chown caddy:caddy /etc/caddy/wikiddle.pem /etc/caddy/wikiddle.key
 
 #### Step 3 — Configure Caddy
 
-```bash
-sudo vim /etc/caddy/Caddyfile
-```
-
-Contents:
-
-```
-wikiddle.com {
-    tls /etc/caddy/wikiddle.pem /etc/caddy/wikiddle.key
-    handle /api/* {
-        reverse_proxy localhost:8000
-    }
-    handle {
-        root * /var/www/wikiddle/frontend
-        file_server
-    }
-}
-:80 {
-    handle /api/* {
-        reverse_proxy localhost:8000
-    }
-    handle {
-        root * /var/www/wikiddle/frontend
-        file_server
-    }
-}
-```
-
-Then restart Caddy:
+Tell the Caddy systemd service to use the config file from the repo:
 
 ```bash
+sudo systemctl edit caddy
+```
+
+Add the following:
+
+```ini
+[Service]
+ExecStart=
+ExecStart=/usr/bin/caddy run --environ --config /var/www/wikiddle/config/Caddyfile.prod
+ExecReload=
+ExecReload=/usr/bin/caddy reload --config /var/www/wikiddle/config/Caddyfile.prod
+```
+
+The empty `ExecStart=` and `ExecReload=` lines clear the defaults defined by Caddy's systemd service before setting the new ones.
+
+Then reload and restart Caddy:
+
+```bash
+sudo systemctl daemon-reload
 sudo systemctl restart caddy
 ```
 
@@ -256,8 +247,8 @@ cd /var/www/wikiddle
 git pull origin main
 venv/bin/pip install -r backend/requirements.txt  # only if dependencies changed; no need to activate the venv
 sudo systemctl restart wikiddle
+sudo systemctl restart caddy  # only if Caddyfile.prod changed
 ```
-
 
 If changes are not reflected immediately, purge the Cloudflare cache: in the Cloudflare dashboard, click on `wikiddle.com`, then **Caching -> Configuration -> Purge Everything**.
 

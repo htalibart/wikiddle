@@ -18,7 +18,7 @@ MAX_NB_SEARCH_RESULTS = 30
 app = FastAPI()
 router = APIRouter(prefix="/api")
 
-origins = ["https://wikiddle.com", "http://wikiddle.com", "http://116.203.197.234"]
+origins = ["https://wikiddle.com", "http://wikiddle.com"]
 if os.environ.get("ENV") == "dev":
     origins = ["*"]
 
@@ -38,6 +38,8 @@ _cached_daily_targets = {lang: {"id": None, "title": None, "date": None} for lan
 def get_con(lang: str) -> duckdb.DuckDBPyConnection:
     db_dir = Path(os.environ.get("WIKI_DB_DIR"))
     db_path = db_dir / lang / 'wiki.db'
+    if not db_path.is_file():
+        raise HTTPException(status_code=500, detail=f"Database not found: {db_path}")
     return duckdb.connect(db_path, read_only=True)
 
 def get_daily_article_cached(lang: str):
