@@ -3,7 +3,7 @@ from pathlib import Path
 import duckdb
 from datetime import date
 
-from fastapi import FastAPI, HTTPException, Query, APIRouter, Request
+from fastapi import FastAPI, HTTPException, Query, APIRouter, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -11,7 +11,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-LANGUAGES = ['en', 'fr']
+LANGUAGES = {'en', 'fr'}
 MIN_NB_LINKS_FOR_TARGET = 20
 MAX_NB_SEARCH_RESULTS = 30
 
@@ -34,6 +34,11 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 _cached_daily_targets = {lang: {"id": None, "title": None, "date": None} for lang in LANGUAGES}
+
+def valid_lang(lang: str) -> str:
+    if lang not in LANGUAGES:
+        raise HTTPException(status_code=400, detail=f"Language not supported: {lang}")
+    return lang
 
 def get_con(lang: str) -> duckdb.DuckDBPyConnection:
     db_dir = Path(os.environ.get("WIKI_DB_DIR"))
@@ -60,7 +65,7 @@ def get_daily_article_cached(lang: str):
 
 @router.get("/{lang}/daily-article")
 @limiter.limit("10/minute")
-def get_daily_article(request: Request, lang: str):
+def get_daily_article(request: Request, lang: str = Depends(valid_lang)):
     # for debugging purposes: will be deleted
     article = get_daily_article_cached(lang)
     return {"id": article["id"], "title": article["title"]}
@@ -68,7 +73,7 @@ def get_daily_article(request: Request, lang: str):
 
 @router.get("/{lang}/article-id")
 @limiter.limit("30/minute")
-def get_article_id(request: Request, lang: str, title: str = Query(...)):
+def get_article_id(request: Request, lang: str = Depends(valid_lang), title: str = Query(...)):
     con = get_con(lang)
     row = con.execute(
         "SELECT id FROM articles WHERE title = ?", [title]
@@ -99,7 +104,7 @@ def get_article_titles(lang: str, ids: set[int]):
 
 @router.get("/{lang}/article-title")
 @limiter.limit("300/minute")
-def get_article_title(request: Request, lang: str, id: int = Query(...)):
+def get_article_title(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)):
     titles = get_article_titles(lang, {id})
     if not titles:
         raise HTTPException(status_code=404, detail="Article not found")
@@ -118,7 +123,7 @@ def get_neighbors(lang: str, article_id: int):
 
 @router.get("/{lang}/common-neighbors")
 @limiter.limit("60/minute")
-def get_common_neighbors_with_target(request: Request, lang: str, id: int = Query(...)):
+def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)):
     article = get_daily_article_cached(lang)
     n1 = get_neighbors(lang, article["id"])
     n2 = get_neighbors(lang, id)
@@ -133,7 +138,7 @@ def get_common_neighbors_with_target(request: Request, lang: str, id: int = Quer
 
 @router.get("/{lang}/articles")
 @limiter.limit("300/minute")
-def search_articles(request: Request, lang: str, query: str = Query(...)):
+def search_articles(request: Request, lang: str = Depends(valid_lang), query: str = Query(...)):
     con = get_con(lang)
     rows = con.execute(
     f"""SELECT id, title FROM articles 
