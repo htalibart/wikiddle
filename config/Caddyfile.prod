@@ -1,10 +1,20 @@
 wikiddle.com {
     tls /etc/caddy/wikiddle.pem /etc/caddy/wikiddle.key
-
     handle /api/* {
         reverse_proxy localhost:8000
     }
-
+    handle /fr* {
+        rewrite * /index.html
+        file_server {
+            root * /var/www/wikiddle/frontend
+        }
+    }
+    handle /en* {
+        rewrite * /index.html
+        file_server {
+            root * /var/www/wikiddle/frontend
+        }
+    }
     handle {
         root * /var/www/wikiddle/frontend
         file_server
@@ -15,7 +25,18 @@ wikiddle.com {
     handle /api/* {
         reverse_proxy localhost:8000
     }
-
+    handle /fr* {
+        rewrite * /index.html
+        file_server {
+            root * /var/www/wikiddle/frontend
+        }
+    }
+    handle /en* {
+        rewrite * /index.html
+        file_server {
+            root * /var/www/wikiddle/frontend
+        }
+    }
     handle {
         root * /var/www/wikiddle/frontend
         file_server

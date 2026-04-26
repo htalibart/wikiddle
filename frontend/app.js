@@ -91,8 +91,7 @@ async function handleGuessInput(state, tomSelect) {
 
 
 function getLang() {
-  const params = new URLSearchParams(window.location.search);
-  const lang = params.get("lang");
+  const lang = window.location.pathname.split("/")[1];
   return LANGUAGES.includes(lang) ? lang : "en";
 }
 
