@@ -145,9 +145,11 @@ def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid
     n2 = get_neighbors(lang, id)
     common = n1 & n2
     is_target = (article["id"] == id)
+    is_on_target = (id in n1)
     return {
         "common": get_article_titles(lang, common),
         "is_target": is_target,
+        "is_on_target": is_on_target,
     }
 
 

@@ -67,6 +67,12 @@ function renderGuessCard(state, guess) {
     card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
   });
 
+  
+  // guess is a link on target -> change color
+  if (guess.isOnTarget) {
+    card.querySelector(".guess-card-title").classList.add("guess-card-title-on-target");
+  }
+
   return card;
 }
 
@@ -126,9 +132,13 @@ async function handleGuessInput(state, tomSelect) {
         score: data.common.length,
         visible: state.linksVisible,
         isTarget: data.is_target,
+        isOnTarget: data.is_on_target,
       };
 
       updateKnownLinks(state, guess.common);
+      if (guess.isOnTarget) {
+        updateKnownLinks(state, [guess.title]);
+      }
 
       if (guess.isTarget) {
         state.knowledgeTarget.title = guess.title;

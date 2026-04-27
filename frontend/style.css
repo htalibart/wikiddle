@@ -156,6 +156,10 @@ body {
   /* background-color: #f0f0f0; */
 }
 
+.guess-card-title-on-target a {
+  color: #000080;
+}
+
 #toggle-links-btn {
   padding: 0.375rem 1rem;
   font-size: 0.875rem;
