@@ -126,6 +126,15 @@ body {
   font-weight: bold;
 }
 
+.guess-card-title a {
+  color: #333333;
+  text-decoration: none;
+}
+
+.guess-card-title a:hover {
+  text-decoration: underline;
+}
+
 .guess-card-links {
   display: none;
 }
@@ -142,18 +151,9 @@ body {
   text-decoration: none;
 }
 
-.guess-card-title a {
-  color: #333333;
-  text-decoration: none;
-}
-
-.guess-card-title a:hover {
-  text-decoration: underline;
-}
-
 .target-guess-card {
   border: 2px solid #333333;
-  background-color: #f0f0f0;
+  /* background-color: #f0f0f0; */
 }
 
 #toggle-links-btn {

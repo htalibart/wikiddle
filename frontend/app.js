@@ -15,29 +15,72 @@ function titleToUrl(title, lang) {
   return `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title.replaceAll(" ", "_"))}`;
 }
 
-function renderCards(state) {
-  const list = document.getElementById("guesses-list");
-  list.innerHTML = "";
-  for (const guess of state.guesses) {
-    const card = document.createElement("div");
-    card.classList.add("guess-card");
-    if (guess.isTarget) {
-      card.classList.add("target-guess-card");
-    }
-    card.innerHTML = `
+function renderTargetCard(state) {
+
+  const card = document.createElement("div");
+  card.classList.add("guess-card");
+  card.classList.add("target-guess-card");
+
+  let titleHTML = `<div class="guess-card-title">?</div>`
+  if (state.knowledgeTarget.title !== null) {
+    titleHTML = `<div class="guess-card-title"><a href=${titleToUrl(state.knowledgeTarget.title, state.lang)} target="_blank">${state.knowledgeTarget.title}</a></div>`
+  };
+
+  const links = state.knowledgeTarget.links;
+
+  card.innerHTML = `
+      <div class="guess-card-header">
+        ${titleHTML}
+        <div class="guess-card-score""></div>
+      </div>
+      <div class="guess-card-links">${links.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
+    `;
+  
+  card.querySelector(".guess-card-links").style.display = "block";
+  
+  return card;
+
+}
+
+function renderGuessCard(state, guess) {
+  const card = document.createElement("div");
+
+  card.classList.add("guess-card");
+
+  card.innerHTML = `
       <div class="guess-card-header">
         <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a></div>
         <div class="guess-card-score" style="color: ${scoreToColor(guess.score)}">${guess.score}</div>
       </div>
       <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
     `;
+  
+  card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
+
+  // prevents click on Wikipedia page to propagate to visibility
+  card.querySelector(".guess-card-links").addEventListener("click", e => e.stopPropagation());
+  card.querySelector(".guess-card-title").addEventListener("click", e => e.stopPropagation());
+
+  // click on card -> change visibility
+  card.addEventListener("click", () => {
+    guess.visible = !guess.visible;
     card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
-    card.querySelector(".guess-card-links").addEventListener("click", e => e.stopPropagation()); // prevents click on Wikipedia page to propagate to visibility
-    card.querySelector(".guess-card-title").addEventListener("click", e => e.stopPropagation()); // prevents click on Wikipedia page to propagate to visibility
-    card.addEventListener("click", () => {
-      guess.visible = !guess.visible;
-      card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
-    });
+  });
+
+  return card;
+}
+
+function renderCards(state) {
+  const list = document.getElementById("guesses-list");
+  list.innerHTML = "";
+
+  // target card on top
+  const targetCard = renderTargetCard(state);
+  list.appendChild(targetCard);
+
+  // all other guesses below
+  for (const guess of state.guesses) {
+    const card = renderGuessCard(state, guess);
     list.appendChild(card);
   }
   
@@ -45,19 +88,24 @@ function renderCards(state) {
 
 function insertSorted(guess, state) {
   let low = 0;
-
-  if (!guess.isTarget) {
-    let high = state.guesses.length;
-    while (low < high) {
-      const m = Math.floor((low + high) / 2);
-      if (guess.score < state.guesses.at(m).score) {
-        low = m + 1;
-      } else {
-        high = m;
-      }
+  let high = state.guesses.length;
+  while (low < high) {
+    const m = Math.floor((low + high) / 2);
+    if (guess.score < state.guesses.at(m).score) {
+      low = m + 1;
+    } else {
+      high = m;
     }
   }
   state.guesses.splice(low, 0, guess);
+}
+
+function updateKnownLinks(state, links) {
+  for (const link of links) {
+    if (! state.knowledgeTarget.links.includes(link)) {
+      state.knowledgeTarget.links.push(link);
+    }
+  }
 }
 
 async function handleGuessInput(state, tomSelect) {
@@ -79,13 +127,19 @@ async function handleGuessInput(state, tomSelect) {
         visible: state.linksVisible,
         isTarget: data.is_target,
       };
-      insertSorted(guess, state);
-      renderCards(state);
+
+      updateKnownLinks(state, guess.common);
 
       if (guess.isTarget) {
+        state.knowledgeTarget.title = guess.title;
         confetti();
         document.getElementById("win-overlay").style.display = "flex";
       }
+      else {
+        insertSorted(guess, state);
+      }
+
+      renderCards(state);
     });
   }
 
@@ -103,6 +157,7 @@ async function loadTranslations(lang) {
   const res = await fetch(`/i18n/${lang}.json`);
   return res.json();
 }
+
 
 function buildHowtoExample(translations, lang) {
   const card = document.createElement("div");
@@ -129,6 +184,10 @@ async function main() {
     lang: getLang(),
     linksVisible: true,
     guesses: [],
+    knowledgeTarget: {
+      title: null,
+      links: []
+    }
   };
 
 
@@ -206,6 +265,8 @@ async function main() {
     document.getElementById("win-overlay").style.display = "none";
   }
 });
+
+renderCards(state);
 }
 
 main();
