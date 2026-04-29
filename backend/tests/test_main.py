@@ -176,3 +176,39 @@ class TestQueryValidation:
     def test_article_id_title_empty(self, client):
         res = client.get("/api/en/article-id?title=")
         assert res.status_code == 422
+
+
+class TestNewTargetNeighbor:
+    def _patches(self, target, neighbors, titles):
+        return (
+            patch("main.get_daily_article_cached", return_value=target),
+            patch("main.get_neighbors", return_value=neighbors),
+            patch("main.get_article_titles", return_value=titles),
+        )
+
+    def test_returns_hint(self, client):
+        target = {"id": 42, "title": "Toto", "date": date.today()}
+        daily_patch, neighbors_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
+        with daily_patch, neighbors_patch, titles_patch:
+            res = client.post("/api/en/new-target-neighbor", json=[])
+        assert res.status_code == 200
+        assert res.json()["title"] is not None
+
+    def test_excludes_already_guessed(self, client):
+        target = {"id": 42, "title": "Toto", "date": date.today()}
+        daily_patch, neighbors_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
+        with daily_patch, neighbors_patch, titles_patch:
+            res = client.post("/api/en/new-target-neighbor", json=["Article 1", "Article 2", "Article 3"])
+        assert res.status_code == 200
+        assert res.json()["title"] is None
+
+    def test_invalid_lang(self, client):
+        res = client.post("/api/xx/new-target-neighbor", json=[])
+        assert res.status_code == 400
+
+    def test_empty_body(self, client):
+        target = {"id": 42, "title": "Toto", "date": date.today()}
+        daily_patch, neighbors_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
+        with daily_patch, neighbors_patch, titles_patch:
+            res = client.post("/api/en/new-target-neighbor")
+        assert res.status_code == 200

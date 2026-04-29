@@ -2,6 +2,7 @@
   "toggle_show": "Show links",
   "toggle_hide": "Hide links",
   "guess": "Guess",
+  "hint": "Hint",
   "input_placeholder": "Guess an article...",
   "win_message": "You found the target article!",
   "howto_btn": "How to play?",

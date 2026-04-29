@@ -188,6 +188,27 @@ function buildHowtoExample(translations, lang) {
   return card;
 }
 
+
+async function addHint(state) {
+  await fetch(`/api/${state.lang}/new-target-neighbor`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(state.knowledgeTarget.links)
+  })
+  .then(res => res.json())
+  .then(
+    data => {
+      if (data.title === null) {
+        console.log("No more hint");
+        return;
+      }
+      state.knowledgeTarget.links.push(data.title);
+    }
+  )
+
+  renderCards(state);
+}
+
 async function main() {
   
   const state = {
@@ -208,6 +229,7 @@ async function main() {
   document.getElementById("guess-input").placeholder = translations.input_placeholder;
   document.getElementById("win-message").textContent = translations.win_message;
   document.getElementById("howto-btn").textContent = translations.howto_btn;
+  document.getElementById("hint-btn").textContent = translations.hint;
 
   // How to play
   document.getElementById("howto-title").textContent = translations.howto_btn;
@@ -225,6 +247,8 @@ async function main() {
     if (e.key === "Escape") howtoOverlay.style.display = "none";
   });
 
+
+  // Search
   const tomSelect = new TomSelect("#guess-input", {
       valueField: "id",
       labelField: "title",
@@ -245,7 +269,12 @@ async function main() {
     });
 
   document.getElementById("guess-btn").addEventListener("click", () => handleGuessInput(state, tomSelect));
+
+  // Hint
+  document.getElementById("hint-btn").addEventListener("click", () => addHint(state));
   
+
+  // Cards visibility
   const toggleBtn = document.getElementById("toggle-links-btn");
 
   toggleBtn.addEventListener("click", () => {
@@ -262,6 +291,9 @@ async function main() {
     });
   toggleBtn.textContent = translations.toggle_hide;
 
+
+  // Win overlay
+
   document.getElementById("win-overlay").addEventListener("click", () => {
     document.getElementById("win-overlay").style.display = "none";
   });
@@ -269,7 +301,6 @@ async function main() {
   document.getElementById("win-close-btn").addEventListener("click", () => {
   document.getElementById("win-overlay").style.display = "none";
 });
-
   document.addEventListener("keydown", e => {
   if (e.key === "Escape") {
     document.getElementById("win-overlay").style.display = "none";
