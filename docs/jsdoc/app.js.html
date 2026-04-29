@@ -1,4 +1,32 @@
-const API_URL = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const API_URL = ["localhost", "127.0.0.1"].includes(window.location.hostname)
   ? "http://127.0.0.1:8000/api"
   : "/api";
 
@@ -38,19 +66,19 @@ function renderTargetCard(state) {
   card.classList.add("guess-card");
   card.classList.add("target-guess-card");
 
-  let titleHTML = `<div class="guess-card-title">?</div>`
+  let titleHTML = `&lt;div class="guess-card-title">?&lt;/div>`
   if (state.knowledgeTarget.title !== null) {
-    titleHTML = `<div class="guess-card-title"><a href=${titleToUrl(state.knowledgeTarget.title, state.lang)} target="_blank">${state.knowledgeTarget.title}</a></div>`
+    titleHTML = `&lt;div class="guess-card-title">&lt;a href=${titleToUrl(state.knowledgeTarget.title, state.lang)} target="_blank">${state.knowledgeTarget.title}&lt;/a>&lt;/div>`
   };
 
   const links = state.knowledgeTarget.links;
 
   card.innerHTML = `
-      <div class="guess-card-header">
+      &lt;div class="guess-card-header">
         ${titleHTML}
-        <div class="guess-card-score""></div>
-      </div>
-      <div class="guess-card-links">${links.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
+        &lt;div class="guess-card-score"">&lt;/div>
+      &lt;/div>
+      &lt;div class="guess-card-links">${links.map(title => `&lt;a href="${titleToUrl(title, state.lang)}" target="_blank">${title}&lt;/a>`).join(" · ")}&lt;/div>
     `;
   
   card.querySelector(".guess-card-links").style.display = "block";
@@ -72,11 +100,11 @@ function renderGuessCard(state, guess) {
   card.classList.add("guess-card");
 
   card.innerHTML = `
-      <div class="guess-card-header">
-        <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a></div>
-        <div class="guess-card-score" style="color: ${scoreToColor(guess.score)}">${guess.score}</div>
-      </div>
-      <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
+      &lt;div class="guess-card-header">
+        &lt;div class="guess-card-title">&lt;a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}&lt;/a>&lt;/div>
+        &lt;div class="guess-card-score" style="color: ${scoreToColor(guess.score)}">${guess.score}&lt;/div>
+      &lt;/div>
+      &lt;div class="guess-card-links">${guess.common.map(title => `&lt;a href="${titleToUrl(title, state.lang)}" target="_blank">${title}&lt;/a>`).join(" · ")}&lt;/div>
     `;
   
   card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
@@ -129,9 +157,9 @@ function renderCards(state) {
 function insertSorted(guess, state) {
   let low = 0;
   let high = state.guesses.length;
-  while (low < high) {
+  while (low &lt; high) {
     const m = Math.floor((low + high) / 2);
-    if (guess.score < state.guesses.at(m).score) {
+    if (guess.score &lt; state.guesses.at(m).score) {
       low = m + 1;
     } else {
       high = m;
@@ -215,7 +243,7 @@ function getLang() {
 /**
  * Loads the translations from the i18n/ folder
  * @param {string} lang - acttive language code
- * @returns {Promise<Object>} translations for the given language
+ * @returns {Promise&lt;Object>} translations for the given language
  */
 async function loadTranslations(lang) {
   const res = await fetch(`/i18n/${lang}.json`);
@@ -232,17 +260,17 @@ function buildHowtoExample(translations, lang) {
   const card = document.createElement("div");
   card.classList.add("guess-card");
   card.innerHTML = `
-    <div class="guess-card-header">
-      <div class="guess-card-title">
-        <a href="${titleToUrl(translations.howto_example_title, lang)}" target="_blank">${translations.howto_example_title}</a>
-      </div>
-      <div class="guess-card-score" style="color: ${scoreToColor(translations.howto_example_score)}">
+    &lt;div class="guess-card-header">
+      &lt;div class="guess-card-title">
+        &lt;a href="${titleToUrl(translations.howto_example_title, lang)}" target="_blank">${translations.howto_example_title}&lt;/a>
+      &lt;/div>
+      &lt;div class="guess-card-score" style="color: ${scoreToColor(translations.howto_example_score)}">
         ${translations.howto_example_score}
-      </div>
-    </div>
-    <div class="guess-card-links" style="display:block">
-      ${translations.howto_example_links.map(title => `<a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>`).join(" · ")}
-    </div>
+      &lt;/div>
+    &lt;/div>
+    &lt;div class="guess-card-links" style="display:block">
+      ${translations.howto_example_links.map(title => `&lt;a href="${titleToUrl(title, lang)}" target="_blank">${title}&lt;/a>`).join(" · ")}
+    &lt;/div>
   `;
   return card;
 }
@@ -293,8 +321,8 @@ async function main() {
 
   // How to play
   document.getElementById("howto-title").textContent = translations.howto_btn;
-  document.getElementById("howto-text-before").innerHTML = translations.howto_text_before.replaceAll("\n\n", "<br><br>");
-  document.getElementById("howto-text-after").innerHTML = translations.howto_text_after.replaceAll("\n\n", "<br><br>");
+  document.getElementById("howto-text-before").innerHTML = translations.howto_text_before.replaceAll("\n\n", "&lt;br>&lt;br>");
+  document.getElementById("howto-text-after").innerHTML = translations.howto_text_after.replaceAll("\n\n", "&lt;br>&lt;br>");
   document.getElementById("howto-example").appendChild(buildHowtoExample(translations, state.lang));
 
   const howtoBtn = document.getElementById("howto-btn");
@@ -361,4 +389,26 @@ async function main() {
 renderCards(state);
 }
 
-main();
+main();</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildHowtoExample">buildHowtoExample</a></li><li><a href="global.html#getLang">getLang</a></li><li><a href="global.html#handleGuessInput">handleGuessInput</a></li><li><a href="global.html#insertSorted">insertSorted</a></li><li><a href="global.html#loadTranslations">loadTranslations</a></li><li><a href="global.html#renderCards">renderCards</a></li><li><a href="global.html#renderGuessCard">renderGuessCard</a></li><li><a href="global.html#renderTargetCard">renderTargetCard</a></li><li><a href="global.html#scoreToColor">scoreToColor</a></li><li><a href="global.html#titleToUrl">titleToUrl</a></li><li><a href="global.html#updateKnownLinks">updateKnownLinks</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Apr 29 2026 21:19:41 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

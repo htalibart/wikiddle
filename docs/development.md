@@ -37,3 +37,9 @@ Run from the root of the project:
 python -m pytest
 ```
 Unit tests (`tests/test_main.py`) mock the database and can be run without it. Integration tests (`tests/test_integration.py`) require the database to be present at `data/wiki.db`.
+
+
+## Documentation
+```bash
+npx jsdoc frontend/app.js -d docs/jsdoc
+```
