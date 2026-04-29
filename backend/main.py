@@ -124,14 +124,14 @@ def get_article_title(request: Request, lang: str = Depends(valid_lang), id: int
 
 
 
-def get_neighbors(lang: str, article_id: int):
-    """ returns the set of article ids that article with id @article_id links to in language @lang """
+def get_neighbors(lang: str, article_id: int) -> dict:
+    """ returns a dict {id: title} articles that article with id @article_id links to in language @lang """
     con = open_con(lang)
     try:
         rows = con.execute(
-            "SELECT target_id FROM links WHERE source_id = ?", [article_id]
+            "SELECT l.target_id, p.title FROM links l JOIN articles p ON l.target_id = p.id WHERE l.source_id = ?", [article_id]
         ).fetchall()
-        return set(row[0] for row in rows)
+        return {row[0]: row[1] for row in rows}
     finally:
         con.close()
 
@@ -143,11 +143,11 @@ def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid
     article = get_daily_article_cached(lang)
     n1 = get_neighbors(lang, article["id"])
     n2 = get_neighbors(lang, id)
-    common = n1 & n2
+    common = set(n1.keys()) & set(n2.keys())
     is_target = (article["id"] == id)
     is_on_target = (id in n1)
     return {
-        "common": get_article_titles(lang, common),
+        "common": [n1[nid] for nid in common],
         "is_target": is_target,
         "is_on_target": is_on_target,
     }
