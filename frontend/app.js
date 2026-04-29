@@ -190,6 +190,12 @@ function buildHowtoExample(translations, lang) {
 
 
 async function addHint(state) {
+  if (state.knowsAllLinks) {
+    console.log("You already have all the links");
+    document.getElementById("hint-btn").classList.toggle("disabled-btn", state.knowsAllLinks);
+    return;
+  }
+
   await fetch(`/api/${state.lang}/new-target-neighbor`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
@@ -199,7 +205,7 @@ async function addHint(state) {
   .then(
     data => {
       if (data.title === null) {
-        console.log("No more hint");
+        state.knowsAllLinks = true;
         return;
       }
       state.knowledgeTarget.links.push(data.title);
@@ -218,7 +224,8 @@ async function main() {
     knowledgeTarget: {
       title: null,
       links: []
-    }
+    },
+    knowsAllLinks: false,
   };
 
 
@@ -270,12 +277,13 @@ async function main() {
 
   document.getElementById("guess-btn").addEventListener("click", () => handleGuessInput(state, tomSelect));
 
-  // Hint
+  // Hint button
   const hintBtn = document.getElementById("hint-btn");
   hintBtn.addEventListener("click", () => {
     addHint(state);
       hintBtn.blur();
   });
+  hintBtn.classList.toggle("disabled-btn", state.knowsAllLinks);
   
 
   // Cards visibility
@@ -285,7 +293,7 @@ async function main() {
     state.linksVisible = !state.linksVisible;
     state.guesses.forEach(g => g.visible = state.linksVisible);
     renderCards(state);
-    document.getElementById("toggle-links-btn").textContent = state.linksVisible ? translations.toggle_hide : translations.toggle_show;
+    toggleBtn.textContent = state.linksVisible ? translations.toggle_hide : translations.toggle_show;
     toggleBtn.blur();
   });
 
@@ -297,7 +305,6 @@ async function main() {
 
 
   // Win overlay
-
   document.getElementById("win-overlay").addEventListener("click", () => {
     document.getElementById("win-overlay").style.display = "none";
   });

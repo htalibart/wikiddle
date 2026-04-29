@@ -96,6 +96,17 @@ body {
   background-color: #bababa;
 }
 
+#hint-btn.disabled-btn {
+  background-color: #f0f0f0;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+#hint-btn.disabled-btn:hover,
+#hint-btn.disabled-btn:focus {
+  background-color: #f0f0f0;
+}
+
 .ts-wrapper,
 .ts-control,
 .ts-dropdown,
