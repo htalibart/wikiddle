@@ -208,7 +208,7 @@ async function addHint(state) {
         state.knowsAllLinks = true;
         return;
       }
-      state.knowledgeTarget.links.push(data.title);
+      updateKnownLinks(state, [data.title]);
     }
   )
 
