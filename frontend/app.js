@@ -271,7 +271,11 @@ async function main() {
   document.getElementById("guess-btn").addEventListener("click", () => handleGuessInput(state, tomSelect));
 
   // Hint
-  document.getElementById("hint-btn").addEventListener("click", () => addHint(state));
+  const hintBtn = document.getElementById("hint-btn");
+  hintBtn.addEventListener("click", () => {
+    addHint(state);
+      hintBtn.blur();
+  });
   
 
   // Cards visibility
