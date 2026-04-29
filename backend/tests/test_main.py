@@ -76,14 +76,14 @@ class TestCommonNeighbors:
         )
 
     def test_correct_guess(self, client):
-        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1, 2, 3}, {1, 2, 3})
+        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {1: "A", 2: "B", 3: "C"})
         with daily_patch, neighbors_patch, titles_patch:
             res = client.get("/api/en/common-neighbors?id=42")
         assert res.status_code == 200
         assert res.json()["is_target"] is True
 
     def test_wrong_guess(self, client):
-        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1, 2, 3}, {2, 3, 4})
+        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {2: "B", 3: "C", 4: "D"})
         with daily_patch, neighbors_patch, titles_patch:
             res = client.get("/api/en/common-neighbors?id=12")
         assert res.status_code == 200
@@ -92,7 +92,7 @@ class TestCommonNeighbors:
         assert len(data["common"]) == 2
 
     def test_no_common_neighbors(self, client):
-        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1, 2}, {3, 4})
+        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1: "A", 2: "B"}, {3: "C", 4: "D"})
         with daily_patch, neighbors_patch, titles_patch:
             res = client.get("/api/en/common-neighbors?id=200")
         assert res.status_code == 200
