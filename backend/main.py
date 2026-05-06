@@ -2,8 +2,9 @@ import os
 from pathlib import Path
 import duckdb
 from datetime import date
+import random
 
-from fastapi import FastAPI, HTTPException, Query, APIRouter, Request, Depends
+from fastapi import FastAPI, HTTPException, Query, APIRouter, Request, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -170,6 +171,20 @@ def search_articles(request: Request, con = Depends(get_con), query: str = Query
     [f"%{query}%", query, f"{query}%"]
     ).fetchall()
     return [{"id": row[0], "title": row[1]} for row in rows]
+
+
+@router.post("/{lang}/new-target-neighbor")
+@limiter.limit("300/minute")
+def get_one_new_neighbor(request: Request, lang: str = Depends(valid_lang), known_titles: list = Body(default=[])):
+    """ API route to get one random link target that was not already found """
+    target = get_daily_article_cached(lang)
+    neighbor_ids = get_neighbors(lang, target["id"])
+    neighbor_titles = set(get_article_titles(lang, neighbor_ids))
+    n_not_guessed = neighbor_titles.difference(set(known_titles))
+    if not n_not_guessed:
+        return {"title": None}
+    hint_title = random.choice(list(n_not_guessed))
+    return {"title": hint_title}
 
 app.include_router(router)
 #app.mount("/", StaticFiles(directory=str(MAIN_DIR / "frontend"), html=True), name="frontend")

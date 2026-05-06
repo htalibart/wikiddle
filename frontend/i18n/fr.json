@@ -2,6 +2,7 @@
   "toggle_show": "Voir les liens",
   "toggle_hide": "Masquer les liens",
   "guess": "Proposer",
+  "hint": "Indice",
   "input_placeholder": "Proposer un article...",
   "win_message":  "Vous avez trouvé l'article mystère !",
   "howto_btn": "Comment jouer ?",

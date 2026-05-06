@@ -81,6 +81,32 @@ body {
   background-color: #555555;
 }
 
+#hint-btn {
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  font-family: Georgia, serif;
+  background-color: #e3e3e3;
+  color: #333333;
+  border: none;
+  cursor: pointer;
+}
+
+#hint-btn:hover,
+#hint-btn:focus {
+  background-color: #bababa;
+}
+
+#hint-btn.disabled-btn {
+  background-color: #f0f0f0;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+#hint-btn.disabled-btn:hover,
+#hint-btn.disabled-btn:focus {
+  background-color: #f0f0f0;
+}
+
 .ts-wrapper,
 .ts-control,
 .ts-dropdown,
