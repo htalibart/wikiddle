@@ -52,9 +52,7 @@ function renderTargetCard(state) {
       </div>
       <div class="guess-card-links">${links.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
     `;
-  
-  card.querySelector(".guess-card-links").style.display = "block";
-  
+    
   return card;
 
 }
@@ -78,18 +76,6 @@ function renderGuessCard(state, guess) {
       </div>
       <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
     `;
-  
-  card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
-
-  // prevents click on Wikipedia page to propagate to visibility
-  card.querySelector(".guess-card-links").addEventListener("click", e => e.stopPropagation());
-  card.querySelector(".guess-card-title").addEventListener("click", e => e.stopPropagation());
-
-  // click on card -> change visibility
-  card.addEventListener("click", () => {
-    guess.visible = !guess.visible;
-    card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
-  });
 
   
   // guess is a link on target -> change color
@@ -176,7 +162,6 @@ async function handleGuessInput(state, tomSelect) {
         title: guessTitle,
         common: data.common,
         score: data.common.length,
-        visible: state.linksVisible,
         isTarget: data.is_target,
         isOnTarget: data.is_on_target,
       };
@@ -255,7 +240,6 @@ function buildHowtoExample(translations, lang) {
  * @property {string} title - article title
  * @property {string[]} common - common neighbors with the target
  * @property {number} score - number of common neighbors with the target
- * @property {boolean} visible - whether the links list is expanded
  * @property {boolean} isTarget - whether this guess is the target article
  * @property {boolean} isOnTarget - whether this guess is a link on the target article
  */
@@ -263,7 +247,6 @@ function buildHowtoExample(translations, lang) {
 /**
  * @typedef {Object} State
  * @property {string} lang - current active language
- * @property {boolean} linksVisible - whether link lists are expanded in the cards
  * @property {Guess[]} guesses - guesses made so far, sorted by decreasing score
  * @property {Object} knowledgeTarget - known information about the target article
  * @property {string|null} knowledgeTarget.title - target page once found, set to null before that
@@ -299,7 +282,6 @@ async function main() {
   
   const state = {
     lang: getLang(),
-    linksVisible: true,
     guesses: [],
     knowledgeTarget: {
       title: null,
@@ -365,24 +347,6 @@ async function main() {
   });
   hintBtn.classList.toggle("disabled-btn", state.knowsAllLinks);
   
-
-  // Cards visibility
-  const toggleBtn = document.getElementById("toggle-links-btn");
-
-  toggleBtn.addEventListener("click", () => {
-    state.linksVisible = !state.linksVisible;
-    state.guesses.forEach(g => g.visible = state.linksVisible);
-    renderCards(state);
-    toggleBtn.textContent = state.linksVisible ? translations.toggle_hide : translations.toggle_show;
-    toggleBtn.blur();
-  });
-
-  [translations.toggle_hide, translations.toggle_show].forEach(text => {
-    toggleBtn.textContent = text;
-    toggleBtn.style.minWidth = Math.max(toggleBtn.offsetWidth, parseInt(toggleBtn.style.minWidth) || 0) + "px";
-    });
-  toggleBtn.textContent = translations.toggle_hide;
-
 
   // Win overlay
   document.getElementById("win-overlay").addEventListener("click", () => {
