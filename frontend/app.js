@@ -275,7 +275,11 @@ function buildHowtoExample(translations, lang) {
   return card;
 }
 
-
+/**
+ * Fetches a new hint from the API and adds it to the known links, then re-renders the cards.
+ * Does nothing if the player already knows all the links.
+ * @param {State} state - current application state
+ */
 async function addHint(state) {
   if (state.knowsAllLinks) {
     console.log("You already have all the links");
