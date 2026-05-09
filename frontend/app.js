@@ -140,6 +140,28 @@ function updateKnownLinks(state, links) {
 }
 
 /**
+ * Shows an overlay when the target article changes mid-game
+ * 
+ */
+function showMidnightOverlay() {
+  return new Promise(resolve => {
+    document.getElementById("midnight-overlay").style.display = "flex";
+    document.getElementById("midnight-btn").addEventListener("click", () => {
+      resolve();
+    });
+  });
+}
+
+/**
+ * Handles the case when the target article changes mid-game
+ */
+async function handleDateChange() {
+  await showMidnightOverlay();
+  window.location.reload();
+}
+
+
+/**
  * Handles a guess proposed by the user.
  * Fetches common neighbors from the API, updates the state, re-renders the cards.
  * If the guess is the target, triggers the win popup.
@@ -157,6 +179,18 @@ async function handleGuessInput(state, tomSelect) {
   fetch(`${API_URL}/${state.lang}/common-neighbors?id=${guessId}`)
     .then(res => res.json())
     .then(data => {
+
+      // Check that the date is still the same as before the player started the game, otherwise reset the game
+      if (state.gameDate == null) {
+        state.gameDate = data.game_date;
+      }
+      else {
+        if (data.game_date != state.gameDate) {
+          handleDateChange();
+          return;
+        }
+      }
+
       const guess = {
         id: guessId,
         title: guessTitle,
@@ -233,25 +267,6 @@ function buildHowtoExample(translations, lang) {
 }
 
 
-
-/**
- * @typedef {Object} Guess
- * @property {string} id - article id
- * @property {string} title - article title
- * @property {string[]} common - common neighbors with the target
- * @property {number} score - number of common neighbors with the target
- * @property {boolean} isTarget - whether this guess is the target article
- * @property {boolean} isOnTarget - whether this guess is a link on the target article
- */
-
-/**
- * @typedef {Object} State
- * @property {string} lang - current active language
- * @property {Guess[]} guesses - guesses made so far, sorted by decreasing score
- * @property {Object} knowledgeTarget - known information about the target article
- * @property {string|null} knowledgeTarget.title - target page once found, set to null before that
- * @property {string[]} knowledgeTarget.links - links on the target page, revealed by guesses or hints
- */
 async function addHint(state) {
   if (state.knowsAllLinks) {
     console.log("You already have all the links");
@@ -278,6 +293,28 @@ async function addHint(state) {
   renderCards(state);
 }
 
+
+/**
+ * @typedef {Object} Guess
+ * @property {string} id - article id
+ * @property {string} title - article title
+ * @property {string[]} common - common neighbors with the target
+ * @property {number} score - number of common neighbors with the target
+ * @property {boolean} isTarget - whether this guess is the target article
+ * @property {boolean} isOnTarget - whether this guess is a link on the target article
+ */
+
+/**
+ * @typedef {Object} State
+ * @property {string} lang - current active language
+ * @property {Guess[]} guesses - guesses made so far, sorted by decreasing score
+ * @property {Object} knowledgeTarget - known information about the target article
+ * @property {string|null} knowledgeTarget.title - target page once found, set to null before that
+ * @property {string[]} knowledgeTarget.links - links on the target page, revealed by guesses or hints
+ * @property {boolean} knowsAllLinks - true if the player already has all the links, false otherwise
+ * @property {string} gameDate - date associated with the ongoing game
+ */
+
 async function main() {
   
   const state = {
@@ -288,8 +325,8 @@ async function main() {
       links: []
     },
     knowsAllLinks: false,
+    gameDate: null,
   };
-
 
   // Translations
   const translations = await loadTranslations(state.lang);
@@ -299,6 +336,9 @@ async function main() {
   document.getElementById("win-message").textContent = translations.win_message;
   document.getElementById("howto-btn").textContent = translations.howto_btn;
   document.getElementById("hint-btn").textContent = translations.hint;
+  document.getElementById("midnight-message").textContent = translations.midnight_message;
+  document.getElementById("midnight-btn").textContent = translations.midnight_btn;
+
 
   // How to play
   document.getElementById("howto-title").textContent = translations.howto_btn;
@@ -360,6 +400,8 @@ async function main() {
   if (e.key === "Escape") {
     document.getElementById("win-overlay").style.display = "none";
   }
+
+  
 });
 
 renderCards(state);

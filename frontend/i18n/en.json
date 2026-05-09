@@ -8,5 +8,8 @@
   "howto_text_after": "\nThe number <strong>6</strong> means Marie Curie and the mystery article have <strong>6 links in common</strong>.\n\nYour guesses are sorted from most to least common links: the higher a guess is in the list, the closer it is to the mystery article.",
   "howto_example_title": "Marie Curie",
   "howto_example_score": 6,
-  "howto_example_links": ["France", "Poland", "Nobel Prize in Physics", "University of Paris", "World War I", "Radioactivity"]
+  "howto_example_links": ["France", "Poland", "Nobel Prize in Physics", "University of Paris", "World War I", "Radioactivity"],
+  "midnight_message": "Midnight has passed and the daily mystery article has changed. Unfortunately your current game can't continue. Ready for today's article?",
+  "midnight_btn": "Let's go!"
+
 }

@@ -66,44 +66,42 @@ body {
   border-color: #333333;
 }
 
-#guess-btn {
+.btn {
   padding: 0.375rem 1rem;
   font-size: 0.875rem;
   font-family: Georgia, serif;
-  background-color: #333333;
-  color: #ffffff;
   border: none;
   cursor: pointer;
 }
 
-#guess-btn:hover,
-#guess-btn:focus {
+.btn-primary {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
   background-color: #555555;
 }
 
-#hint-btn {
-  padding: 0.375rem 1rem;
-  font-size: 0.875rem;
-  font-family: Georgia, serif;
+.btn-secondary {
   background-color: #e3e3e3;
   color: #333333;
-  border: none;
-  cursor: pointer;
 }
 
-#hint-btn:hover,
-#hint-btn:focus {
+.btn-secondary:hover,
+.btn-secondary:focus {
   background-color: #bababa;
 }
 
-#hint-btn.disabled-btn {
+.btn-secondary.disabled-btn {
   background-color: #f0f0f0;
   color: #999999;
   cursor: not-allowed;
 }
 
-#hint-btn.disabled-btn:hover,
-#hint-btn.disabled-btn:focus {
+.btn-secondary.disabled-btn:hover,
+.btn-secondary.disabled-btn:focus {
   background-color: #f0f0f0;
 }
 
@@ -179,40 +177,62 @@ body {
 
 .target-guess-card {
   border: 2px solid #333333;
-  /* background-color: #f0f0f0; */
 }
 
 .guess-card-title-on-target a {
   color: #000080;
 }
 
-
-#win-overlay {
+.overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0,0,0,0.5);
-  display: flex;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
   align-items: center;
   justify-content: center;
+  z-index: 100;
 }
 
-#win-box {
+.overlay-box {
   background-color: #ffffff;
   padding: 2rem 3rem;
-  text-align: center;
-  font-size: 1.5rem;
   position: relative;
   max-width: calc(100% - 2rem);
   word-break: break-word;
 }
 
-#win-close-btn {
+.overlay-close-btn {
   position: absolute;
   top: 0.75rem;
   right: 1rem;
   font-size: 1.25rem;
   cursor: pointer;
   color: #333333;
+}
+
+#win-box {
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+#howto-example {
+  border-top: 1px solid #dddddd;
+  padding-top: 1rem;
+}
+
+#howto-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  font-size: 0.7rem;
+  color: #666666;
+  padding: 0;
+  text-decoration: none;
+}
+
+#howto-btn:hover {
+  font-weight: bold;
 }
 
 #lang-switcher {
@@ -237,53 +257,6 @@ body {
   text-decoration: underline;
 }
 
-#howto-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-#howto-box {
-  background-color: #ffffff;
-  padding: 2rem 3rem;
-  position: relative;
-  max-width: calc(100% - 2rem);
-  word-break: break-word;
-}
-
-#howto-close-btn {
-  position: absolute;
-  top: 0.75rem;
-  right: 1rem;
-  font-size: 1.25rem;
-  cursor: pointer;
-  color: #333333;
-}
-
-#howto-example {
-  border-top: 1px solid #dddddd;
-  padding-top: 1rem;
-}
-
-#howto-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: Georgia, serif;
-  font-size: 0.7rem;
-  color: #666666;
-  padding: 0;
-  text-decoration: none;
-}
-
-#howto-btn:hover {
-  font-weight: bold;
-}
-
 @media (max-width: 600px) {
   #title-area {
     width: 100%;
@@ -301,15 +274,13 @@ body {
     flex: 1;
   }
 
-  #win-box {
+  .overlay-box {
     padding: 2rem 1.5rem;
     margin: 1rem;
   }
 
   #howto-box {
-    padding: 2rem 1.5rem;
-    margin: 1rem;
     max-height: 85vh;
     overflow-y: auto;
-}
+  }
 }

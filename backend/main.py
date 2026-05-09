@@ -59,7 +59,7 @@ def get_con(lang: str = Depends(valid_lang)):
     finally:
         con.close()
 
-def get_daily_article_cached(lang: str):
+def get_daily_article_cached(lang: str) -> dict:
     """ returns today's daily article for the given language, refreshes the cache if needed """
     today = date.today()
     if _cached_daily_targets[lang]["date"] != today:
@@ -151,6 +151,7 @@ def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid
         "common": [n1[nid] for nid in common],
         "is_target": is_target,
         "is_on_target": is_on_target,
+        "game_date": article["date"].isoformat()
     }
 
 

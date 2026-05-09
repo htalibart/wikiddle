@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +8,6 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
 </head>
-
 <body>
   <div id="top-panel">
     <div id="title-area">
@@ -22,29 +20,39 @@
     </div>
     <div id="input-area">
       <input type="text" id="guess-input" placeholder="" />
-      <button id="guess-btn"></button>
-      <button id="hint-btn"></button>
+      <button id="guess-btn" class="btn btn-primary"></button>
+      <button id="hint-btn" class="btn btn-secondary"></button>
     </div>
   </div>
+
   <div id="guesses-panel">
-    <div id="guesses-list">
-    </div>
+    <div id="guesses-list"></div>
   </div>
-  <div id="win-overlay" style="display:none">
-    <div id="win-box">
-      <span id="win-close-btn">×</span>
+
+  <div id="win-overlay" class="overlay">
+    <div id="win-box" class="overlay-box">
+      <span id="win-close-btn" class="overlay-close-btn">×</span>
       <p id="win-message"></p>
     </div>
   </div>
-  <div id="howto-overlay" style="display:none">
-    <div id="howto-box">
-      <span id="howto-close-btn">×</span>
+
+  <div id="howto-overlay" class="overlay">
+    <div id="howto-box" class="overlay-box">
+      <span id="howto-close-btn" class="overlay-close-btn">×</span>
       <h2 id="howto-title"></h2>
       <p id="howto-text-before"></p>
       <div id="howto-example"></div>
       <p id="howto-text-after"></p>
     </div>
   </div>
+
+  <div id="midnight-overlay" class="overlay">
+    <div id="midnight-box" class="overlay-box">
+      <p id="midnight-message"></p>
+      <button id="midnight-btn" class="btn btn-primary"></button>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
   <script src="app.js"></script>

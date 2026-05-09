@@ -8,5 +8,7 @@
   "howto_text_after": "\nLe nombre <strong>6</strong> signifie que Marie Curie et l'article mystère ont <strong>6 liens en commun</strong>. \n\nVos propositions sont classées du plus grand au plus petit nombre de liens en commun : plus une proposition est haute dans la liste, plus elle est proche de l'article mystère.",
   "howto_example_title": "Marie Curie",
   "howto_example_score": 6,
-  "howto_example_links": ["France", "Pologne", "Prix Nobel de physique", "Université de Paris", "Première Guerre mondiale", "Radioactivité"]
+  "howto_example_links": ["France", "Pologne", "Prix Nobel de physique", "Université de Paris", "Première Guerre mondiale", "Radioactivité"],
+  "midnight_message": "Minuit est passé et l'article mystère du jour a changé. Malheureusement, votre partie en cours ne peut plus continuer. On relève le défi avec l'article d'aujourd'hui ?",
+  "midnight_btn": "C'est parti !"
 }
