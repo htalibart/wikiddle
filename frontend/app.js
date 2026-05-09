@@ -160,6 +160,14 @@ async function handleDateChange() {
   window.location.reload();
 }
 
+/**
+ * Saves the current state to localStorage
+ * (stores one state per language)
+ * @param {State} state - current application state
+ */
+function saveState(state) {
+  localStorage.setItem(`game-state-${state.lang}`, JSON.stringify(state));
+}
 
 /**
  * Handles a guess proposed by the user.
@@ -215,6 +223,7 @@ async function handleGuessInput(state, tomSelect) {
       }
 
       renderCards(state);
+      saveState(state);
     });
   }
 
@@ -291,6 +300,7 @@ async function addHint(state) {
   )
 
   renderCards(state);
+  saveState(state);
 }
 
 
@@ -315,9 +325,13 @@ async function addHint(state) {
  * @property {string} gameDate - date associated with the ongoing game
  */
 
-async function main() {
-  
-  const state = {
+
+/**
+ * Creates an empty state for a new game
+ * @returns {State} a new state object
+ */
+function createState() {
+  return {
     lang: getLang(),
     guesses: [],
     knowledgeTarget: {
@@ -327,6 +341,39 @@ async function main() {
     knowsAllLinks: false,
     gameDate: null,
   };
+}
+
+
+/**
+ * Loads the saved state from localStorage if it exists and is still valid for today's game,
+ * otherwise creates an empty state.
+ * @returns {Promise<State>} the restored or newly created state
+ */
+async function loadOrCreateState() {
+
+  const lang = getLang();
+
+  const savedState = localStorage.getItem(`game-state-${lang}`);
+
+  if (savedState == null) {
+    return createState();
+  }
+
+  const state = JSON.parse(savedState);
+
+  const res = await fetch(`${API_URL}/${state.lang}/game-date`);
+  const { date } = await res.json();
+  if (state.gameDate != date) {
+    return createState();
+  }
+  
+  return state;
+}
+
+
+async function main() {
+  
+  const state = await loadOrCreateState();
 
   // Translations
   const translations = await loadTranslations(state.lang);

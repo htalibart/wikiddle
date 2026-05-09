@@ -187,5 +187,13 @@ def get_one_new_neighbor(request: Request, lang: str = Depends(valid_lang), know
     hint_title = random.choice(list(n_not_guessed))
     return {"title": hint_title}
 
+
+@router.get("/{lang}/game-date")
+@limiter.limit("10/minute")
+def get_game_date(request: Request, lang: str = Depends(valid_lang)):
+    """ API route to get the date of the current cached game """
+    article = get_daily_article_cached(lang)
+    return {"date": article["date"].isoformat()}
+
 app.include_router(router)
 #app.mount("/", StaticFiles(directory=str(MAIN_DIR / "frontend"), html=True), name="frontend")
