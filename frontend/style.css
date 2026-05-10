@@ -247,6 +247,14 @@ body {
   gap: 0.5rem;
 }
 
+.on-target {
+  color: var(--on-target-color);
+}
+
+.no-pointer-events {
+  pointer-events: none;
+}
+
 #lang-switcher a {
   color: var(--main-light-color);
   text-decoration: none;

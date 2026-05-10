@@ -67,12 +67,13 @@ function renderGuessCard(state, guess) {
   card.classList.add("guess-card");
 
   card.innerHTML = `
-      <div class="guess-card-header">
-        <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a></div>
-        <div class="guess-card-score" style="color: ${scoreToColor(guess.score)}">${guess.score}</div>
-      </div>
-      <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
-    `;
+    <div class="guess-card-header">
+      <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a></div>
+      <div class="guess-card-score">${guess.score}</div>
+    </div>
+    <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
+  `;
+  card.querySelector(".guess-card-score").style.color = scoreToColor(guess.score);
 
   
   // guess is a link on target -> change color
@@ -261,14 +262,15 @@ function buildHowtoExample(translations, lang) {
       <div class="guess-card-title">
         <a href="${titleToUrl(translations.howto_example_title, lang)}" target="_blank">${translations.howto_example_title}</a>
       </div>
-      <div class="guess-card-score" style="color: ${scoreToColor(translations.howto_example_score)}">
+      <div class="guess-card-score">
         ${translations.howto_example_score}
       </div>
     </div>
-    <div class="guess-card-links" style="display:block">
+    <div class="guess-card-links">
       ${translations.howto_example_links.map(title => `<a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>`).join(" · ")}
     </div>
   `;
+  card.querySelector(".guess-card-score").style.color = scoreToColor(translations.howto_example_score);
   return card;
 }
 
