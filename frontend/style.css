@@ -1,5 +1,10 @@
 html {
   font-size: clamp(18px, 5vw, 30px);
+  --on-target-color: #000080;
+  --main-dark-color: #333333;
+  --main-medium-color: #666666;
+  --main-light-color: #999999;
+  --almost-white: #dddddd;
 }
 
 * {
@@ -14,7 +19,7 @@ body {
   height: 100vh;
   font-family: Georgia, serif;
   background-color: #f9f9f9;
-  color: #333333;
+  color: var(--main-dark-color);
 }
 
 #top-panel {
@@ -24,7 +29,7 @@ body {
   gap: 1rem;
   padding: 1rem 1.5rem;
   background-color: #ffffff;
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid var(--almost-white);
 }
 
 #top-panel h1 {
@@ -58,12 +63,12 @@ body {
   font-family: Georgia, serif;
   border: 1px solid #cccccc;
   background-color: #ffffff;
-  color: #333333;
+  color: var(--main-dark-color);
   outline: none;
 }
 
 #guess-input:focus {
-  border-color: #333333;
+  border-color: var(--main-dark-color);
 }
 
 .btn {
@@ -75,18 +80,18 @@ body {
 }
 
 .btn-primary {
-  background-color: #333333;
+  background-color: var(--main-dark-color);
   color: #ffffff;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background-color: #555555;
+  background-color: var(--main-medium-color);
 }
 
 .btn-secondary {
   background-color: #e3e3e3;
-  color: #333333;
+  color: var(--main-dark-color);
 }
 
 .btn-secondary:hover,
@@ -96,7 +101,7 @@ body {
 
 .btn-secondary.disabled-btn {
   background-color: #f0f0f0;
-  color: #999999;
+  color: var(--main-light-color);
   cursor: not-allowed;
 }
 
@@ -136,7 +141,7 @@ body {
 
 .guess-card {
   background-color: #ffffff;
-  border: 1px solid #dddddd;
+  border: 1px solid var(--almost-white);
   padding: 0.75rem 1rem;
 }
 
@@ -151,7 +156,7 @@ body {
 }
 
 .guess-card-title a {
-  color: #333333;
+  color: var(--main-dark-color);
   text-decoration: none;
 }
 
@@ -165,22 +170,22 @@ body {
 
 .guess-card-links a {
   font-size: 0.75rem;
-  color: #666666;
+  color: var(--main-medium-color);
   text-decoration: none;
 }
 
 .guess-card-links a:hover {
   font-size: 0.75rem;
-  color: #333333;
+  color: var(--main-dark-color);
   text-decoration: none;
 }
 
 .target-guess-card {
-  border: 2px solid #333333;
+  border: 2px solid var(--main-dark-color);
 }
 
 .guess-card-title-on-target a {
-  color: #000080;
+  color: var(--on-target-color);
 }
 
 .overlay {
@@ -207,7 +212,7 @@ body {
   right: 1rem;
   font-size: 1.25rem;
   cursor: pointer;
-  color: #333333;
+  color: var(--main-dark-color);
 }
 
 #win-box {
@@ -216,7 +221,7 @@ body {
 }
 
 #howto-example {
-  border-top: 1px solid #dddddd;
+  border-top: 1px solid var(--almost-white);
   padding-top: 1rem;
 }
 
@@ -226,7 +231,7 @@ body {
   cursor: pointer;
   font-family: Georgia, serif;
   font-size: 0.7rem;
-  color: #666666;
+  color: var(--main-medium-color);
   padding: 0;
   text-decoration: none;
 }
@@ -243,17 +248,17 @@ body {
 }
 
 #lang-switcher a {
-  color: #999999;
+  color: var(--main-light-color);
   text-decoration: none;
 }
 
 #lang-switcher a:hover {
-  color: #999999;
+  color: var(--main-light-color),
   text-decoration: underline;
 }
 
 #lang-switcher a.active {
-  color: #999999;
+  color: var(--main-light-color);
   text-decoration: underline;
 }
 
