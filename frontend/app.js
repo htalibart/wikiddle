@@ -383,6 +383,7 @@ async function main() {
   document.querySelector(`#lang-switcher a[href="/${state.lang}"]`).classList.add("active");
   document.getElementById("guess-btn").textContent = translations.guess;
   document.getElementById("guess-input").placeholder = translations.input_placeholder;
+  document.getElementById("guess-input-label").textContent = translations.input_placeholder;
   document.getElementById("win-message").textContent = translations.win_message;
   document.getElementById("howto-btn").textContent = translations.howto_btn;
   document.getElementById("hint-btn").textContent = translations.hint;
