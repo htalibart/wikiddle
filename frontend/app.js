@@ -287,7 +287,7 @@ async function addHint(state) {
     return;
   }
 
-  await fetch(`/api/${state.lang}/new-target-neighbor`, {
+  await fetch(`/${API_URL}/${state.lang}/new-target-neighbor`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(state.knowledgeTarget.links)
