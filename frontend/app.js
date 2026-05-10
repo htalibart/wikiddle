@@ -393,8 +393,8 @@ async function main() {
 
   // How to play
   document.getElementById("howto-title").textContent = translations.howto_btn;
-  document.getElementById("howto-text-before").innerHTML = translations.howto_text_before.replaceAll("\n\n", "<br><br>");
-  document.getElementById("howto-text-after").innerHTML = translations.howto_text_after.replaceAll("\n\n", "<br><br>");
+  document.getElementById("howto-text-before").innerHTML = translations.howto_text_before;
+  document.getElementById("howto-text-after").innerHTML = translations.howto_text_after;
   document.getElementById("howto-example").appendChild(buildHowtoExample(translations, state.lang));
 
   const howtoBtn = document.getElementById("howto-btn");
