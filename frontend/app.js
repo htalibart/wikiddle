@@ -81,19 +81,31 @@ function renderGuessCard(state, guess) {
     card.querySelector(".guess-card-title").classList.add("guess-card-title-on-target");
   }
 
+  // guess is latest guess -> change style
+  if (guess.id == state.lastGuess?.id) {
+    card.classList.add("last-guess-card")
+  }
+
   return card;
 }
 
 
 /**
- * Renders all article cards (target and guesses)
+ * Renders all article cards (target, latest guess all other guesses)
  * @param {State} state - current application state 
  */
 function renderCards(state) {
   const list = document.getElementById("guesses-list");
   list.innerHTML = "";
 
-  // target card on top
+  // last guess card on top (if any)
+  if (state.lastGuess != null) {
+    console.log(state.lastGuess);
+    const lastGuessCard = renderGuessCard(state, state.lastGuess);
+    list.appendChild(lastGuessCard);
+  }
+
+  // target card right below
   const targetCard = renderTargetCard(state);
   list.appendChild(targetCard);
 
@@ -216,8 +228,11 @@ async function handleGuessInput(state, tomSelect) {
         confetti();
         document.getElementById("win-overlay").style.display = "flex";
       }
-      else {
-        insertSorted(guess, state);
+      else { // update last guess, sort the rest of the cards
+        if (state.lastGuess != null) {
+          insertSorted(state.lastGuess, state);
+        }
+        state.lastGuess = guess;
       }
 
       renderCards(state);
@@ -326,6 +341,7 @@ async function addHint(state) {
  * @property {string[]} knowledgeTarget.links - links on the target page, revealed by guesses or hints
  * @property {boolean} knowsAllLinks - true if the player already has all the links, false otherwise
  * @property {string} gameDate - date associated with the ongoing game
+ * @property {Guess} lastGuess - last guess proposed by the player
  */
 
 
@@ -343,6 +359,7 @@ function createState() {
     },
     knowsAllLinks: false,
     gameDate: null,
+    lastGuess: null,
   };
 }
 

@@ -184,6 +184,10 @@ body {
   border: 2px solid var(--main-dark-color);
 }
 
+.last-guess-card {
+  background-color: #efefef;
+}
+
 .guess-card-title-on-target a {
   color: var(--on-target-color);
 }
