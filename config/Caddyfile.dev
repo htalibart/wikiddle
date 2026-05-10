@@ -1,5 +1,5 @@
 :8080 {
-	header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net"
+	header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; form-action 'self'; frame-ancestors 'none'"
     handle /api/* {
         reverse_proxy localhost:8000
     }
