@@ -31,6 +31,18 @@ caddy run --config config/Caddyfile.dev
 ```
 The site will be available at `http://localhost:8080`.
 
+## Updating External Dependencies
+
+External scripts and stylesheets are loaded from jsdelivr with [Subresource Integrity (SRI)](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) hashes to prevent tampering.
+
+To update a dependency:
+1. Find the latest version:
+```bash
+   curl https://cdn.jsdelivr.net/npm/${package}/package.json | grep '"version"'
+```
+2. For each file of the package loaded in `frontend/index.html`, replace the version number in the URL with the new one (e.g. `tom-select@2.5.0` -> `tom-select@2.6.0`)
+3. Paste each updated URL into https://srihash.org and copy the generated `integrity` attribute back into `frontend/index.html`
+
 ## Tests
 Run from the root of the project:
 ```bash
