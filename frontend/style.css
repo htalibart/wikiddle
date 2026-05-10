@@ -256,17 +256,17 @@ body {
 }
 
 #lang-switcher a {
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   text-decoration: none;
 }
 
 #lang-switcher a:hover {
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   text-decoration: underline;
 }
 
 #lang-switcher a.active {
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   text-decoration: underline;
 }
 
