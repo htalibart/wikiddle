@@ -253,7 +253,7 @@ body {
 }
 
 #lang-switcher a:hover {
-  color: var(--main-light-color),
+  color: var(--main-light-color);
   text-decoration: underline;
 }
 
