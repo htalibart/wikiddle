@@ -1,9 +1,29 @@
 :8080 {
-	header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:"
-	header X-Content-Type-Options "nosniff"
+    # Restrict sources for scripts, styles, etc. to same origin and jsdelivr CDN
+    header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:"
+    # Prevent MIME type sniffing
+    header X-Content-Type-Options "nosniff"
+
+    # API — proxied to FastAPI
     handle /api/* {
         reverse_proxy localhost:8000
     }
+
+    # index.html — entry point, never cache
+    handle /index.html {
+        header Cache-Control "no-cache"
+        root * frontend
+        file_server
+    }
+
+    # Translation files — always revalidate with server
+    handle /i18n/* {
+        header Cache-Control "no-cache"
+        root * frontend
+        file_server
+    }
+
+    # Everything else — static files (JS, CSS, images)
     handle {
         root * frontend
         try_files {path} /index.html

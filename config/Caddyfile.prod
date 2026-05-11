@@ -1,22 +1,64 @@
 wikiddle.com {
     tls /etc/caddy/wikiddle.pem /etc/caddy/wikiddle.key
-	header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:"
-	header X-Content-Type-Options "nosniff"
+
+    # Restrict sources for scripts, styles, etc. to same origin and jsdelivr CDN
+    header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:"
+    # Prevent MIME type sniffing
+    header X-Content-Type-Options "nosniff"
+
+    # API — proxied to FastAPI
     handle /api/* {
         reverse_proxy localhost:8000
     }
+
+    # index.html — entry point, never cache so users always get the latest version after a deployment
+    handle /index.html {
+        header Cache-Control "no-cache"
+        root * /var/www/wikiddle/frontend
+        file_server
+    }
+
+    # Translation files — always revalidate with server so users always get the latest translations
+    handle /i18n/* {
+        header Cache-Control "no-cache"
+        root * /var/www/wikiddle/frontend
+        file_server
+    }
+
+    # Everything else — static files (JS, CSS, images) served with default caching
     handle {
         root * /var/www/wikiddle/frontend
         try_files {path} /index.html
         file_server
     }
 }
+
 :80 {
-	header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:"
-	header X-Content-Type-Options "nosniff"
+    # Restrict sources for scripts, styles, etc. to same origin and jsdelivr CDN
+    header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:"
+    # Prevent MIME type sniffing
+    header X-Content-Type-Options "nosniff"
+
+    # API — proxied to FastAPI
     handle /api/* {
         reverse_proxy localhost:8000
     }
+
+    # index.html — entry point, never cache so users always get the latest version after a deployment
+    handle /index.html {
+        header Cache-Control "no-cache"
+        root * /var/www/wikiddle/frontend
+        file_server
+    }
+
+    # Translation files — always revalidate with server so users always get the latest translations
+    handle /i18n/* {
+        header Cache-Control "no-cache"
+        root * /var/www/wikiddle/frontend
+        file_server
+    }
+
+    # Everything else — static files (JS, CSS, images) served with default caching
     handle {
         root * /var/www/wikiddle/frontend
         try_files {path} /index.html
