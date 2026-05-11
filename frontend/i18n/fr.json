@@ -1,4 +1,5 @@
 {
+  "title": "Wikiddle - Devine l'article Wikipedia du jour",
   "guess": "Proposer",
   "hint": "Indice",
   "input_placeholder": "Proposer un article...",

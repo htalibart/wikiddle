@@ -397,6 +397,7 @@ async function main() {
 
   // Translations
   const translations = await loadTranslations(state.lang);
+  document.title = translations.title;
   document.querySelector(`#lang-switcher a[href="/${state.lang}"]`).classList.add("active");
   document.getElementById("guess-btn").textContent = translations.guess;
   document.getElementById("guess-input").placeholder = translations.input_placeholder;
