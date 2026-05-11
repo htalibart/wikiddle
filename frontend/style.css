@@ -169,17 +169,22 @@ body {
 }
 
 .guess-card-links {
-  display: block;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
 }
 
 .guess-card-links a {
-  font-size: 0.75rem;
-  color: var(--main-medium-color);
+  font-size: 0.65rem;
+  background: #f0f0f0;
+  color: #555555;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
   text-decoration: none;
 }
 
 .guess-card-links a:hover {
-  font-size: 0.75rem;
+  background: #e0e0e0;
   color: var(--main-dark-color);
   text-decoration: none;
 }

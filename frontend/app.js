@@ -47,7 +47,7 @@ function renderTargetCard(state) {
         ${titleHTML}
         <div class="guess-card-score""></div>
       </div>
-      <div class="guess-card-links">${links.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
+      <div class="guess-card-links">${links.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>
     `;
     
   return card;
@@ -71,7 +71,7 @@ function renderGuessCard(state, guess) {
       <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a></div>
       <div class="guess-card-score">${guess.score}</div>
     </div>
-    <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" · ")}</div>
+    <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>
   `;
   card.querySelector(".guess-card-score").style.color = scoreToColor(guess.score);
 
