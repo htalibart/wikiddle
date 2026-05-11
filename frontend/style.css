@@ -190,11 +190,32 @@ body {
 }
 
 .target-guess-card {
-  border: 2px solid var(--main-dark-color);
+  background-color: #ffffff;
+  border: 2px solid #333333;
+}
+
+.target-guess-card .guess-card-header * {
+  color: #333333;
+}
+
+.target-guess-card .guess-card-links a {
+  background: #f0f0f0;
+  color: #555555;
+}
+
+.target-guess-card .guess-card-links a:hover {
+  background: #e0e0e0;
+  color: #333333;
 }
 
 .last-guess-card {
-  background-color: #efefef;
+  background-color: #ffffff;
+  border-left: 3px solid #534AB7;
+}
+
+.last-guess-card .guess-card-links a {
+  background: #f0f0f0;
+  color: #555555;
 }
 
 .guess-card-title-on-target a {
