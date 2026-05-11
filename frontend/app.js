@@ -104,7 +104,6 @@ function renderCards(state, translations) {
 
   // last guess card on top (if any)
   if (state.lastGuess != null) {
-    console.log(state.lastGuess);
     const lastGuessCard = renderGuessCard(state, state.lastGuess);
     list.appendChild(lastGuessCard);
   }
