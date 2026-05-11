@@ -1,6 +1,7 @@
 html {
   font-size: clamp(18px, 5vw, 30px);
   --wikipedia-blue: #0C57A8;
+  --dark-wikipedia-blue: #0a4a8f;
   --main-dark-color: #333333;
   --main-medium-color: #666666;
   --main-light-color: #999999;
@@ -83,13 +84,13 @@ body {
 }
 
 .btn-primary {
-  background-color: var(--main-dark-color);
+  background-color: var(--wikipedia-blue);
   color: #ffffff;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background-color: var(--main-medium-color);
+  background-color: var(--dark-wikipedia-blue);
 }
 
 .btn-secondary {
