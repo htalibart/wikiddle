@@ -27,7 +27,7 @@ function makeScoreColorFn(targetHex, maxScore = 20) {
   }
 }
 
-const scoreToColor = makeScoreColorFn("#3d5a80");
+const scoreToColor = makeScoreColorFn("#0C57A8");
 
 /**
  * Returns the URL of a Wikipedia page given its title

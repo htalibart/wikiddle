@@ -1,11 +1,10 @@
 html {
   font-size: clamp(18px, 5vw, 30px);
-  --on-target-color: #3d5a80;
+  --wikipedia-blue: #0C57A8;
   --main-dark-color: #333333;
   --main-medium-color: #666666;
   --main-light-color: #999999;
   --almost-white: #dddddd;
-  --last-guess-color: #3d5a80;
   --border-radius: 0.375em;
 }
 
@@ -224,7 +223,7 @@ body {
 
 .last-guess-card {
   background-color: #ffffff;
-  border-left: 3px solid var(--last-guess-color);
+  border-left: 3px solid var(--wikipedia-blue);
 }
 
 .last-guess-card .guess-card-links a {
@@ -233,7 +232,7 @@ body {
 }
 
 .guess-card-title-on-target a {
-  color: var(--on-target-color);
+  color: var(--wikipedia-blue);
 }
 
 .overlay {
@@ -291,7 +290,7 @@ body {
 
 
 .on-target {
-  color: var(--on-target-color);
+  color: var(--wikipedia-blue);
 }
 
 .no-pointer-events {
