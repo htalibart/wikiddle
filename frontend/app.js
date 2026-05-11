@@ -2,16 +2,18 @@ const API_URL = "/api";
 const LANGUAGES = ["en", "fr"];
 
 /**
- * Returns a color between blue (cold) and red (hot) for a score
+ * Returns a color between gray and blue for a score
  * @param {number} score - score to color
- * @param {number} [maxScore=20] - score that maps to red
+ * @param {number} [maxScore=20] - score that maps to max
  * @returns {string} CSS color string, e.g. "rgb(255, 0, 0)"
  */
 function scoreToColor(score, maxScore = 20) {
-  const normalized = score / maxScore;
-  const r = Math.round(normalized * 255);
-  const b = Math.round((1 - normalized) * 255);
-  return `rgb(${r}, 0, ${b})`;
+  if (score <= 3) return "#888780";
+  const normalized = (score - 3) / (maxScore - 3);
+  const r = Math.round((1 - normalized) * 200);
+  const g = Math.round((1 - normalized) * 200);
+  const b = Math.round(128 + (1 - normalized) * (200 - 128));
+  return `rgb(${r}, ${g}, ${b})`;
 }
 
 /**
