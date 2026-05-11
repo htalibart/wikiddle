@@ -249,12 +249,6 @@ body {
   font-weight: bold;
 }
 
-#lang-switcher {
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
-  display: flex;
-  gap: 0.5rem;
-}
 
 .on-target {
   color: var(--on-target-color);
@@ -264,19 +258,37 @@ body {
   pointer-events: none;
 }
 
+#lang-switcher {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  gap: 0;
+  border: 1px solid var(--almost-white);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
 #lang-switcher a {
+  padding: 0.1rem 0.4rem;
   color: var(--main-medium-color);
   text-decoration: none;
 }
 
-#lang-switcher a:hover {
-  color: var(--main-medium-color);
-  text-decoration: underline;
+#lang-switcher a:hover:not(.active) {
+  background-color: var(--almost-white);
+  color: var(--main-dark-color);
+  text-decoration: none;
 }
 
 #lang-switcher a.active {
-  color: var(--main-medium-color);
-  text-decoration: underline;
+  background-color: var(--almost-white);
+  color: var(--main-dark-color);
+  text-decoration: none;
+}
+
+#lang-switcher a:focus-visible {
+  outline: 2px solid var(--main-dark-color);
+  outline-offset: -2px;
 }
 
 .visually-hidden {
