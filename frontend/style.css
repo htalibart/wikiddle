@@ -5,6 +5,7 @@ html {
   --main-medium-color: #666666;
   --main-light-color: #999999;
   --almost-white: #dddddd;
+  --border-radius: 0.375em;
 }
 
 * {
@@ -65,6 +66,7 @@ body {
   background-color: #ffffff;
   color: var(--main-dark-color);
   outline: none;
+  border-radius: var(--border-radius);
 }
 
 #guess-input:focus {
@@ -77,6 +79,7 @@ body {
   font-family: Georgia, serif;
   border: none;
   cursor: pointer;
+  border-radius: var(--border-radius);
 }
 
 .btn-primary {
@@ -143,6 +146,7 @@ body {
   background-color: #ffffff;
   border: 1px solid var(--almost-white);
   padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
 }
 
 .guess-card-header {
@@ -208,6 +212,7 @@ body {
   position: relative;
   max-width: calc(100% - 2rem);
   word-break: break-word;
+  border-radius: var(--border-radius);
 }
 
 .overlay-close-btn {
