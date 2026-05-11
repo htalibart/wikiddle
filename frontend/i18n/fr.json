@@ -1,5 +1,6 @@
 {
   "title": "Wikiddle - Devine l'article Wikipedia du jour",
+  "description": "Chaque jour, un nouvel article Wikipedia mystère à trouver. Faites des propositions, suivez les liens, perdez-vous dans Wikipedia et trouvez la réponse.",
   "guess": "Proposer",
   "hint": "Indice",
   "input_placeholder": "Proposer un article...",

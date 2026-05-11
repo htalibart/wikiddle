@@ -1,5 +1,6 @@
 {
   "title": "Wikiddle - Daily Wikipedia Puzzle: Follow the Links, Find the Article",
+  "description": "Every day, a new mystery Wikipedia article to find. Make guesses, follow the shared links, fall down the Wikipedia rabbit hole, and track down the answer.",
   "guess": "Guess",
   "hint": "Hint",
   "input_placeholder": "Guess an article...",
