@@ -282,7 +282,7 @@ function buildHowtoExample(translations, lang) {
       </div>
     </div>
     <div class="guess-card-links">
-      ${translations.howto_example_links.map(title => `<a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>`).join(" · ")}
+      ${translations.howto_example_links.map(title => `<a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>`).join(" ")}
     </div>
   `;
   card.querySelector(".guess-card-score").style.color = scoreToColor(translations.howto_example_score);
