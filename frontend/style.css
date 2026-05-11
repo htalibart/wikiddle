@@ -208,6 +208,19 @@ body {
   color: #333333;
 }
 
+.target-label {
+  font-size: 0.7rem;
+  color: #999999;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.target-placeholder {
+  font-size: 0.75rem;
+  color: #999999;
+  font-style: italic;
+}
+
 .last-guess-card {
   background-color: #ffffff;
   border-left: 3px solid #534AB7;

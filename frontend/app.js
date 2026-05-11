@@ -29,7 +29,7 @@ function titleToUrl(title, lang) {
  * @param {State} state - current application state
  * @returns {HTMLElement} the target article card
  */
-function renderTargetCard(state) {
+function renderTargetCard(state, translations) {
 
   const card = document.createElement("div");
   card.classList.add("guess-card");
@@ -42,12 +42,16 @@ function renderTargetCard(state) {
 
   const links = state.knowledgeTarget.links;
 
+  const linksHTML = links.length > 0
+    ? links.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")
+    : `<span class="target-placeholder">${translations.target_placeholder}</span>`;
+
   card.innerHTML = `
       <div class="guess-card-header">
         ${titleHTML}
-        <div class="guess-card-score""></div>
+        <div class="target-label">${translations.target_label}</div>
       </div>
-      <div class="guess-card-links">${links.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>
+      <div class="guess-card-links">${linksHTML}</div>
     `;
     
   return card;
@@ -94,7 +98,7 @@ function renderGuessCard(state, guess) {
  * Renders all article cards (target, latest guess all other guesses)
  * @param {State} state - current application state 
  */
-function renderCards(state) {
+function renderCards(state, translations) {
   const list = document.getElementById("guesses-list");
   list.innerHTML = "";
 
@@ -106,7 +110,7 @@ function renderCards(state) {
   }
 
   // target card right below
-  const targetCard = renderTargetCard(state);
+  const targetCard = renderTargetCard(state, translations);
   list.appendChild(targetCard);
 
   // all other guesses below
@@ -186,7 +190,7 @@ function saveState(state) {
  * @param {State} state - current application state 
  * @param {TomSelect} tomSelect - the TomSelect search input instance
  */
-async function handleGuessInput(state, tomSelect) {
+async function handleGuessInput(state, tomSelect, translations) {
   const guessId = tomSelect.getValue();
   const guessTitle = tomSelect.getOption(guessId)?.textContent?.trim();
   if (!guessId) return;
@@ -235,7 +239,7 @@ async function handleGuessInput(state, tomSelect) {
         state.lastGuess = guess;
       }
 
-      renderCards(state);
+      renderCards(state, translations);
       saveState(state);
     });
   }
@@ -294,7 +298,7 @@ function buildHowtoExample(translations, lang) {
  * Does nothing if the player already knows all the links.
  * @param {State} state - current application state
  */
-async function addHint(state) {
+async function addHint(state, translations) {
   if (state.knowsAllLinks) {
     console.log("You already have all the links");
     document.getElementById("hint-btn").classList.toggle("disabled-btn", state.knowsAllLinks);
@@ -317,7 +321,7 @@ async function addHint(state) {
     }
   )
 
-  renderCards(state);
+  renderCards(state, translations);
   saveState(state);
 }
 
@@ -443,16 +447,16 @@ async function main() {
           .catch(() => callback());
       },
       onItemAdd: function() {
-        handleGuessInput(state, tomSelect);
+        handleGuessInput(state, tomSelect, translations);
       }
     });
 
-  document.getElementById("guess-btn").addEventListener("click", () => handleGuessInput(state, tomSelect));
+  document.getElementById("guess-btn").addEventListener("click", () => handleGuessInput(state, tomSelect, translations));
 
   // Hint button
   const hintBtn = document.getElementById("hint-btn");
   hintBtn.addEventListener("click", () => {
-    addHint(state);
+    addHint(state, translations);
       hintBtn.blur();
   });
   hintBtn.classList.toggle("disabled-btn", state.knowsAllLinks);
@@ -474,7 +478,7 @@ async function main() {
   
 });
 
-renderCards(state);
+renderCards(state, translations);
 }
 
 main();
