@@ -1,10 +1,11 @@
 html {
   font-size: clamp(18px, 5vw, 30px);
-  --on-target-color: #000080;
+  --on-target-color: #3d5a80;
   --main-dark-color: #333333;
   --main-medium-color: #666666;
   --main-light-color: #999999;
   --almost-white: #dddddd;
+  --last-guess-color: #3d5a80;
   --border-radius: 0.375em;
 }
 
@@ -223,7 +224,7 @@ body {
 
 .last-guess-card {
   background-color: #ffffff;
-  border-left: 3px solid #534AB7;
+  border-left: 3px solid var(--last-guess-color);
 }
 
 .last-guess-card .guess-card-links a {
