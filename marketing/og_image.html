@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../frontend/style.css">
+<style>
+html {
+  font-size: 22px !important;
+}
+body {
+  flex-direction: row !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  background: #e0e0e0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.og {
+  width: 1200px;
+  height: 630px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: row;
+}
+.og-left {
+  width: 400px;
+  height: 630px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 40px;
+  gap: 0.75rem;
+  border-right: 1px solid var(--almost-white);
+}
+.og-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.og-logo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.og-title {
+  font-size: 2.2rem;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+  color: var(--main-dark-color);
+}
+.og-tagline {
+  font-size: 1rem;
+  color: var(--main-medium-color);
+  line-height: 1.6;
+}
+.og-right {
+  width: 750px;
+  height: 630px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 24px;
+  gap: 0.5rem;
+}
+.og-search {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+.og-input {
+  flex: 1;
+  padding: 0.375rem 0.75rem;
+  font-size: var(--font-size-control);
+  font-family: var(--main-font);
+  border: 1px solid var(--input-border-color);
+  border-radius: var(--border-radius);
+  color: var(--main-light-color);
+}
+#lang-switcher {
+  width: fit-content;
+}
+</style>
+</head>
+<body>
+<div class="og">
+  <div class="og-left">
+    <div class="og-logo">
+      <img src="logo.png" alt="Wikiddle logo">
+      <span class="og-title">Wikiddle</span>
+    </div>
+    <p class="og-tagline">Daily Wikipedia puzzle.<br>Follow the links, find the mystery article.</p>
+  </div>
+  <div class="og-right">
+    <div class="og-search">
+      <div class="og-input">Guess an article...</div>
+      <button class="btn btn-primary">Guess</button>
+      <button class="btn btn-secondary">Hint</button>
+    </div>
+    <div class="guess-card target-guess-card">
+      <div class="guess-card-header">
+        <div class="guess-card-title">?</div>
+        <div class="target-label">mystery article</div>
+      </div>
+      <div class="guess-card-links">
+        <a href="#">World Wide Web</a>
+        <a href="#">Cloud computing</a>
+        <a href="#">IP address</a>
+        <a href="#">Web browser</a>
+        <a href="#">Reference work</a>
+        <a href="#">Online encyclopedia</a>
+      </div>
+    </div>
+    <div class="guess-card">
+      <div class="guess-card-header">
+        <div class="guess-card-title"><a href="#">Internet</a></div>
+        <div class="guess-card-score" style="color: #0C57A8;">28</div>
+      </div>
+      <div class="guess-card-links">
+        <a href="#">World Wide Web</a>
+        <a href="#">Cloud computing</a>
+        <a href="#">IP address</a>
+        <a href="#">Web browser</a>
+      </div>
+    </div>
+    <div class="guess-card">
+      <div class="guess-card-header">
+        <div class="guess-card-title"><a href="#">Encyclopedia</a></div>
+        <div class="guess-card-score" style="color: #6b9bcb;">19</div>
+      </div>
+      <div class="guess-card-links">
+        <a href="#">Article (publishing)</a>
+        <a href="#">Information retrieval</a>
+        <a href="#">Online encyclopedia</a>
+        <a href="#">Reference work</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
