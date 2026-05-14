@@ -214,7 +214,7 @@ body {
 .ts-dropdown-content,
 .ts-control input {
   font-size: var(--font-size-control) !important;
-  font-family: var(--font-serif); !important;
+  font-family: var(--font-serif) !important;
 }
 
 .ts-dropdown .option {
