@@ -1,143 +1,217 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<link rel="stylesheet" href="../frontend/style.css">
+<meta charset="UTF-8">
 <style>
-html {
-  font-size: 22px !important;
-}
-body {
-  flex-direction: row !important;
-  height: auto !important;
-  min-height: 100vh !important;
-  background: #e0e0e0 !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-.og {
-  width: 1200px;
-  height: 630px;
-  background: #ffffff;
-  display: flex;
-  flex-direction: row;
-}
-.og-left {
-  width: 400px;
-  height: 630px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 40px;
-  gap: 0.75rem;
-  border-right: 1px solid var(--almost-white);
-}
-.og-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-.og-logo img {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-.og-title {
-  font-size: 2.2rem;
-  font-weight: normal;
-  letter-spacing: 0.05em;
-  color: var(--main-dark-color);
-}
-.og-tagline {
-  font-size: 1rem;
-  color: var(--main-medium-color);
-  line-height: 1.6;
-}
-.og-right {
-  width: 750px;
-  height: 630px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 32px 24px;
-  gap: 0.5rem;
-}
-.og-search {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-.og-input {
-  flex: 1;
-  padding: 0.375rem 0.75rem;
-  font-size: var(--font-size-control);
-  font-family: var(--main-font);
-  border: 1px solid var(--input-border-color);
-  border-radius: var(--border-radius);
-  color: var(--main-light-color);
-}
-#lang-switcher {
-  width: fit-content;
-}
+  html {
+    font-size: 20px;
+
+    --wikipedia-blue: #0C57A8;
+    --main-dark-color: #333333;
+    --main-medium-color: #666666;
+    --main-light-color: #999999;
+    --very-light-color: #dddddd;
+    --almost-white: #f9f9f9;
+    --surface-background: #ffffff;
+    --border-radius: 0.375em;
+    --font-serif: Georgia, serif;
+
+    --font-size-smallest: 0.65rem;
+    --font-size-small: 0.7rem;
+    --font-size-control: 0.875rem;
+    --font-size-title: 1.875rem;
+
+    --space-smallest: 0.15rem;
+    --space-small: 0.375rem;
+    --space-medium: 0.5rem;
+    --space-large: 0.75rem;
+    --space-larger: 1rem;
+    --space-largest: 1.5rem;
+
+    --pill-background: var(--almost-white);
+    --pill-color: var(--wikipedia-blue);
+
+    --target-card-background: var(--surface-background);
+    --target-card-border-color: var(--main-dark-color);
+    --target-card-header-color: var(--main-dark-color);
+    --target-card-pill-background: var(--almost-white);
+    --target-card-pill-color: var(--wikipedia-blue);
+
+    --input-border-color: #cccccc;
+    --primary-button-background: var(--wikipedia-blue);
+    --primary-button-color: var(--surface-background);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-serif);
+    background-color: var(--almost-white);
+    color: var(--main-dark-color);
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 3rem;
+    gap: 1.5rem;
+  }
+
+  #content {
+    width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transform: scale(1.6);
+    transform-origin: center center;
+  }
+
+  /* Logo */
+  #title-area {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  #title-divider {
+    color: var(--very-light-color);
+    font-size: var(--font-size-title);
+    font-weight: 200;
+    line-height: 1;
+  }
+
+  #tagline {
+    font-size: var(--font-size-small);
+    color: var(--main-medium-color);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  #tagline-main {
+    font-size: var(--font-size-control);
+    color: var(--main-dark-color);
+    font-style: normal;
+    font-weight: bold;
+  }
+
+  #title-logo {
+    height: 2.2rem;
+    width: auto;
+  }
+
+  h1 {
+    font-size: var(--font-size-title);
+    font-weight: normal;
+    letter-spacing: 0.05em;
+  }
+
+  /* Target card — copied from your CSS */
+  .guess-card {
+    padding: var(--space-large) var(--space-larger);
+    background-color: var(--target-card-background);
+    border: 2px solid var(--target-card-border-color);
+    border-radius: var(--border-radius);
+  }
+
+  .guess-card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-small);
+  }
+
+  .guess-card-title {
+    font-weight: bold;
+    font-size: 1.4rem;
+  }
+
+  .target-label {
+    font-size: var(--font-size-small);
+    color: var(--main-light-color);
+    font-style: italic;
+    font-weight: normal;
+  }
+
+  .guess-card-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .guess-card-links a {
+    padding: var(--space-smallest) var(--space-medium);
+    font-size: var(--font-size-smallest);
+    background-color: var(--target-card-pill-background);
+    color: var(--target-card-pill-color);
+    border-radius: 999px;
+    text-decoration: none;
+  }
+
+  /* Input row */
+  #input-row {
+    display: flex;
+    gap: var(--space-medium);
+  }
+
+  #guess-input {
+    flex: 1;
+    padding: var(--space-small) var(--space-large);
+    font-size: var(--font-size-control);
+    font-family: var(--font-serif);
+    border: 1px solid var(--input-border-color);
+    background-color: var(--surface-background);
+    color: var(--main-light-color);
+    border-radius: var(--border-radius);
+    outline: none;
+  }
+
+  .btn {
+    padding: var(--space-small) var(--space-larger);
+    font-size: var(--font-size-control);
+    font-family: var(--font-serif);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background-color: var(--primary-button-background);
+    color: var(--primary-button-color);
+  }
 </style>
 </head>
 <body>
-<div class="og">
-  <div class="og-left">
-    <div class="og-logo">
-      <img src="logo.png" alt="Wikiddle logo">
-      <span class="og-title">Wikiddle</span>
-    </div>
-    <p class="og-tagline">Daily Wikipedia puzzle.<br>Follow the links, find the mystery article.</p>
+
+  <div id="content">
+  <div id="title-area">
+    <img src="../frontend/wikiddle.png" id="title-logo" alt="Wikiddle">
+    <span id="title-divider">|</span>
+    <span id="tagline"><span id="tagline-main">Your daily Wikipedia puzzle</span><br>Follow the links, find the article.</span>
   </div>
-  <div class="og-right">
-    <div class="og-search">
-      <div class="og-input">Guess an article...</div>
-      <button class="btn btn-primary">Guess</button>
-      <button class="btn btn-secondary">Hint</button>
+
+  <div class="guess-card">
+    <div class="guess-card-header">
+      <div class="guess-card-title">?</div>
+      <div class="target-label">mystery article</div>
     </div>
-    <div class="guess-card target-guess-card">
-      <div class="guess-card-header">
-        <div class="guess-card-title">?</div>
-        <div class="target-label">mystery article</div>
-      </div>
-      <div class="guess-card-links">
-        <a href="#">World Wide Web</a>
-        <a href="#">Cloud computing</a>
-        <a href="#">IP address</a>
-        <a href="#">Web browser</a>
-        <a href="#">Reference work</a>
-        <a href="#">Online encyclopedia</a>
-      </div>
-    </div>
-    <div class="guess-card">
-      <div class="guess-card-header">
-        <div class="guess-card-title"><a href="#">Internet</a></div>
-        <div class="guess-card-score" style="color: #0C57A8;">28</div>
-      </div>
-      <div class="guess-card-links">
-        <a href="#">World Wide Web</a>
-        <a href="#">Cloud computing</a>
-        <a href="#">IP address</a>
-        <a href="#">Web browser</a>
-      </div>
-    </div>
-    <div class="guess-card">
-      <div class="guess-card-header">
-        <div class="guess-card-title"><a href="#">Encyclopedia</a></div>
-        <div class="guess-card-score" style="color: #6b9bcb;">19</div>
-      </div>
-      <div class="guess-card-links">
-        <a href="#">Article (publishing)</a>
-        <a href="#">Information retrieval</a>
-        <a href="#">Online encyclopedia</a>
-        <a href="#">Reference work</a>
-      </div>
+    <div class="guess-card-links">
+      <a href="#">World Wide Web</a>
+      <a href="#">Free content</a>
+      <a href="#">Jimmy Wales</a>
+      <a href="#">Larry Sanger</a>
+      <a href="#">PHP</a>
+      <a href="#">Internet</a>
+      <a href="#">Democratization of knowledge</a>
+      <a href="#">Online encyclopedia</a>
     </div>
   </div>
-</div>
+
+  <div id="input-row">
+    <input type="text" id="guess-input" placeholder="Guess an article..." readonly>
+    <button class="btn btn-primary">Guess</button>
+  </div>
+  </div>
+
 </body>
 </html>

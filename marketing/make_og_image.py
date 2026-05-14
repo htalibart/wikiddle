@@ -11,5 +11,5 @@ if __name__=="__main__":
         page = browser.new_page(viewport={"width": 1200, "height": 630})
         og_html_file = THIS_DIR / "og_image.html"
         page.goto(f"file:///{og_html_file}")
-        page.locator(".og").screenshot(path=THIS_DIR.parent / "frontend" / "og_image.png")
+        page.screenshot(path=THIS_DIR.parent / "frontend" / "og_image.png")
         browser.close()
