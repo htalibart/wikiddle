@@ -254,8 +254,15 @@ async function handleGuessInput(state, tomSelect, translations) {
   tomSelect.clearOptions();
   
   fetch(`${API_URL}/${state.lang}/common-neighbors?id=${guessId}`)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        showToast(translations.error_message);
+        return;
+      }
+      return res.json();
+      })
     .then(data => {
+      if (!data) return;
 
       // Check that the date is still the same as before the player started the game, otherwise reset the game
       checkGameDate(state, data.game_date);
@@ -289,6 +296,9 @@ async function handleGuessInput(state, tomSelect, translations) {
 
       renderCards(state, translations);
       saveState(state);
+    })
+    .catch(() => {
+      showToast(translations.error_message);
     });
   }
 
@@ -438,9 +448,16 @@ async function addHint(state, translations) {
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(state.knowledgeTarget.links)
   })
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) {
+      showToast(translations.error_message);
+      return;
+    }
+    return res.json();
+    })
   .then(
     data => {
+      if (!data) return;
       checkGameDate(state, data.game_date);
 
       if (data.title === null) {
@@ -450,8 +467,18 @@ async function addHint(state, translations) {
       updateKnownLinks(state, [data.title]);
     }
   )
+  .catch(() => {
+    showToast(translations.error_message);
+  });
   renderCards(state, translations);
   saveState(state);
+}
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("visible");
+  setTimeout(() => toast.classList.remove("visible"), 3000);
 }
 
 

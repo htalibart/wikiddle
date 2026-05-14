@@ -4,6 +4,10 @@ html {
   --wikipedia-blue: #0C57A8;
   --wikipedia-light-blue: #C3D8EF;
   --wikipedia-dark-blue: #0a4a8f;
+  --wikipedia-red: #970302;
+  --wikipedia-light-red: #E5C0C0;
+  --wikipedia-yellow: #F0BC00;
+  --wikipedia-light-orange: #FBDFC5;
   --main-dark-color: #333333;
   --main-medium-color: #666666;
   --main-light-color: #999999;
@@ -59,6 +63,8 @@ html {
   --lang-switcher-color: var(--main-medium-color);
   --lang-switcher-active-background: var(--very-light-color);
   --lang-switcher-active-color: var(--main-dark-color);
+
+  --error-color: var(--main-dark-color);
 
   --font-size-smallest: 0.65rem;
   --font-size-small: 0.7rem;
@@ -446,6 +452,29 @@ body {
 #lang-switcher a:focus-visible {
   outline: 2px solid var(--main-dark-color);
   outline-offset: -2px;
+}
+
+/* Toast notifications */
+
+#toast {
+  position: fixed;
+  top: var(--space-largest);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--error-color);
+  color: var(--surface-background);
+  padding: var(--space-small) var(--space-larger);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-small);
+  font-family: var(--font-sans);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 200;
+}
+
+#toast.visible {
+  opacity: 1;
 }
 
 /* Utilities */

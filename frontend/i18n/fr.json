@@ -26,5 +26,6 @@
   "howto_example_europe_score": 3,
   "howto_example_europe_links": ["Allemand", "Français", "Néerlandais"],
   "midnight_message": "Minuit est passé et l'article mystère du jour a changé. Malheureusement, votre partie en cours ne peut plus continuer. On relève le défi avec l'article d'aujourd'hui ?",
-  "midnight_btn": "C'est parti !"
+  "midnight_btn": "C'est parti !",
+  "error_message": "Une erreur est survenue. Veuillez réessayer."
 }
