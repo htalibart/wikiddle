@@ -290,6 +290,11 @@ body {
   color: var(--wikipedia-blue);
 }
 
+.on-target {
+  color: var(--wikipedia-blue);
+}
+
+
 
 
 /* Target card */
@@ -444,10 +449,6 @@ body {
 }
 
 /* Utilities */
-
-.on-target {
-  color: var(--wikipedia-blue);
-}
 
 .no-pointer-events {
   pointer-events: none;
