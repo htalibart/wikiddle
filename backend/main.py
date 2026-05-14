@@ -182,12 +182,16 @@ def get_one_new_neighbor(request: Request, lang: str = Depends(valid_lang), know
     neighbor_ids = get_neighbors(lang, target["id"])
     neighbor_titles = set(get_article_titles(lang, neighbor_ids))
     n_not_guessed = neighbor_titles.difference(set(known_titles))
+    game_date = target["date"].isoformat()
     if not n_not_guessed:
-        return {"title": None}
+        return {
+            "title": None,
+            "game_date": game_date
+            }
     hint_title = random.choice(list(n_not_guessed))
     return {
         "title": hint_title,
-        "game_date": target["date"].isoformat()
+        "game_date": game_date
         }
 
 
