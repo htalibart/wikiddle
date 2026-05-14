@@ -27,5 +27,6 @@
   "howto_example_europe_links": ["Amsterdam", "Croatia", "English language"],
   "midnight_message": "Midnight has passed and the daily mystery article has changed. Unfortunately your current game can't continue. Ready for today's article?",
   "midnight_btn": "Let's go!",
-  "error_message": "Something went wrong. Please try again."
+  "error_message": "Something went wrong. Please try again.",
+  "all_links_found": "You already have all the links"
 }

@@ -438,7 +438,7 @@ function buildHowtoExample(translations, lang) {
  */
 async function addHint(state, translations) {
   if (state.knowsAllLinks) {
-    console.log("You already have all the links");
+    showToast(translations.all_links_found);
     document.getElementById("hint-btn").classList.toggle("disabled-btn", state.knowsAllLinks);
     return;
   }
@@ -458,6 +458,7 @@ async function addHint(state, translations) {
   .then(
     data => {
       if (!data) return;
+
       checkGameDate(state, data.game_date);
 
       if (data.title === null) {
