@@ -289,6 +289,8 @@ async function handleGuessInput(state, tomSelect, translations) {
 
       if (guess.isTarget) {
         state.knowledgeTarget.title = guess.title;
+        insertSorted(state.lastGuess, state);
+        state.lastGuess = null;
         confetti();
         document.getElementById("win-overlay").style.display = "flex";
       }
