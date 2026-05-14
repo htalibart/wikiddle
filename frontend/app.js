@@ -79,14 +79,18 @@ function renderTargetCard(state, translations) {
  * @param {Guess} guess - the guess to render
  * @returns {HTMLElement} the article card
  */
-function renderGuessCard(state, guess) {
+function renderGuessCard(state, guess, translations) {
   const card = document.createElement("div");
 
   card.classList.add("guess-card");
+  
+  const onTargetLabel = guess.isOnTarget
+    ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>`
+    : "";
 
   card.innerHTML = `
     <div class="guess-card-header">
-      <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a></div>
+      <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a>${onTargetLabel}</div>
       <div class="guess-card-score">${guess.score}</div>
     </div>
     <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>
@@ -122,7 +126,7 @@ function renderCards(state, translations) {
     label.classList.add("section-label");
     label.textContent = translations.section_last_guess;
     list.appendChild(label);
-    const lastGuessCard = renderGuessCard(state, state.lastGuess);
+    const lastGuessCard = renderGuessCard(state, state.lastGuess, translations);
     list.appendChild(lastGuessCard);
   }
 
@@ -142,7 +146,7 @@ function renderCards(state, translations) {
     prevLabel.textContent = translations.section_previous_guesses;
     list.appendChild(prevLabel);
     for (const guess of state.guesses) {
-      const card = renderGuessCard(state, guess);
+      const card = renderGuessCard(state, guess, translations);
       list.appendChild(card);
     }
   }
@@ -341,7 +345,7 @@ function buildHowtoExample(translations, lang) {
     card.innerHTML = `
       <div class="guess-card-header">
         <div class="guess-card-title${isOnTarget ? " guess-card-title-on-target" : ""}">
-          <a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>
+          <a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>${isOnTarget ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>` : ""}
         </div>
         <div class="guess-card-score">${score}</div>
       </div>

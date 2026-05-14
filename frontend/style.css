@@ -282,6 +282,14 @@ body {
   color: var(--wikipedia-blue);
 }
 
+.guess-card-on-target-label {
+  font-size: var(--font-size-smallest);
+  font-weight: normal;
+  font-family: var(--font-sans);
+  font-style: italic;
+  color: var(--wikipedia-blue);
+}
+
 
 
 /* Target card */
