@@ -216,6 +216,22 @@ function saveState(state) {
 }
 
 /**
+ * Checks that the date is still the same as before the player started the game, otherwise resets the game
+ * @param {State} state 
+ */
+function checkGameDate(state, currentDate) {
+  if (state.gameDate == null) {
+    state.gameDate = currentDate;
+  }
+  else {
+    if (currentDate != state.gameDate) {
+      handleDateChange();
+      return;
+    }
+  }
+}
+
+/**
  * Handles a guess proposed by the user.
  * Fetches common neighbors from the API, updates the state, re-renders the cards.
  * If the guess is the target, triggers the win popup.
@@ -235,15 +251,7 @@ async function handleGuessInput(state, tomSelect, translations) {
     .then(data => {
 
       // Check that the date is still the same as before the player started the game, otherwise reset the game
-      if (state.gameDate == null) {
-        state.gameDate = data.game_date;
-      }
-      else {
-        if (data.game_date != state.gameDate) {
-          handleDateChange();
-          return;
-        }
-      }
+      checkGameDate(state, data.game_date);
 
       const guess = {
         id: guessId,
@@ -425,6 +433,8 @@ async function addHint(state, translations) {
   .then(res => res.json())
   .then(
     data => {
+      checkGameDate(state, data.game_date);
+
       if (data.title === null) {
         state.knowsAllLinks = true;
         return;
@@ -432,7 +442,6 @@ async function addHint(state, translations) {
       updateKnownLinks(state, [data.title]);
     }
   )
-
   renderCards(state, translations);
   saveState(state);
 }

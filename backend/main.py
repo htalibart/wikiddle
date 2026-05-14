@@ -185,7 +185,10 @@ def get_one_new_neighbor(request: Request, lang: str = Depends(valid_lang), know
     if not n_not_guessed:
         return {"title": None}
     hint_title = random.choice(list(n_not_guessed))
-    return {"title": hint_title}
+    return {
+        "title": hint_title,
+        "game_date": target["date"].isoformat()
+        }
 
 
 @router.get("/{lang}/game-date")
