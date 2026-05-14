@@ -223,6 +223,14 @@ body {
 
 /* Guess cards */
 
+.section-label {
+  font-size: var(--font-size-small);
+  color: var(--main-light-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-small) 0 var(--space-smallest) 0;
+}
+
 .guess-card {
   padding: var(--space-large) var(--space-larger);
   background-color: var(--card-background);
@@ -295,13 +303,6 @@ body {
 .target-guess-card .guess-card-links a:hover {
   background-color: var(--target-card-pill-hover-background);
   color: var(--target-card-pill-hover-color);
-}
-
-.target-label {
-  font-size: var(--font-size-small);
-  color: var(--main-light-color);
-  font-style: italic;
-  font-weight: normal;
 }
 
 .target-placeholder {
@@ -463,5 +464,14 @@ body {
   #howto-box {
     max-height: 85vh;
     overflow-y: auto;
+  }
+
+  #guesses-list {
+    gap: var(--space-smallest);
+  }
+
+  .section-label {
+    font-size: var(--font-size-smallest);
+    padding: var(--space-small) 0 var(--space-smallest) 0;
   }
 }

@@ -64,7 +64,6 @@ function renderTargetCard(state, translations) {
   card.innerHTML = `
       <div class="guess-card-header">
         ${titleHTML}
-        <div class="target-label">${translations.target_label}</div>
       </div>
       <div class="guess-card-links">${linksHTML}</div>
     `;
@@ -119,18 +118,33 @@ function renderCards(state, translations) {
 
   // last guess card on top (if any)
   if (state.lastGuess != null) {
+    const label = document.createElement("div");
+    label.classList.add("section-label");
+    label.textContent = translations.section_last_guess;
+    list.appendChild(label);
     const lastGuessCard = renderGuessCard(state, state.lastGuess);
     list.appendChild(lastGuessCard);
   }
 
   // target card right below
+  const mysteryLabel = document.createElement("div");
+  mysteryLabel.classList.add("section-label");
+  mysteryLabel.textContent = translations.section_mystery;
+  list.appendChild(mysteryLabel);
   const targetCard = renderTargetCard(state, translations);
   list.appendChild(targetCard);
 
   // all other guesses below
-  for (const guess of state.guesses) {
-    const card = renderGuessCard(state, guess);
-    list.appendChild(card);
+  if (state.guesses.length > 0)
+  {
+    const prevLabel = document.createElement("div");
+    prevLabel.classList.add("section-label");
+    prevLabel.textContent = translations.section_previous_guesses;
+    list.appendChild(prevLabel);
+    for (const guess of state.guesses) {
+      const card = renderGuessCard(state, guess);
+      list.appendChild(card);
+    }
   }
   
 }
