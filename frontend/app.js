@@ -276,7 +276,7 @@ async function handleGuessInput(state, tomSelect, translations) {
         isOnTarget: data.is_on_target,
       };
 
-      const linksToAdd = guess.common;
+      const linksToAdd = [...guess.common];
       if (guess.isOnTarget) {
         linksToAdd.push(guess.title);
       }
