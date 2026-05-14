@@ -2,23 +2,25 @@ html {
   font-size: clamp(18px, 5vw, 30px);
 
   --wikipedia-blue: #0C57A8;
-  --dark-wikipedia-blue: #0a4a8f;
+  --wikipedia-light-blue: #C3D8EF;
+  --wikipedia-dark-blue: #0a4a8f;
   --main-dark-color: #333333;
   --main-medium-color: #666666;
   --main-light-color: #999999;
-  --almost-white: #dddddd;
+  --very-light-color: #dddddd;
+  --almost-white: #f9f9f9;
   --border-radius: 0.375em;
 
   --font-serif: Georgia, serif;
   --font-sans: sans-serif;
 
-  --page-background: #f9f9f9;
+  --page-background: var(--almost-white);
   --surface-background: #ffffff;
 
   --input-border-color: #cccccc;
 
   --primary-button-background: var(--wikipedia-blue);
-  --primary-button-hover-background: var(--dark-wikipedia-blue);
+  --primary-button-hover-background: var(--wikipedia-dark-blue);
   --primary-button-color: var(--surface-background);
 
   --secondary-button-background: #e3e3e3;
@@ -28,13 +30,13 @@ html {
   --disabled-button-background: #f0f0f0;
   --disabled-button-color: var(--main-light-color);
 
-  --pill-background: #f0f0f0;
+  --pill-background: var(--almost-white);
   --pill-hover-background: #e0e0e0;
-  --pill-color: #555555;
-  --pill-hover-color: var(--main-dark-color);
+  --pill-color: var(--wikipedia-blue);
+  --pill-hover-color: var(--wikipedia-dark-blue);
 
   --card-background: var(--surface-background);
-  --card-border-color: var(--almost-white);
+  --card-border-color: var(--very-light-color);
   --card-title-color: var(--main-dark-color);
 
   --target-card-background: var(--surface-background);
@@ -43,7 +45,7 @@ html {
   --target-card-pill-background: var(--pill-background);
   --target-card-pill-color: var(--pill-color);
   --target-card-pill-hover-background: var(--pill-hover-background);
-  --target-card-pill-hover-color: var(--main-dark-color);
+  --target-card-pill-hover-color: var(--pill-hover-color);
 
   --last-guess-card-background: var(--surface-background);
   --last-guess-card-border-color: var(--wikipedia-blue);
@@ -53,9 +55,9 @@ html {
   --overlay-background: rgb(0 0 0 / 50%);
   --overlay-box-background: var(--surface-background);
 
-  --lang-switcher-border-color: var(--almost-white);
+  --lang-switcher-border-color: var(--very-light-color);
   --lang-switcher-color: var(--main-medium-color);
-  --lang-switcher-active-background: var(--almost-white);
+  --lang-switcher-active-background: var(--very-light-color);
   --lang-switcher-active-color: var(--main-dark-color);
 
   --font-size-smallest: 0.65rem;
@@ -103,7 +105,7 @@ body {
   gap: var(--space-larger);
   padding: var(--space-larger) var(--space-largest);
   background-color: var(--surface-background);
-  border-bottom: 1px solid var(--almost-white);
+  border-bottom: 1px solid var(--very-light-color);
 }
 
 #top-panel h1 {
@@ -268,6 +270,12 @@ body {
   text-decoration: none;
 }
 
+.guess-card-title-on-target a {
+  color: var(--wikipedia-blue);
+}
+
+
+
 /* Target card */
 
 .target-guess-card {
@@ -314,8 +322,9 @@ body {
   color: var(--last-guess-card-pill-color);
 }
 
-.guess-card-title-on-target a {
-  color: var(--wikipedia-blue);
+.last-guess-card .guess-card-links a:hover {
+  background-color: var(--pill-hover-background);
+  color: var(--pill-hover-color);
 }
 
 /* Overlay */
@@ -355,7 +364,7 @@ body {
 
 #howto-example {
   padding-top: var(--space-larger);
-  border-top: 1px solid var(--almost-white);
+  border-top: 1px solid var(--very-light-color);
 }
 
 #howto-btn {
