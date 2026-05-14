@@ -382,6 +382,15 @@ body {
   font-weight: bold;
 }
 
+.howto-annotation {
+  font-size: var(--font-size-small);
+  color: var(--main-medium-color);
+  font-style: italic;
+  border-left: 2px solid var(--very-light-color);
+  padding-left: var(--space-large);
+  margin: var(--space-smallest) 0 var(--space-large) 0;
+}
+
 /* Language switcher */
 
 #lang-switcher {
