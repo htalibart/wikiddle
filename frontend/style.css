@@ -170,7 +170,7 @@ body {
   border: none;
   cursor: pointer;
   border-radius: var(--border-radius);
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
 }
 
 .btn-primary {
@@ -212,7 +212,7 @@ body {
 .ts-dropdown-content,
 .ts-control input {
   font-size: var(--font-size-control) !important;
-  font-family: var(--font-sans); !important;
+  font-family: var(--font-serif); !important;
 }
 
 .ts-dropdown .option {
