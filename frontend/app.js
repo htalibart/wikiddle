@@ -55,6 +55,10 @@ function renderTargetCard(state, translations) {
     titleHTML = `<div class="guess-card-title"><a href=${titleToUrl(state.knowledgeTarget.title, state.lang)} target="_blank">${state.knowledgeTarget.title}</a></div>`
   };
 
+  const knowsHTML = state.knowsAllLinks
+  ? `<div class="guess-card-knows">${translations.all_links_found}</div>`
+  : "";
+
   const links = state.knowledgeTarget.links;
   const newLinks = state.knowledgeTarget.newLinks;
 
@@ -68,10 +72,11 @@ function renderTargetCard(state, translations) {
   card.innerHTML = `
       <div class="guess-card-header">
         ${titleHTML}
+        ${knowsHTML}
       </div>
       <div class="guess-card-links">${linksHTML}</div>
     `;
-    
+
   return card;
 
 }

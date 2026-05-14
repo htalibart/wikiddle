@@ -338,6 +338,13 @@ body {
   font-style: italic;
 }
 
+.target-guess-card .guess-card-knows {
+  font-size: var(--font-size-small);
+  color: var(--main-light-color);
+  font-style: italic;
+  font-family: var(--font-sans);
+}
+
 /* Last guess card */
 
 .last-guess-card {

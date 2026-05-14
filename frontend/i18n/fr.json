@@ -28,5 +28,6 @@
   "midnight_message": "Minuit est passé et l'article mystère du jour a changé. Malheureusement, votre partie en cours ne peut plus continuer. On relève le défi avec l'article d'aujourd'hui ?",
   "midnight_btn": "C'est parti !",
   "error_message": "Une erreur est survenue. Veuillez réessayer.",
-  "all_links_found": "Vous avez déjà trouvé tous les liens !"
+  "all_links_found_error": "Vous avez déjà trouvé tous les liens !",
+  "all_links_found": "Vous avez trouvé tous les liens...!"
 }
