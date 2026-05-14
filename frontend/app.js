@@ -56,9 +56,13 @@ function renderTargetCard(state, translations) {
   };
 
   const links = state.knowledgeTarget.links;
+  const newLinks = state.knowledgeTarget.newLinks;
 
   const linksHTML = links.length > 0
-    ? links.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")
+    ? links.map(title => {
+        const isNew = newLinks && newLinks.has(title);
+        return `<a href="${titleToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-link"' : ''}>${title} </a>`
+      }).join(" ")
     : `<span class="target-placeholder">${translations.target_placeholder}</span>`;
 
   card.innerHTML = `
@@ -178,9 +182,11 @@ function insertSorted(guess, state) {
  * @param {str[]} links - array of article titles to add to the known links
  */
 function updateKnownLinks(state, links) {
+  state.knowledgeTarget.newLinks.clear();
   for (const link of links) {
     if (! state.knowledgeTarget.links.includes(link)) {
       state.knowledgeTarget.links.push(link);
+      state.knowledgeTarget.newLinks.add(link);
     }
   }
 }
@@ -207,12 +213,13 @@ async function handleDateChange() {
 }
 
 /**
- * Saves the current state to localStorage
+ * Saves the current state to localStorage, except for the new links
  * (stores one state per language)
  * @param {State} state - current application state
  */
 function saveState(state) {
-  localStorage.setItem(`game-state-${state.lang}`, JSON.stringify(state));
+  const { newLinks, ...knowledgeTarget } = state.knowledgeTarget;
+  localStorage.setItem(`game-state-${state.lang}`, JSON.stringify({...state, knowledgeTarget}));
 }
 
 /**
@@ -262,10 +269,11 @@ async function handleGuessInput(state, tomSelect, translations) {
         isOnTarget: data.is_on_target,
       };
 
-      updateKnownLinks(state, guess.common);
+      const linksToAdd = guess.common;
       if (guess.isOnTarget) {
-        updateKnownLinks(state, [guess.title]);
+        linksToAdd.push(guess.title);
       }
+      updateKnownLinks(state, linksToAdd);
 
       if (guess.isTarget) {
         state.knowledgeTarget.title = guess.title;
@@ -464,6 +472,7 @@ async function addHint(state, translations) {
  * @property {Object} knowledgeTarget - known information about the target article
  * @property {string|null} knowledgeTarget.title - target page once found, set to null before that
  * @property {string[]} knowledgeTarget.links - links on the target page, revealed by guesses or hints
+ * @property {Set<string>} knowledgeTarget.newLinks - new links on the target paged (colored differently)
  * @property {boolean} knowsAllLinks - true if the player already has all the links, false otherwise
  * @property {string} gameDate - date associated with the ongoing game
  * @property {Guess} lastGuess - last guess proposed by the player
@@ -480,7 +489,8 @@ function createState() {
     guesses: [],
     knowledgeTarget: {
       title: null,
-      links: []
+      links: [],
+      newLinks: new Set()
     },
     knowsAllLinks: false,
     gameDate: null,
@@ -511,6 +521,8 @@ async function loadOrCreateState() {
   if (state.gameDate != date) {
     return createState();
   }
+
+  state.knowledgeTarget.newLinks = new Set();
   
   return state;
 }

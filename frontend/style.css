@@ -313,6 +313,14 @@ body {
   color: var(--target-card-pill-hover-color);
 }
 
+.target-guess-card .guess-card-links a.new-link {
+  background-color: var(--wikipedia-light-blue);
+}
+
+.target-guess-card .guess-card-links a.new-link:hover {
+  background-color: var(--target-card-pill-hover-background);
+}
+
 .target-placeholder {
   font-size: var(--font-size-medium);
   color: var(--main-light-color);
