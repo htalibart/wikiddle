@@ -64,7 +64,7 @@ function renderTargetCard(state, translations) {
 
   const linksHTML = links.length > 0
     ? links.map(title => {
-        const isNew = newLinks && newLinks.has(title);
+        const isNew = newLinks && newLinks.has(title) && (state.knowledgeTarget.title == null);
         return `<a href="${titleToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-link"' : ''}>${title} </a>`
       }).join(" ")
     : `<span class="target-placeholder">${translations.target_placeholder}</span>`;
