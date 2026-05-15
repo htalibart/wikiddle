@@ -45,8 +45,10 @@ def valid_lang(lang: str) -> str:
 
 def open_con(lang: str) -> duckdb.DuckDBPyConnection:
     """ opens a DuckDB connection connection to the appropriate database depending on language, raises 500 if database file is not found """
-    db_dir = Path(os.environ.get("WIKI_DB_DIR"))
-    db_path = db_dir / lang / 'wiki.db'
+    db_dir = os.environ.get("WIKI_DB_DIR")
+    if db_dir is None:
+        raise HTTPException(status_code=500, detail="WIKI_DB_DIR environment variable is not set")
+    db_path = Path(db_dir) / lang / 'wiki.db'
     if not db_path.is_file():
         raise HTTPException(status_code=500, detail=f"Database not found: {db_path}")
     return duckdb.connect(db_path, read_only=True)
