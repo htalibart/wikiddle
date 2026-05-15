@@ -30,16 +30,6 @@ function makeScoreColorFn(targetHex, maxScore = 20) {
 const scoreToColor = makeScoreColorFn("#0C57A8");
 
 /**
- * Returns the URL of a Wikipedia page given its title
- * @param {string} title - page title 
- * @param {string} lang - active language code
- * @returns {string} Wikipedia url
- */
-function titleToUrl(title, lang) {
-  return `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title.replaceAll(" ", "_"))}`;
-}
-
-/**
  * Renders the target article card
  * @param {State} state - current application state
  * @returns {HTMLElement} the target article card
@@ -202,18 +192,7 @@ function updateKnownLinks(state, links) {
   }
 }
 
-/**
- * Shows an overlay when the target article changes mid-game
- * 
- */
-function showMidnightOverlay() {
-  return new Promise(resolve => {
-    document.getElementById("midnight-overlay").style.display = "flex";
-    document.getElementById("midnight-btn").addEventListener("click", () => {
-      resolve();
-    });
-  });
-}
+
 
 /**
  * Handles the case when the target article changes mid-game
@@ -223,15 +202,6 @@ async function handleDateChange() {
   window.location.reload();
 }
 
-/**
- * Saves the current state to localStorage, except for the new links
- * (stores one state per language)
- * @param {State} state - current application state
- */
-function saveState(state) {
-  const { newLinks, ...knowledgeTarget } = state.knowledgeTarget;
-  localStorage.setItem(`game-state-${state.lang}`, JSON.stringify({...state, knowledgeTarget}));
-}
 
 /**
  * Checks that the date is still the same as before the player started the game, otherwise resets the game
@@ -338,111 +308,8 @@ async function loadTranslations(lang) {
   return res.json();
 }
 
-/**
- * Builds the "how to play" overlay
- * @param {Object} translations - translations for the current language
- * @param {string} lang - language code
- * @returns {HTMLElement} the how-to-play overlay
- */
-function buildHowtoExample(translations, lang) {
-  const box = document.getElementById("howto-box");
-  box.innerHTML = "";
 
-  const closeBtn = document.createElement("span");
-  closeBtn.id = "howto-close-btn";
-  closeBtn.classList.add("overlay-close-btn");
-  closeBtn.textContent = "×";
-  box.appendChild(closeBtn);
-  closeBtn.addEventListener("click", () => document.getElementById("howto-overlay").style.display = "none");
 
-  const title = document.createElement("h2");
-  title.textContent = translations.howto_btn;
-  box.appendChild(title);
-
-  const textBefore = document.createElement("p");
-  textBefore.innerHTML = translations.howto_text_before;
-  box.appendChild(textBefore);
-
-  function makeLabel(text) {
-    const label = document.createElement("div");
-    label.classList.add("section-label");
-    label.textContent = text;
-    return label;
-  }
-
-  function makeAnnotation(text) {
-    const anno = document.createElement("p");
-    anno.classList.add("howto-annotation");
-    anno.innerHTML = text;
-    return anno;
-  }
-
-  function makeGuessCard(title, score, links, isOnTarget, isLastGuess) {
-    const card = document.createElement("div");
-    card.classList.add("guess-card");
-    if (isLastGuess) card.classList.add("last-guess-card");
-    card.innerHTML = `
-      <div class="guess-card-header">
-        <div class="guess-card-title${isOnTarget ? " guess-card-title-on-target" : ""}">
-          <a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>${isOnTarget ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>` : ""}
-        </div>
-        <div class="guess-card-score">${score}</div>
-      </div>
-      <div class="guess-card-links">
-        ${links.map(t => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
-      </div>
-    `;
-    card.querySelector(".guess-card-score").style.color = scoreToColor(score);
-    return card;
-  }
-
-  box.appendChild(makeLabel(translations.section_last_guess));
-  box.appendChild(makeGuessCard(
-    translations.howto_example_encyclopedia_title,
-    translations.howto_example_encyclopedia_score,
-    translations.howto_example_encyclopedia_links,
-    true, true
-  ));
-  box.appendChild(makeAnnotation(translations.howto_annotation_last_guess));
-
-  box.appendChild(makeLabel(translations.section_mystery));
-  const targetCard = document.createElement("div");
-  targetCard.classList.add("guess-card", "target-guess-card");
-  const mysteryLinks = [
-    ...translations.howto_example_internet_links,
-    ...translations.howto_example_encyclopedia_links,
-    ...translations.howto_example_europe_links,
-  ];
-  targetCard.innerHTML = `
-    <div class="guess-card-header">
-      <div class="guess-card-title">?</div>
-    </div>
-    <div class="guess-card-links">
-      ${mysteryLinks.map(t => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
-    </div>
-  `;
-  box.appendChild(targetCard);
-  box.appendChild(makeAnnotation(translations.howto_annotation_mystery));
-
-  box.appendChild(makeLabel(translations.section_previous_guesses));
-  box.appendChild(makeGuessCard(
-    translations.howto_example_internet_title,
-    translations.howto_example_internet_score,
-    translations.howto_example_internet_links,
-    true, false
-  ));
-  box.appendChild(makeGuessCard(
-    translations.howto_example_europe_title,
-    translations.howto_example_europe_score,
-    translations.howto_example_europe_links,
-    false, false
-  ));
-  box.appendChild(makeAnnotation(translations.howto_annotation_previous_guesses));
-
-  const textAfter = document.createElement("p");
-  textAfter.innerHTML = translations.howto_text_after;
-  box.appendChild(textAfter);
-}
 
 /**
  * Fetches a new hint from the API and adds it to the known links, then re-renders the cards.
@@ -487,6 +354,7 @@ async function addHint(state, translations) {
   renderCards(state, translations);
   saveState(state);
 }
+
 
 /**
  * Shows a toast notification message
@@ -573,6 +441,18 @@ async function loadOrCreateState() {
 }
 
 
+
+/**
+ * Saves the current state to localStorage, except for the new links
+ * (stores one state per language)
+ * @param {State} state - current application state
+ */
+function saveState(state) {
+  const { newLinks, ...knowledgeTarget } = state.knowledgeTarget;
+  localStorage.setItem(`game-state-${state.lang}`, JSON.stringify({...state, knowledgeTarget}));
+}
+
+
 async function main() {
   
   const state = await loadOrCreateState();
@@ -592,7 +472,7 @@ async function main() {
   document.getElementById("midnight-btn").textContent = translations.midnight_btn;
 
 
-  buildHowtoExample(translations, state.lang);
+  buildHowtoExample(translations, state.lang, scoreToColor);
 
   const howtoBtn = document.getElementById("howto-btn");
   const howtoOverlay = document.getElementById("howto-overlay");
