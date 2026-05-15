@@ -7,7 +7,10 @@ html {
   --wikipedia-red: #970302;
   --wikipedia-light-red: #E5C0C0;
   --wikipedia-yellow: #F0BC00;
+  --wikipedia-light-yellow: #FBEEBF;
+  --wikipedia-orange: #EE8019;
   --wikipedia-light-orange: #FBDFC5;
+  --wikipedia-green: #308557;
   --main-dark-color: #333333;
   --main-medium-color: #666666;
   --main-light-color: #999999;
@@ -343,6 +346,13 @@ body {
   color: var(--main-light-color);
   font-style: italic;
   font-family: var(--font-sans);
+}
+
+
+/* Target card when found */
+
+.found-target-guess-card {
+  border: 3px solid var(--wikipedia-yellow);
 }
 
 /* Last guess card */

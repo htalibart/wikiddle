@@ -45,13 +45,19 @@ function titleToUrl(title, lang) {
  * @returns {HTMLElement} the target article card
  */
 function renderTargetCard(state, translations) {
+  const targetFound = (state.knowledgeTarget.title !== null)
 
   const card = document.createElement("div");
   card.classList.add("guess-card");
   card.classList.add("target-guess-card");
 
+  if (targetFound) {
+    card.classList.add("found-target-guess-card");
+  }
+
+
   let titleHTML = `<div class="guess-card-title">?</div>`
-  if (state.knowledgeTarget.title !== null) {
+  if (targetFound) {
     titleHTML = `<div class="guess-card-title"><a href=${titleToUrl(state.knowledgeTarget.title, state.lang)} target="_blank">${state.knowledgeTarget.title}</a></div>`
   };
 
@@ -64,7 +70,7 @@ function renderTargetCard(state, translations) {
 
   const linksHTML = links.length > 0
     ? links.map(title => {
-        const isNew = newLinks && newLinks.has(title) && (state.knowledgeTarget.title == null);
+        const isNew = newLinks && newLinks.has(title) && (!targetFound);
         return `<a href="${titleToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-link"' : ''}>${title} </a>`
       }).join(" ")
     : `<span class="target-placeholder">${translations.target_placeholder}</span>`;
