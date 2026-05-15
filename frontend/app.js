@@ -606,7 +606,7 @@ async function main() {
       load: function(query, callback) {
         fetch(`${API_URL}/${state.lang}/articles?query=${encodeURIComponent(query)}`)
           .then(res => res.json())
-          .then(data => data.filter(article => !state.guesses.some(g => g.id == article.id)))
+          .then(data => data.filter(article => (!state.guesses.some(g => g.id == article.id)) && (article.id != state.lastGuess?.id) ))
           .then(data => callback(data))
           .catch(() => callback());
       },
