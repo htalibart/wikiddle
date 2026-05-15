@@ -387,6 +387,8 @@ body {
 .overlay-box {
   position: relative;
   max-width: calc(100% - 2rem);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
   padding: var(--space-overlay) 3rem;
   background-color: var(--overlay-box-background);
   border-radius: var(--border-radius);
