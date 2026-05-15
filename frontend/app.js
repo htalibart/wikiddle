@@ -477,13 +477,6 @@ async function main() {
   const howtoBtn = document.getElementById("howto-btn");
   const howtoOverlay = document.getElementById("howto-overlay");
   howtoBtn.addEventListener("click", () => howtoOverlay.style.display = "flex");
-  howtoOverlay.addEventListener("click", () => howtoOverlay.style.display = "none");
-  document.getElementById("howto-box").addEventListener("click", e => e.stopPropagation());
-  document.getElementById("howto-close-btn").addEventListener("click", () => howtoOverlay.style.display = "none");
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") howtoOverlay.style.display = "none";
-  });
-
 
   // Search
   const tomSelect = new TomSelect("#guess-input", {

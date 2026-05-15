@@ -2,10 +2,11 @@
  * Builds the "how to play" overlay
  * @param {Object} translations - translations for the current language
  * @param {string} lang - language code
- * @returns {HTMLElement} the how-to-play overlay
+ * @param {function} scoreToColor - function that maps a score to a CSS color string
  */
 function buildHowtoExample(translations, lang, scoreToColor) {
   const box = document.getElementById("howto-box");
+  const overlay = document.getElementById("howto-overlay");
   box.innerHTML = "";
 
   const closeBtn = document.createElement("span");
@@ -13,7 +14,6 @@ function buildHowtoExample(translations, lang, scoreToColor) {
   closeBtn.classList.add("overlay-close-btn");
   closeBtn.textContent = "×";
   box.appendChild(closeBtn);
-  closeBtn.addEventListener("click", () => document.getElementById("howto-overlay").style.display = "none");
 
   const title = document.createElement("h2");
   title.textContent = translations.howto_btn;
@@ -102,7 +102,14 @@ function buildHowtoExample(translations, lang, scoreToColor) {
   const textAfter = document.createElement("p");
   textAfter.innerHTML = translations.howto_text_after;
   box.appendChild(textAfter);
-  
+
+  // Event listeners
+  closeBtn.addEventListener("click", () => overlay.style.display = "none");
+  overlay.addEventListener("click", () => overlay.style.display = "none");
+  box.addEventListener("click", e => e.stopPropagation());
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") overlay.style.display = "none";
+  });
 }
 
 
