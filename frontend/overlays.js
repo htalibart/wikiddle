@@ -127,6 +127,10 @@ function showMidnightOverlay() {
 }
 
 
+/**
+ * Builds the win overlay
+ * @param {Object} translations - translations for the current language
+ */
 function buildWinOverlay(translations) {
     document.getElementById("win-message").textContent = translations.win_message;
     
