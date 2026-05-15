@@ -488,6 +488,10 @@ async function addHint(state, translations) {
   saveState(state);
 }
 
+/**
+ * Shows a toast notification message
+ * @param {string} message - message to show
+ */
 function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
