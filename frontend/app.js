@@ -465,7 +465,6 @@ async function main() {
   document.getElementById("guess-btn").textContent = translations.guess;
   document.getElementById("guess-input").placeholder = translations.input_placeholder;
   document.getElementById("guess-input-label").textContent = translations.input_placeholder;
-  document.getElementById("win-message").textContent = translations.win_message;
   document.getElementById("howto-btn").textContent = translations.howto_btn;
   document.getElementById("hint-btn").textContent = translations.hint;
   document.getElementById("midnight-message").textContent = translations.midnight_message;
@@ -507,25 +506,10 @@ async function main() {
       hintBtn.blur();
   });
   hintBtn.classList.toggle("disabled-btn", state.knowsAllLinks);
-  
 
-  // Win overlay
-  document.getElementById("win-overlay").addEventListener("click", () => {
-    document.getElementById("win-overlay").style.display = "none";
-  });
-  document.getElementById("win-box").addEventListener("click", e => e.stopPropagation());
-  document.getElementById("win-close-btn").addEventListener("click", () => {
-  document.getElementById("win-overlay").style.display = "none";
-});
-  document.addEventListener("keydown", e => {
-  if (e.key === "Escape") {
-    document.getElementById("win-overlay").style.display = "none";
-  }
+  buildWinOverlay(translations);
 
-  
-});
-
-renderCards(state, translations);
+  renderCards(state, translations);
 }
 
 main();

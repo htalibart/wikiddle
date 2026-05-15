@@ -125,3 +125,21 @@ function showMidnightOverlay() {
     });
   });
 }
+
+
+function buildWinOverlay(translations) {
+    document.getElementById("win-message").textContent = translations.win_message;
+    
+    document.getElementById("win-overlay").addEventListener("click", () => {
+        document.getElementById("win-overlay").style.display = "none";
+    });
+    document.getElementById("win-box").addEventListener("click", e => e.stopPropagation());
+    document.getElementById("win-close-btn").addEventListener("click", () => {
+        document.getElementById("win-overlay").style.display = "none";
+     });
+    document.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            document.getElementById("win-overlay").style.display = "none";
+        }
+    });
+}
