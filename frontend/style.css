@@ -413,6 +413,35 @@ body {
   font-size: var(--font-size-overlay);
 }
 
+#win-message {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: var(--space-small);
+}
+
+#win-article {
+  font-size: var(--font-size-control);
+  color: var(--main-medium-color);
+  margin-bottom: var(--space-smallest);
+}
+
+#win-article a {
+  color: var(--wikipedia-blue);
+  text-decoration: none;
+}
+
+#win-article a:hover {
+  text-decoration: underline;
+}
+
+#win-nb-guesses {
+  font-size: var(--font-size-small);
+  font-family: var(--font-sans);
+  color: var(--main-light-color);
+  margin-bottom: var(--space-largest);
+}
+
+
 #howto-example {
   padding-top: var(--space-larger);
   border-top: 1px solid var(--very-light-color);

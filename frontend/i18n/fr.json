@@ -10,7 +10,6 @@
   "section_last_guess": "Votre dernière proposition",
   "section_mystery": "Article mystère",
   "section_previous_guesses": "Vos propositions précédentes",
-  "win_message": "Vous avez trouvé l'article mystère !",
   "howto_btn": "Comment jouer ?",
   "howto_text_before": "Chaque jour, un article Wikipédia est choisi aléatoirement comme <strong>article mystère</strong>. Votre but est de le trouver.<br><br>Chaque article Wikipédia contient des liens vers d'autres articles. Lorsque vous proposez un article, le jeu vous montre quels autres articles apparaissent en tant que liens à la fois sur la page de l'article proposé et sur la page de l'article mystère. Utilisez-les comme indices pour trouver l'article mystère.<br><br>Voici un exemple de partie en cours, après 3 propositions :",
   "howto_text_after": "Si vous bloquez, utilisez le bouton indice : <button class=\"btn btn-secondary no-pointer-events\">Indice</button> pour révéler un lien aléatoire de l'article mystère.<br><br>Il n'y a pas de limite sur le nombre de tentatives, pas de chronomètre : jouez à votre rythme, perdez-vous sur Wikipédia et amusez-vous.",
@@ -30,5 +29,8 @@
   "midnight_btn": "C'est parti !",
   "error_message": "Une erreur est survenue. Veuillez réessayer.",
   "all_links_found_error": "Vous avez déjà trouvé tous les liens !",
-  "all_links_found": "Vous avez trouvé tous les liens...!"
+  "all_links_found": "Vous avez trouvé tous les liens...!",
+  "win_message": "Vous avez trouvé !",
+  "win_article": "L'article mystère du jour était {title}",
+  "win_guesses": "Trouvé en {n} coups"
 }

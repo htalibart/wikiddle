@@ -10,7 +10,6 @@
   "section_last_guess": "Your last guess",
   "section_mystery": "Mystery article",
   "section_previous_guesses": "Your previous guesses",
-  "win_message": "You found the target article!",
   "howto_btn": "How to play?",
   "howto_text_before": "Every day, a random Wikipedia article is chosen as the <strong>mystery article</strong>. Your goal is to find it.<br><br>Every Wikipedia article contains links to other articles. When you guess an article, the game shows you which other articles are linked by both your guess and the mystery article. Use them to narrow down the mystery article.<br><br>Here's an example game in progress, after 3 guesses:",
   "howto_text_after": "If you're stuck, hit the hint button: <button class=\"btn btn-secondary no-pointer-events\">Hint</button> to reveal a random link from the mystery article.<br><br>There's no guess limit and no timer: explore Wikipedia freely and enjoy yourself.",
@@ -30,5 +29,8 @@
   "midnight_btn": "Let's go!",
   "error_message": "Something went wrong. Please try again.",
   "all_links_found_error": "You already have all the links!",
-  "all_links_found": "You have found all the links...!"
+  "all_links_found": "You have found all the links...!",
+  "win_message": "You found it!",
+  "win_article": "Today's mystery article was {title}",
+  "win_guesses": "Found in {n} guesses"
 }

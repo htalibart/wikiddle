@@ -246,8 +246,7 @@ async function handleGuessInput(state, tomSelect, translations) {
           insertSorted(state.lastGuess, state);
         }
         state.lastGuess = null;
-        confetti();
-        document.getElementById("win-overlay").style.display = "flex";
+        showWinOverlay(state, translations);
       }
       else { // update last guess, sort the rest of the cards
         if (state.lastGuess != null) {
