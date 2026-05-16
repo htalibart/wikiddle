@@ -65,13 +65,17 @@ function renderGuessCard(state, guess, translations) {
   const onTargetLabel = guess.isOnTarget
     ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>`
     : "";
+  
+  const linksHTML = guess.common.length > 0
+  ? `<div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>`
+  : `<div class="guess-card-nolinks">${translations.no_common_links}</div>`;
 
   card.innerHTML = `
     <div class="guess-card-header">
       <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a>${onTargetLabel}</div>
       <div class="guess-card-score">${guess.score}</div>
     </div>
-    <div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>
+    ${linksHTML}
   `;
   card.querySelector(".guess-card-score").style.color = scoreToColor(guess.score);
 

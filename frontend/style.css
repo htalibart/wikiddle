@@ -303,6 +303,11 @@ body {
   color: var(--wikipedia-blue);
 }
 
+.guess-card-nolinks {
+  font-size: var(--font-size-small);
+  color: var(--main-light-color);
+  font-style: italic;
+}
 
 
 
@@ -345,7 +350,6 @@ body {
   font-size: var(--font-size-small);
   color: var(--main-light-color);
   font-style: italic;
-  font-family: var(--font-sans);
 }
 
 

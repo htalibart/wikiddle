@@ -6,6 +6,7 @@
   "input_placeholder": "Guess an article...",
   "target_placeholder": "Common links will appear here.",
   "on_target_label": "on the mystery article!",
+  "no_common_links": "No common link with mystery article.",
   "section_last_guess": "Your last guess",
   "section_mystery": "Mystery article",
   "section_previous_guesses": "Your previous guesses",
