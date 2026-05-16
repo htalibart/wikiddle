@@ -323,6 +323,7 @@ async function addHint(state, translations) {
         return;
       }
       updateKnownLinks(state, [data.title]);
+      state.nbHints += 1;
     }
   )
   .catch(() => {
@@ -366,6 +367,7 @@ function showToast(message) {
  * @property {boolean} knowsAllLinks - true if the player already has all the links, false otherwise
  * @property {string} gameDate - date associated with the ongoing game
  * @property {Guess} lastGuess - last guess proposed by the player
+ * @property {int} nbHints - number of hints asked by the player
  */
 
 
@@ -385,6 +387,7 @@ function createState() {
     knowsAllLinks: false,
     gameDate: null,
     lastGuess: null,
+    nbHints: 0,
   };
 }
 

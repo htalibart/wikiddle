@@ -156,7 +156,8 @@ function showWinOverlay(state, translations) {
   confetti();
   const nbGuesses = 1 + state.guesses.length + (state.lastGuess ? 1 : 0);
   const mysteryTitle = state.knowledgeTarget.title;
+  const nbHints = state.nbHints;
   document.getElementById("win-article").innerHTML = translations.win_article.replace("{title}", `<a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank">${mysteryTitle}</a>`);
-  document.getElementById("win-nb-guesses").textContent = translations.win_guesses.replace("{n}", nbGuesses);
+  document.getElementById("win-game-stats").textContent = translations.win_game_stats.replace("{nbGuesses}", nbGuesses).replace("{nbHints}", nbHints);
   document.getElementById("win-overlay").style.display = "flex";
 }

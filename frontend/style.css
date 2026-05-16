@@ -434,7 +434,7 @@ body {
   text-decoration: underline;
 }
 
-#win-nb-guesses {
+#win-game-stats {
   font-size: var(--font-size-small);
   font-family: var(--font-sans);
   color: var(--main-light-color);

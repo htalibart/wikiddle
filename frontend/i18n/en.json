@@ -32,5 +32,5 @@
   "all_links_found": "You have found all the links...!",
   "win_message": "You found it!",
   "win_article": "Today's mystery article was {title}",
-  "win_guesses": "Found in {n} guesses"
+  "win_game_stats": "Found in {nbGuesses} guesses, {nbHints} hints."
 }
