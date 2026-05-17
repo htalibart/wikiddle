@@ -58,5 +58,5 @@ Unit tests (`tests/test_main.py`) mock the database and can be run without it. I
 
 ## Documentation
 ```bash
-npx jsdoc frontend/app.js -d docs/jsdoc
+npx jsdoc frontend/*.js -d docs/jsdoc
 ```

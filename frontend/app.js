@@ -5,6 +5,7 @@ const scoreToColor = makeScoreColorFn("#0C57A8");
 /**
  * Renders the target article card
  * @param {State} state - current application state
+ * @param {Object} translations - translations for the current language
  * @returns {HTMLElement} the target article card
  */
 function renderTargetCard(state, translations) {
@@ -55,6 +56,7 @@ function renderTargetCard(state, translations) {
  * Renders a guessed article card
  * @param {State} state - current application state
  * @param {Guess} guess - the guess to render
+ * @param {Object} translations - translations for the current language
  * @returns {HTMLElement} the article card
  */
 function renderGuessCard(state, guess, translations) {
@@ -97,6 +99,7 @@ function renderGuessCard(state, guess, translations) {
 /**
  * Renders all article cards (target, latest guess all other guesses)
  * @param {State} state - current application state 
+ * @param {Object} translations - translations for the current language
  */
 function renderCards(state, translations) {
   const list = document.getElementById("guesses-list");
@@ -199,8 +202,8 @@ function checkGameDate(state, currentDate) {
 
 /**
  * Shows yesterday's answer in a banner 
- * @param {State} state 
- * @param {Object} translations
+ * @param {State} state - current state
+ * @param {Object} translations - translations for the current language
  */
 async function showYesterdaysAnswer(state, translations) {
   const banner = document.getElementById("yesterdays-banner");
@@ -233,6 +236,7 @@ async function showYesterdaysAnswer(state, translations) {
  * If the guess is the target, triggers the win popup.
  * @param {State} state - current application state 
  * @param {TomSelect} tomSelect - the TomSelect search input instance
+ * @param {Object} translations - translations for the current language
  */
 async function handleGuessInput(state, tomSelect, translations) {
   const guessId = tomSelect.getValue();
@@ -323,6 +327,7 @@ async function loadTranslations(lang) {
  * Fetches a new hint from the API and adds it to the known links, then re-renders the cards.
  * Does nothing if the player already knows all the links.
  * @param {State} state - current application state
+ * @param {Object} translations - translations for the current language
  */
 async function addHint(state, translations) {
   if (state.knowsAllLinks) {

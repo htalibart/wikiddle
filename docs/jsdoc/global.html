@@ -104,7 +104,7 @@
     
 
     
-    <h4 class="name" id="buildHowtoExample"><span class="type-signature"></span>buildHowtoExample<span class="signature">(translations, lang)</span><span class="type-signature"> &rarr; {HTMLElement}</span></h4>
+    <h4 class="name" id="addHint"><span class="type-signature">(async) </span>addHint<span class="signature">(state, translations)</span><span class="type-signature"></span></h4>
     
 
     
@@ -112,7 +112,168 @@
 
 
 <div class="description">
-    Builds the example guess card shown in the "how to play" overlay
+    Fetches a new hint from the API and adds it to the known links, then re-renders the cards.
+Does nothing if the player already knows all the links.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#State">State</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">current application state</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>translations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">translations for the current language</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line332">line 332</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="buildHowtoExample"><span class="type-signature"></span>buildHowtoExample<span class="signature">(translations, lang, scoreToColor)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Builds the "how to play" overlay
 </div>
 
 
@@ -191,6 +352,29 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>scoreToColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">function that maps a score to a CSS color string</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -228,7 +412,369 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line231">line 231</a>
+        <a href="overlays.js.html">overlays.js</a>, <a href="overlays.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="buildWinOverlay"><span class="type-signature"></span>buildWinOverlay<span class="signature">(translations)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Builds the win overlay
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>translations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">translations for the current language</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="overlays.js.html">overlays.js</a>, <a href="overlays.js.html#line134">line 134</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="checkGameDate"><span class="type-signature"></span>checkGameDate<span class="signature">(state)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Checks that the date is still the same as before the player started the game, otherwise resets the game
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#State">State</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line190">line 190</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createState"><span class="type-signature"></span>createState<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#State">State</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates an empty state for a new game
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line414">line 414</a>
     </li></ul></dd>
     
 
@@ -257,7 +803,7 @@
 
         
 <div class="param-desc">
-    the example card
+    a new state object
 </div>
 
 
@@ -268,7 +814,7 @@
     </dt>
     <dd>
         
-<span class="param-type">HTMLElement</span>
+<span class="param-type"><a href="global.html#State">State</a></span>
 
 
     </dd>
@@ -338,7 +884,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line206">line 206</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line304">line 304</a>
     </li></ul></dd>
     
 
@@ -396,7 +942,95 @@
     
 
     
-    <h4 class="name" id="handleGuessInput"><span class="type-signature">(async) </span>handleGuessInput<span class="signature">(state, tomSelect)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="handleDateChange"><span class="type-signature">(async) </span>handleDateChange<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Handles the case when the target article changes mid-game
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line180">line 180</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="handleGuessInput"><span class="type-signature">(async) </span>handleGuessInput<span class="signature">(state, tomSelect, translations)</span><span class="type-signature"></span></h4>
     
 
     
@@ -485,6 +1119,29 @@ If the guess is the target, triggers the win popup.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>translations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">translations for the current language</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -522,7 +1179,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line163">line 163</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line241">line 241</a>
     </li></ul></dd>
     
 
@@ -682,7 +1339,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line129">line 129</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line146">line 146</a>
     </li></ul></dd>
     
 
@@ -707,6 +1364,117 @@ If the guess is the target, triggers the win popup.
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="loadOrCreateState"><span class="type-signature">(async) </span>loadOrCreateState<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#State">State</a>>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Loads the saved state from localStorage if it exists and is still valid for today's game,
+otherwise creates an empty state.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line436">line 436</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the restored or newly created state
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="global.html#State">State</a>></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -819,7 +1587,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line220">line 220</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line318">line 318</a>
     </li></ul></dd>
     
 
@@ -877,7 +1645,7 @@ If the guess is the target, triggers the win popup.
     
 
     
-    <h4 class="name" id="renderCards"><span class="type-signature"></span>renderCards<span class="signature">(state)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="makeScoreColorFn"><span class="type-signature"></span>makeScoreColorFn<span class="signature">(targetHex, maxScore<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {function}</span></h4>
     
 
     
@@ -885,7 +1653,221 @@ If the guess is the target, triggers the win popup.
 
 
 <div class="description">
-    Renders all article cards (target and guesses)
+    Returns a scoring color function that interpolates from light gray to a target color
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>targetHex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">target color in hex format, e.g. "#3d5a80"</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maxScore</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    20
+                
+                </td>
+            
+
+            <td class="description last">score that maps to the target color</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line17">line 17</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    a function that takes a score and returns a CSS color string
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="renderCards"><span class="type-signature"></span>renderCards<span class="signature">(state, translations)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Renders all article cards (target, latest guess all other guesses)
 </div>
 
 
@@ -941,6 +1923,29 @@ If the guess is the target, triggers the win popup.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>translations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">translations for the current language</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -978,7 +1983,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line108">line 108</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line104">line 104</a>
     </li></ul></dd>
     
 
@@ -1014,7 +2019,7 @@ If the guess is the target, triggers the win popup.
     
 
     
-    <h4 class="name" id="renderGuessCard"><span class="type-signature"></span>renderGuessCard<span class="signature">(state, guess)</span><span class="type-signature"> &rarr; {HTMLElement}</span></h4>
+    <h4 class="name" id="renderGuessCard"><span class="type-signature"></span>renderGuessCard<span class="signature">(state, guess, translations)</span><span class="type-signature"> &rarr; {HTMLElement}</span></h4>
     
 
     
@@ -1101,6 +2106,29 @@ If the guess is the target, triggers the win popup.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>translations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">translations for the current language</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -1138,7 +2166,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line69">line 69</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line62">line 62</a>
     </li></ul></dd>
     
 
@@ -1196,7 +2224,7 @@ If the guess is the target, triggers the win popup.
     
 
     
-    <h4 class="name" id="renderTargetCard"><span class="type-signature"></span>renderTargetCard<span class="signature">(state)</span><span class="type-signature"> &rarr; {HTMLElement}</span></h4>
+    <h4 class="name" id="renderTargetCard"><span class="type-signature"></span>renderTargetCard<span class="signature">(state, translations)</span><span class="type-signature"> &rarr; {HTMLElement}</span></h4>
     
 
     
@@ -1205,6 +2233,189 @@ If the guess is the target, triggers the win popup.
 
 <div class="description">
     Renders the target article card
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#State">State</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">current application state</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>translations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">translations for the current language</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line11">line 11</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the target article card
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">HTMLElement</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="saveState"><span class="type-signature"></span>saveState<span class="signature">(state)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Saves the current state to localStorage, except for the new links
+(stores one state per language)
 </div>
 
 
@@ -1297,7 +2508,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line35">line 35</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line466">line 466</a>
     </li></ul></dd>
     
 
@@ -1322,28 +2533,6 @@ If the guess is the target, triggers the win popup.
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    the target article card
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">HTMLElement</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -1355,7 +2544,7 @@ If the guess is the target, triggers the win popup.
     
 
     
-    <h4 class="name" id="scoreToColor"><span class="type-signature"></span>scoreToColor<span class="signature">(score, maxScore<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id="showMidnightOverlay"><span class="type-signature"></span>showMidnightOverlay<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -1363,7 +2552,95 @@ If the guess is the target, triggers the win popup.
 
 
 <div class="description">
-    Returns a color between blue (cold) and red (hot) for a score
+    Shows an overlay when the target article changes mid-game
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="overlays.js.html">overlays.js</a>, <a href="overlays.js.html#line120">line 120</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="showToast"><span class="type-signature"></span>showToast<span class="signature">(message)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Shows a toast notification message
 </div>
 
 
@@ -1387,11 +2664,7 @@ If the guess is the target, triggers the win popup.
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1403,74 +2676,23 @@ If the guess is the target, triggers the win popup.
 
         <tr>
             
-                <td class="name"><code>score</code></td>
+                <td class="name"><code>message</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">string</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                </td>
-            
 
-            <td class="description last">score to color</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>maxScore</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    20
-                
-                </td>
-            
-
-            <td class="description last">score that maps to red</td>
+            <td class="description last">message to show</td>
         </tr>
 
     
@@ -1511,7 +2733,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line13">line 13</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line377">line 377</a>
     </li></ul></dd>
     
 
@@ -1536,28 +2758,326 @@ If the guess is the target, triggers the win popup.
 
 
 
-<h5>Returns:</h5>
+
+
+
+
 
         
-<div class="param-desc">
-    CSS color string, e.g. "rgb(255, 0, 0)"
+            
+
+    
+
+    
+    <h4 class="name" id="showWinOverlay"><span class="type-signature"></span>showWinOverlay<span class="signature">(state, translations)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Shows the win overlay
 </div>
 
 
 
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
         
-<span class="param-type">string</span>
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#State">State</a></span>
 
 
-    </dd>
-</dl>
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">current application state</td>
+        </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>translations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">translations for the current language</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="overlays.js.html">overlays.js</a>, <a href="overlays.js.html#line157">line 157</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="showYesterdaysAnswer"><span class="type-signature">(async) </span>showYesterdaysAnswer<span class="signature">(state, translations)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Shows yesterday's answer in a banner
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#State">State</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">current state</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>translations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">translations for the current language</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line208">line 208</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1693,7 +3213,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line26">line 26</a>
+        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line7">line 7</a>
     </li></ul></dd>
     
 
@@ -1875,7 +3395,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line148">line 148</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line165">line 165</a>
     </li></ul></dd>
     
 
@@ -2052,29 +3572,6 @@ If the guess is the target, triggers the win popup.
 
         <tr>
             
-                <td class="name"><code>visible</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">whether the links list is expanded</td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>isTarget</code></td>
             
 
@@ -2153,7 +3650,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line252">line 252</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line385">line 385</a>
     </li></ul></dd>
     
 
@@ -2235,29 +3732,6 @@ If the guess is the target, triggers the win popup.
             
 
             <td class="description last">current active language</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>linksVisible</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">whether link lists are expanded in the cards</td>
         </tr>
 
     
@@ -2374,10 +3848,125 @@ If the guess is the target, triggers the win popup.
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>newLinks</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Set.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">new links on the target paged (colored differently)</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
             </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>knowsAllLinks</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">true if the player already has all the links, false otherwise</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>gameDate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">date associated with the ongoing game</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lastGuess</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Guess">Guess</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">last guess proposed by the player</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nbHints</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">number of hints asked by the player</td>
         </tr>
 
     
@@ -2416,7 +4005,7 @@ If the guess is the target, triggers the win popup.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line263">line 263</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line395">line 395</a>
     </li></ul></dd>
     
 
@@ -2446,13 +4035,13 @@ If the guess is the target, triggers the win popup.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildHowtoExample">buildHowtoExample</a></li><li><a href="global.html#getLang">getLang</a></li><li><a href="global.html#handleGuessInput">handleGuessInput</a></li><li><a href="global.html#insertSorted">insertSorted</a></li><li><a href="global.html#loadTranslations">loadTranslations</a></li><li><a href="global.html#renderCards">renderCards</a></li><li><a href="global.html#renderGuessCard">renderGuessCard</a></li><li><a href="global.html#renderTargetCard">renderTargetCard</a></li><li><a href="global.html#scoreToColor">scoreToColor</a></li><li><a href="global.html#titleToUrl">titleToUrl</a></li><li><a href="global.html#updateKnownLinks">updateKnownLinks</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addHint">addHint</a></li><li><a href="global.html#buildHowtoExample">buildHowtoExample</a></li><li><a href="global.html#buildWinOverlay">buildWinOverlay</a></li><li><a href="global.html#checkGameDate">checkGameDate</a></li><li><a href="global.html#createState">createState</a></li><li><a href="global.html#getLang">getLang</a></li><li><a href="global.html#handleDateChange">handleDateChange</a></li><li><a href="global.html#handleGuessInput">handleGuessInput</a></li><li><a href="global.html#insertSorted">insertSorted</a></li><li><a href="global.html#loadOrCreateState">loadOrCreateState</a></li><li><a href="global.html#loadTranslations">loadTranslations</a></li><li><a href="global.html#makeScoreColorFn">makeScoreColorFn</a></li><li><a href="global.html#renderCards">renderCards</a></li><li><a href="global.html#renderGuessCard">renderGuessCard</a></li><li><a href="global.html#renderTargetCard">renderTargetCard</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#showMidnightOverlay">showMidnightOverlay</a></li><li><a href="global.html#showToast">showToast</a></li><li><a href="global.html#showWinOverlay">showWinOverlay</a></li><li><a href="global.html#showYesterdaysAnswer">showYesterdaysAnswer</a></li><li><a href="global.html#titleToUrl">titleToUrl</a></li><li><a href="global.html#updateKnownLinks">updateKnownLinks</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Apr 29 2026 21:19:41 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun May 17 2026 16:36:55 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

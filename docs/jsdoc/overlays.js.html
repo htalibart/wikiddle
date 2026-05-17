@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: overlays.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: overlays.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * Builds the "how to play" overlay
  * @param {Object} translations - translations for the current language
  * @param {string} lang - language code
@@ -42,15 +70,15 @@ function buildHowtoExample(translations, lang, scoreToColor) {
     card.classList.add("guess-card");
     if (isLastGuess) card.classList.add("last-guess-card");
     card.innerHTML = `
-      <div class="guess-card-header">
-        <div class="guess-card-title${isOnTarget ? " guess-card-title-on-target" : ""}">
-          <a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>${isOnTarget ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>` : ""}
-        </div>
-        <div class="guess-card-score">${score}</div>
-      </div>
-      <div class="guess-card-links">
-        ${links.map(t => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
-      </div>
+      &lt;div class="guess-card-header">
+        &lt;div class="guess-card-title${isOnTarget ? " guess-card-title-on-target" : ""}">
+          &lt;a href="${titleToUrl(title, lang)}" target="_blank">${title}&lt;/a>${isOnTarget ? ` &lt;span class="guess-card-on-target-label">— ${translations.on_target_label}&lt;/span>` : ""}
+        &lt;/div>
+        &lt;div class="guess-card-score">${score}&lt;/div>
+      &lt;/div>
+      &lt;div class="guess-card-links">
+        ${links.map(t => `&lt;a href="${titleToUrl(t, lang)}" target="_blank">${t}&lt;/a>`).join(" ")}
+      &lt;/div>
     `;
     card.querySelector(".guess-card-score").style.color = scoreToColor(score);
     return card;
@@ -74,12 +102,12 @@ function buildHowtoExample(translations, lang, scoreToColor) {
     ...translations.howto_example_europe_links,
   ];
   targetCard.innerHTML = `
-    <div class="guess-card-header">
-      <div class="guess-card-title">?</div>
-    </div>
-    <div class="guess-card-links">
-      ${mysteryLinks.map(t => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
-    </div>
+    &lt;div class="guess-card-header">
+      &lt;div class="guess-card-title">?&lt;/div>
+    &lt;/div>
+    &lt;div class="guess-card-links">
+      ${mysteryLinks.map(t => `&lt;a href="${titleToUrl(t, lang)}" target="_blank">${t}&lt;/a>`).join(" ")}
+    &lt;/div>
   `;
   box.appendChild(targetCard);
   box.appendChild(makeAnnotation(translations.howto_annotation_mystery));
@@ -159,7 +187,30 @@ function showWinOverlay(state, translations) {
   const nbGuesses = 1 + state.guesses.length + (state.lastGuess ? 1 : 0);
   const mysteryTitle = state.knowledgeTarget.title;
   const nbHints = state.nbHints;
-  document.getElementById("win-article").innerHTML = translations.win_article.replace("{title}", `<a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank">${mysteryTitle}</a>`);
+  document.getElementById("win-article").innerHTML = translations.win_article.replace("{title}", `&lt;a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank">${mysteryTitle}&lt;/a>`);
   document.getElementById("win-game-stats").textContent = translations.win_game_stats.replace("{nbGuesses}", nbGuesses).replace("{nbHints}", nbHints);
   document.getElementById("win-overlay").style.display = "flex";
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addHint">addHint</a></li><li><a href="global.html#buildHowtoExample">buildHowtoExample</a></li><li><a href="global.html#buildWinOverlay">buildWinOverlay</a></li><li><a href="global.html#checkGameDate">checkGameDate</a></li><li><a href="global.html#createState">createState</a></li><li><a href="global.html#getLang">getLang</a></li><li><a href="global.html#handleDateChange">handleDateChange</a></li><li><a href="global.html#handleGuessInput">handleGuessInput</a></li><li><a href="global.html#insertSorted">insertSorted</a></li><li><a href="global.html#loadOrCreateState">loadOrCreateState</a></li><li><a href="global.html#loadTranslations">loadTranslations</a></li><li><a href="global.html#makeScoreColorFn">makeScoreColorFn</a></li><li><a href="global.html#renderCards">renderCards</a></li><li><a href="global.html#renderGuessCard">renderGuessCard</a></li><li><a href="global.html#renderTargetCard">renderTargetCard</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#showMidnightOverlay">showMidnightOverlay</a></li><li><a href="global.html#showToast">showToast</a></li><li><a href="global.html#showWinOverlay">showWinOverlay</a></li><li><a href="global.html#showYesterdaysAnswer">showYesterdaysAnswer</a></li><li><a href="global.html#titleToUrl">titleToUrl</a></li><li><a href="global.html#updateKnownLinks">updateKnownLinks</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun May 17 2026 16:36:55 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

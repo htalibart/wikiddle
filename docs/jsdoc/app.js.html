@@ -26,63 +26,55 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const API_URL = ["localhost", "127.0.0.1"].includes(window.location.hostname)
-  ? "http://127.0.0.1:8000/api"
-  : "/api";
-
+            <pre class="prettyprint source linenums"><code>const API_URL = "/api";
 const LANGUAGES = ["en", "fr"];
-
-/**
- * Returns a color between blue (cold) and red (hot) for a score
- * @param {number} score - score to color
- * @param {number} [maxScore=20] - score that maps to red
- * @returns {string} CSS color string, e.g. "rgb(255, 0, 0)"
- */
-function scoreToColor(score, maxScore = 20) {
-  const normalized = score / maxScore;
-  const r = Math.round(normalized * 255);
-  const b = Math.round((1 - normalized) * 255);
-  return `rgb(${r}, 0, ${b})`;
-}
-
-/**
- * Returns the URL of a Wikipedia page given its title
- * @param {string} title - page title 
- * @param {string} lang - active language code
- * @returns {string} Wikipedia url
- */
-function titleToUrl(title, lang) {
-  return `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title.replaceAll(" ", "_"))}`;
-}
+const scoreToColor = makeScoreColorFn("#0C57A8");
 
 /**
  * Renders the target article card
  * @param {State} state - current application state
+ * @param {Object} translations - translations for the current language
  * @returns {HTMLElement} the target article card
  */
-function renderTargetCard(state) {
+function renderTargetCard(state, translations) {
+  const targetFound = (state.knowledgeTarget.title !== null)
 
   const card = document.createElement("div");
   card.classList.add("guess-card");
   card.classList.add("target-guess-card");
 
+  if (targetFound) {
+    card.classList.add("found-target-guess-card");
+  }
+
+
   let titleHTML = `&lt;div class="guess-card-title">?&lt;/div>`
-  if (state.knowledgeTarget.title !== null) {
+  if (targetFound) {
     titleHTML = `&lt;div class="guess-card-title">&lt;a href=${titleToUrl(state.knowledgeTarget.title, state.lang)} target="_blank">${state.knowledgeTarget.title}&lt;/a>&lt;/div>`
   };
 
+  const knowsHTML = state.knowsAllLinks
+  ? `&lt;div class="guess-card-knows">${translations.all_links_found}&lt;/div>`
+  : "";
+
   const links = state.knowledgeTarget.links;
+  const newLinks = state.knowledgeTarget.newLinks;
+
+  const linksHTML = links.length > 0
+    ? links.map(title => {
+        const isNew = newLinks &amp;&amp; newLinks.has(title) &amp;&amp; (!targetFound);
+        return `&lt;a href="${titleToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-link"' : ''}>${title} &lt;/a>`
+      }).join(" ")
+    : `&lt;span class="target-placeholder">${translations.target_placeholder}&lt;/span>`;
 
   card.innerHTML = `
       &lt;div class="guess-card-header">
         ${titleHTML}
-        &lt;div class="guess-card-score"">&lt;/div>
+        ${knowsHTML}
       &lt;/div>
-      &lt;div class="guess-card-links">${links.map(title => `&lt;a href="${titleToUrl(title, state.lang)}" target="_blank">${title}&lt;/a>`).join(" · ")}&lt;/div>
+      &lt;div class="guess-card-links">${linksHTML}&lt;/div>
     `;
-  
-  card.querySelector(".guess-card-links").style.display = "block";
-  
+
   return card;
 
 }
@@ -92,32 +84,30 @@ function renderTargetCard(state) {
  * Renders a guessed article card
  * @param {State} state - current application state
  * @param {Guess} guess - the guess to render
+ * @param {Object} translations - translations for the current language
  * @returns {HTMLElement} the article card
  */
-function renderGuessCard(state, guess) {
+function renderGuessCard(state, guess, translations) {
   const card = document.createElement("div");
 
   card.classList.add("guess-card");
+  
+  const onTargetLabel = guess.isOnTarget
+    ? ` &lt;span class="guess-card-on-target-label">— ${translations.on_target_label}&lt;/span>`
+    : "";
+  
+  const linksHTML = guess.common.length > 0
+  ? `&lt;div class="guess-card-links">${guess.common.map(title => `&lt;a href="${titleToUrl(title, state.lang)}" target="_blank">${title}&lt;/a>`).join(" ")}&lt;/div>`
+  : `&lt;div class="guess-card-nolinks">${translations.no_common_links}&lt;/div>`;
 
   card.innerHTML = `
-      &lt;div class="guess-card-header">
-        &lt;div class="guess-card-title">&lt;a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}&lt;/a>&lt;/div>
-        &lt;div class="guess-card-score" style="color: ${scoreToColor(guess.score)}">${guess.score}&lt;/div>
-      &lt;/div>
-      &lt;div class="guess-card-links">${guess.common.map(title => `&lt;a href="${titleToUrl(title, state.lang)}" target="_blank">${title}&lt;/a>`).join(" · ")}&lt;/div>
-    `;
-  
-  card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
-
-  // prevents click on Wikipedia page to propagate to visibility
-  card.querySelector(".guess-card-links").addEventListener("click", e => e.stopPropagation());
-  card.querySelector(".guess-card-title").addEventListener("click", e => e.stopPropagation());
-
-  // click on card -> change visibility
-  card.addEventListener("click", () => {
-    guess.visible = !guess.visible;
-    card.querySelector(".guess-card-links").style.display = guess.visible ? "block" : "none";
-  });
+    &lt;div class="guess-card-header">
+      &lt;div class="guess-card-title">&lt;a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}&lt;/a>${onTargetLabel}&lt;/div>
+      &lt;div class="guess-card-score">${guess.score}&lt;/div>
+    &lt;/div>
+    ${linksHTML}
+  `;
+  card.querySelector(".guess-card-score").style.color = scoreToColor(guess.score);
 
   
   // guess is a link on target -> change color
@@ -125,26 +115,53 @@ function renderGuessCard(state, guess) {
     card.querySelector(".guess-card-title").classList.add("guess-card-title-on-target");
   }
 
+  // guess is latest guess -> change style
+  if (guess.id == state.lastGuess?.id) {
+    card.classList.add("last-guess-card")
+  }
+
   return card;
 }
 
 
 /**
- * Renders all article cards (target and guesses)
+ * Renders all article cards (target, latest guess all other guesses)
  * @param {State} state - current application state 
+ * @param {Object} translations - translations for the current language
  */
-function renderCards(state) {
+function renderCards(state, translations) {
   const list = document.getElementById("guesses-list");
   list.innerHTML = "";
 
-  // target card on top
-  const targetCard = renderTargetCard(state);
+  // last guess card on top (if any)
+  if (state.lastGuess != null) {
+    const label = document.createElement("div");
+    label.classList.add("section-label");
+    label.textContent = translations.section_last_guess;
+    list.appendChild(label);
+    const lastGuessCard = renderGuessCard(state, state.lastGuess, translations);
+    list.appendChild(lastGuessCard);
+  }
+
+  // target card right below
+  const mysteryLabel = document.createElement("div");
+  mysteryLabel.classList.add("section-label");
+  mysteryLabel.textContent = translations.section_mystery;
+  list.appendChild(mysteryLabel);
+  const targetCard = renderTargetCard(state, translations);
   list.appendChild(targetCard);
 
   // all other guesses below
-  for (const guess of state.guesses) {
-    const card = renderGuessCard(state, guess);
-    list.appendChild(card);
+  if (state.guesses.length > 0)
+  {
+    const prevLabel = document.createElement("div");
+    prevLabel.classList.add("section-label");
+    prevLabel.textContent = translations.section_previous_guesses;
+    list.appendChild(prevLabel);
+    for (const guess of state.guesses) {
+      const card = renderGuessCard(state, guess, translations);
+      list.appendChild(card);
+    }
   }
   
 }
@@ -174,12 +191,72 @@ function insertSorted(guess, state) {
  * @param {str[]} links - array of article titles to add to the known links
  */
 function updateKnownLinks(state, links) {
+  state.knowledgeTarget.newLinks.clear();
   for (const link of links) {
     if (! state.knowledgeTarget.links.includes(link)) {
       state.knowledgeTarget.links.push(link);
+      state.knowledgeTarget.newLinks.add(link);
     }
   }
 }
+
+
+
+/**
+ * Handles the case when the target article changes mid-game
+ */
+async function handleDateChange() {
+  await showMidnightOverlay();
+  window.location.reload();
+}
+
+
+/**
+ * Checks that the date is still the same as before the player started the game, otherwise resets the game
+ * @param {State} state 
+ */
+function checkGameDate(state, currentDate) {
+  if (state.gameDate == null) {
+    state.gameDate = currentDate;
+  }
+  else {
+    if (currentDate != state.gameDate) {
+      handleDateChange();
+      return;
+    }
+  }
+}
+
+
+/**
+ * Shows yesterday's answer in a banner 
+ * @param {State} state - current state
+ * @param {Object} translations - translations for the current language
+ */
+async function showYesterdaysAnswer(state, translations) {
+  const banner = document.getElementById("yesterdays-banner");
+  const dismissBtn = document.getElementById("yesterdays-banner-dismiss");
+
+  try {
+    const res = await fetch(`${API_URL}/${state.lang}/yesterdays-article`);
+    if (!res.ok) {
+      banner.style.display = "none";
+      return;
+    }
+    const { title } = await res.json();
+    const titleLink = `&lt;a href="${titleToUrl(title, state.lang)}" target="_blank">${title}&lt;/a>`;
+    document.getElementById("yesterdays-banner-message").innerHTML = translations.yesterdays_answer.replace("{title}", titleLink);
+  } catch {
+    banner.style.display = "none";
+    return;
+  }
+
+  dismissBtn.addEventListener("click", () => {
+    banner.style.display = "none";
+  });
+}
+
+
 
 /**
  * Handles a guess proposed by the user.
@@ -187,8 +264,9 @@ function updateKnownLinks(state, links) {
  * If the guess is the target, triggers the win popup.
  * @param {State} state - current application state 
  * @param {TomSelect} tomSelect - the TomSelect search input instance
+ * @param {Object} translations - translations for the current language
  */
-async function handleGuessInput(state, tomSelect) {
+async function handleGuessInput(state, tomSelect, translations) {
   const guessId = tomSelect.getValue();
   const guessTitle = tomSelect.getOption(guessId)?.textContent?.trim();
   if (!guessId) return;
@@ -197,33 +275,53 @@ async function handleGuessInput(state, tomSelect) {
   tomSelect.clearOptions();
   
   fetch(`${API_URL}/${state.lang}/common-neighbors?id=${guessId}`)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        showToast(translations.error_message);
+        return;
+      }
+      return res.json();
+      })
     .then(data => {
+      if (!data) return;
+
+      // Check that the date is still the same as before the player started the game, otherwise reset the game
+      checkGameDate(state, data.game_date);
+
       const guess = {
         id: guessId,
         title: guessTitle,
         common: data.common,
         score: data.common.length,
-        visible: state.linksVisible,
         isTarget: data.is_target,
         isOnTarget: data.is_on_target,
       };
 
-      updateKnownLinks(state, guess.common);
+      const linksToAdd = [...guess.common];
       if (guess.isOnTarget) {
-        updateKnownLinks(state, [guess.title]);
+        linksToAdd.push(guess.title);
       }
+      updateKnownLinks(state, linksToAdd);
 
       if (guess.isTarget) {
         state.knowledgeTarget.title = guess.title;
-        confetti();
-        document.getElementById("win-overlay").style.display = "flex";
+        if (state.lastGuess) {
+          insertSorted(state.lastGuess, state);
+        }
+        state.lastGuess = null;
+        showWinOverlay(state, translations);
       }
-      else {
-        insertSorted(guess, state);
+      else { // update last guess, sort the rest of the cards
+        if (state.lastGuess != null) {
+          insertSorted(state.lastGuess, state);
+        }
+        state.lastGuess = guess;
       }
-
-      renderCards(state);
+      renderCards(state, translations);
+      saveState(state);
+    })
+    .catch(() => {
+      showToast(translations.error_message);
     });
   }
 
@@ -250,31 +348,66 @@ async function loadTranslations(lang) {
   return res.json();
 }
 
+
+
+
 /**
- * Builds the example guess card shown in the "how to play" overlay
+ * Fetches a new hint from the API and adds it to the known links, then re-renders the cards.
+ * Does nothing if the player already knows all the links.
+ * @param {State} state - current application state
  * @param {Object} translations - translations for the current language
- * @param {string} lang - language code
- * @returns {HTMLElement} the example card
  */
-function buildHowtoExample(translations, lang) {
-  const card = document.createElement("div");
-  card.classList.add("guess-card");
-  card.innerHTML = `
-    &lt;div class="guess-card-header">
-      &lt;div class="guess-card-title">
-        &lt;a href="${titleToUrl(translations.howto_example_title, lang)}" target="_blank">${translations.howto_example_title}&lt;/a>
-      &lt;/div>
-      &lt;div class="guess-card-score" style="color: ${scoreToColor(translations.howto_example_score)}">
-        ${translations.howto_example_score}
-      &lt;/div>
-    &lt;/div>
-    &lt;div class="guess-card-links" style="display:block">
-      ${translations.howto_example_links.map(title => `&lt;a href="${titleToUrl(title, lang)}" target="_blank">${title}&lt;/a>`).join(" · ")}
-    &lt;/div>
-  `;
-  return card;
+async function addHint(state, translations) {
+  if (state.knowsAllLinks) {
+    showToast(translations.all_links_found);
+    document.getElementById("hint-btn").classList.toggle("disabled-btn", state.knowsAllLinks);
+    return;
+  }
+
+  await fetch(`${API_URL}/${state.lang}/new-target-neighbor`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(state.knowledgeTarget.links)
+  })
+  .then(res => {
+    if (!res.ok) {
+      showToast(translations.error_message);
+      return;
+    }
+    return res.json();
+    })
+  .then(
+    data => {
+      if (!data) return;
+
+      checkGameDate(state, data.game_date);
+
+      if (data.title === null) {
+        state.knowsAllLinks = true;
+        return;
+      }
+      updateKnownLinks(state, [data.title]);
+      state.nbHints += 1;
+    }
+  )
+  .catch(() => {
+    showToast(translations.error_message);
+  });
+  renderCards(state, translations);
+  saveState(state);
 }
 
+
+/**
+ * Shows a toast notification message
+ * @param {string} message - message to show
+ */
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("visible");
+  setTimeout(() => toast.classList.remove("visible"), 3000);
+}
 
 
 /**
@@ -283,7 +416,6 @@ function buildHowtoExample(translations, lang) {
  * @property {string} title - article title
  * @property {string[]} common - common neighbors with the target
  * @property {number} score - number of common neighbors with the target
- * @property {boolean} visible - whether the links list is expanded
  * @property {boolean} isTarget - whether this guess is the target article
  * @property {boolean} isOnTarget - whether this guess is a link on the target article
  */
@@ -291,50 +423,107 @@ function buildHowtoExample(translations, lang) {
 /**
  * @typedef {Object} State
  * @property {string} lang - current active language
- * @property {boolean} linksVisible - whether link lists are expanded in the cards
  * @property {Guess[]} guesses - guesses made so far, sorted by decreasing score
  * @property {Object} knowledgeTarget - known information about the target article
  * @property {string|null} knowledgeTarget.title - target page once found, set to null before that
  * @property {string[]} knowledgeTarget.links - links on the target page, revealed by guesses or hints
+ * @property {Set&lt;string>} knowledgeTarget.newLinks - new links on the target paged (colored differently)
+ * @property {boolean} knowsAllLinks - true if the player already has all the links, false otherwise
+ * @property {string} gameDate - date associated with the ongoing game
+ * @property {Guess} lastGuess - last guess proposed by the player
+ * @property {int} nbHints - number of hints asked by the player
  */
 
-async function main() {
-  
-  const state = {
+
+/**
+ * Creates an empty state for a new game
+ * @returns {State} a new state object
+ */
+function createState() {
+  return {
     lang: getLang(),
-    linksVisible: true,
     guesses: [],
     knowledgeTarget: {
       title: null,
-      links: []
-    }
+      links: [],
+      newLinks: new Set()
+    },
+    knowsAllLinks: false,
+    gameDate: null,
+    lastGuess: null,
+    nbHints: 0,
   };
+}
 
+
+/**
+ * Loads the saved state from localStorage if it exists and is still valid for today's game,
+ * otherwise creates an empty state.
+ * @returns {Promise&lt;State>} the restored or newly created state
+ */
+async function loadOrCreateState() {
+
+  const lang = getLang();
+
+  const savedState = localStorage.getItem(`game-state-${lang}`);
+
+  if (savedState == null) {
+    return createState();
+  }
+
+  const state = JSON.parse(savedState);
+
+  const res = await fetch(`${API_URL}/${state.lang}/game-date`);
+  const { date } = await res.json();
+  if (state.gameDate != date) {
+    return createState();
+  }
+
+  state.knowledgeTarget.newLinks = new Set();
+  
+  return state;
+}
+
+
+
+/**
+ * Saves the current state to localStorage, except for the new links
+ * (stores one state per language)
+ * @param {State} state - current application state
+ */
+function saveState(state) {
+  const { newLinks, ...knowledgeTarget } = state.knowledgeTarget;
+  localStorage.setItem(`game-state-${state.lang}`, JSON.stringify({...state, knowledgeTarget}));
+}
+
+
+async function main() {
+  
+  const state = await loadOrCreateState();
 
   // Translations
   const translations = await loadTranslations(state.lang);
+  document.title = translations.title;
+  document.querySelector('meta[name="description"]').setAttribute('content', translations.description);
   document.querySelector(`#lang-switcher a[href="/${state.lang}"]`).classList.add("active");
   document.getElementById("guess-btn").textContent = translations.guess;
   document.getElementById("guess-input").placeholder = translations.input_placeholder;
-  document.getElementById("win-message").textContent = translations.win_message;
+  document.getElementById("guess-input-label").textContent = translations.input_placeholder;
   document.getElementById("howto-btn").textContent = translations.howto_btn;
+  document.getElementById("hint-btn").textContent = translations.hint;
+  document.getElementById("midnight-message").textContent = translations.midnight_message;
+  document.getElementById("midnight-btn").textContent = translations.midnight_btn;
 
-  // How to play
-  document.getElementById("howto-title").textContent = translations.howto_btn;
-  document.getElementById("howto-text-before").innerHTML = translations.howto_text_before.replaceAll("\n\n", "&lt;br>&lt;br>");
-  document.getElementById("howto-text-after").innerHTML = translations.howto_text_after.replaceAll("\n\n", "&lt;br>&lt;br>");
-  document.getElementById("howto-example").appendChild(buildHowtoExample(translations, state.lang));
+
+  buildHowtoExample(translations, state.lang, scoreToColor);
 
   const howtoBtn = document.getElementById("howto-btn");
   const howtoOverlay = document.getElementById("howto-overlay");
   howtoBtn.addEventListener("click", () => howtoOverlay.style.display = "flex");
-  howtoOverlay.addEventListener("click", () => howtoOverlay.style.display = "none");
-  document.getElementById("howto-box").addEventListener("click", e => e.stopPropagation());
-  document.getElementById("howto-close-btn").addEventListener("click", () => howtoOverlay.style.display = "none");
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") howtoOverlay.style.display = "none";
-  });
 
+  showYesterdaysAnswer(state, translations);
+
+  // Search
   const tomSelect = new TomSelect("#guess-input", {
       valueField: "id",
       labelField: "title",
@@ -345,51 +534,32 @@ async function main() {
       load: function(query, callback) {
         fetch(`${API_URL}/${state.lang}/articles?query=${encodeURIComponent(query)}`)
           .then(res => res.json())
-          .then(data => data.filter(article => !state.guesses.some(g => g.id == article.id)))
+          .then(data => data.filter(article => (!state.guesses.some(g => g.id == article.id)) &amp;&amp; (article.id != state.lastGuess?.id) ))
           .then(data => callback(data))
           .catch(() => callback());
       },
       onItemAdd: function() {
-        handleGuessInput(state, tomSelect);
+        handleGuessInput(state, tomSelect, translations);
       }
     });
 
-  document.getElementById("guess-btn").addEventListener("click", () => handleGuessInput(state, tomSelect));
-  
-  const toggleBtn = document.getElementById("toggle-links-btn");
+  document.getElementById("guess-btn").addEventListener("click", () => handleGuessInput(state, tomSelect, translations));
 
-  toggleBtn.addEventListener("click", () => {
-    state.linksVisible = !state.linksVisible;
-    state.guesses.forEach(g => g.visible = state.linksVisible);
-    renderCards(state);
-    document.getElementById("toggle-links-btn").textContent = state.linksVisible ? translations.toggle_hide : translations.toggle_show;
-    toggleBtn.blur();
+  // Hint button
+  const hintBtn = document.getElementById("hint-btn");
+  hintBtn.addEventListener("click", () => {
+    addHint(state, translations);
+      hintBtn.blur();
   });
+  hintBtn.classList.toggle("disabled-btn", state.knowsAllLinks);
 
-  [translations.toggle_hide, translations.toggle_show].forEach(text => {
-    toggleBtn.textContent = text;
-    toggleBtn.style.minWidth = Math.max(toggleBtn.offsetWidth, parseInt(toggleBtn.style.minWidth) || 0) + "px";
-    });
-  toggleBtn.textContent = translations.toggle_hide;
+  buildWinOverlay(translations);
 
-  document.getElementById("win-overlay").addEventListener("click", () => {
-    document.getElementById("win-overlay").style.display = "none";
-  });
-  document.getElementById("win-box").addEventListener("click", e => e.stopPropagation());
-  document.getElementById("win-close-btn").addEventListener("click", () => {
-  document.getElementById("win-overlay").style.display = "none";
-});
-
-  document.addEventListener("keydown", e => {
-  if (e.key === "Escape") {
-    document.getElementById("win-overlay").style.display = "none";
-  }
-});
-
-renderCards(state);
+  renderCards(state, translations);
 }
 
-main();</code></pre>
+main();
+</code></pre>
         </article>
     </section>
 
@@ -399,13 +569,13 @@ main();</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildHowtoExample">buildHowtoExample</a></li><li><a href="global.html#getLang">getLang</a></li><li><a href="global.html#handleGuessInput">handleGuessInput</a></li><li><a href="global.html#insertSorted">insertSorted</a></li><li><a href="global.html#loadTranslations">loadTranslations</a></li><li><a href="global.html#renderCards">renderCards</a></li><li><a href="global.html#renderGuessCard">renderGuessCard</a></li><li><a href="global.html#renderTargetCard">renderTargetCard</a></li><li><a href="global.html#scoreToColor">scoreToColor</a></li><li><a href="global.html#titleToUrl">titleToUrl</a></li><li><a href="global.html#updateKnownLinks">updateKnownLinks</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addHint">addHint</a></li><li><a href="global.html#buildHowtoExample">buildHowtoExample</a></li><li><a href="global.html#buildWinOverlay">buildWinOverlay</a></li><li><a href="global.html#checkGameDate">checkGameDate</a></li><li><a href="global.html#createState">createState</a></li><li><a href="global.html#getLang">getLang</a></li><li><a href="global.html#handleDateChange">handleDateChange</a></li><li><a href="global.html#handleGuessInput">handleGuessInput</a></li><li><a href="global.html#insertSorted">insertSorted</a></li><li><a href="global.html#loadOrCreateState">loadOrCreateState</a></li><li><a href="global.html#loadTranslations">loadTranslations</a></li><li><a href="global.html#makeScoreColorFn">makeScoreColorFn</a></li><li><a href="global.html#renderCards">renderCards</a></li><li><a href="global.html#renderGuessCard">renderGuessCard</a></li><li><a href="global.html#renderTargetCard">renderTargetCard</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#showMidnightOverlay">showMidnightOverlay</a></li><li><a href="global.html#showToast">showToast</a></li><li><a href="global.html#showWinOverlay">showWinOverlay</a></li><li><a href="global.html#showYesterdaysAnswer">showYesterdaysAnswer</a></li><li><a href="global.html#titleToUrl">titleToUrl</a></li><li><a href="global.html#updateKnownLinks">updateKnownLinks</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Apr 29 2026 21:19:41 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun May 17 2026 16:36:55 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
