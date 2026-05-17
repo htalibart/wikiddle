@@ -283,7 +283,7 @@ def get_game_date(request: Request, lang: str = Depends(valid_lang)):
 
 
 @router.get("/admin/refresh")
-def refresh_daily_articles(request: Request, token: str = Query(...)):
+def refresh_daily_articles(request: Request, token: str = Query(default=None)):
     ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN")
     if not ADMIN_TOKEN or token != ADMIN_TOKEN:
         raise HTTPException(status_code=403, detail="Forbidden")
