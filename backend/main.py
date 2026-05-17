@@ -6,7 +6,6 @@ import random
 
 from fastapi import FastAPI, HTTPException, Query, APIRouter, Request, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -283,4 +282,3 @@ def get_game_date(request: Request, lang: str = Depends(valid_lang)):
     return {"date": format_date(article["date"])}
 
 app.include_router(router)
-#app.mount("/", StaticFiles(directory=str(MAIN_DIR / "frontend"), html=True), name="frontend")
