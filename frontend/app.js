@@ -198,22 +198,29 @@ function checkGameDate(state, currentDate) {
 
 
 
-
 async function showYesterdaysAnswer(state, translations) {
   const banner = document.getElementById("yesterdays-banner");
-  const label = document.getElementById("yesterdays-banner-message");
   const dismissBtn = document.getElementById("yesterdays-banner-dismiss");
 
-  const res = await fetch(`${API_URL}/${state.lang}/yesterdays-article`);
-  const { title } = await res.json();
-
-  const titleLink = `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`
-  document.getElementById("yesterdays-banner-message").innerHTML = translations.yesterdays_answer.replace("{title}", titleLink)
+  try {
+    const res = await fetch(`${API_URL}/${state.lang}/yesterdays-article`);
+    if (!res.ok) {
+      banner.style.display = "none";
+      return;
+    }
+    const { title } = await res.json();
+    const titleLink = `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`;
+    document.getElementById("yesterdays-banner-message").innerHTML = translations.yesterdays_answer.replace("{title}", titleLink);
+  } catch {
+    banner.style.display = "none";
+    return;
+  }
 
   dismissBtn.addEventListener("click", () => {
     banner.style.display = "none";
   });
 }
+
 
 
 /**

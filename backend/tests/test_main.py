@@ -224,6 +224,10 @@ class TestNewTargetNeighbor:
 
 
 class TestYesterdaysArticle:
+    def setup_method(self):
+        for lang in _cached_yesterday_targets:
+            _cached_yesterday_targets[lang].update({"id": None, "title": None, "date": None})
+
     def test_returns_yesterdays_article(self, client):
         with patch("main.open_games_db_con", return_value=make_games_con_mock(article_id=12, title="Titi")):
             res = client.get("/api/en/yesterdays-article")
@@ -231,6 +235,11 @@ class TestYesterdaysArticle:
         data = res.json()
         assert data["id"] == 12
         assert data["title"] == "Titi"
+
+    def test_not_found(self, client):
+        with patch("main.open_games_db_con", return_value=make_con_mock(fetchone=None)):
+            res = client.get("/api/en/yesterdays-article")
+        assert res.status_code == 404
 
     def test_invalid_lang(self, client):
         res = client.get("/api/xx/yesterdays-article")

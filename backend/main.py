@@ -94,6 +94,7 @@ def get_games_db_con():
     finally:
         con.close()
 
+
 def get_previous_article(lang: str, d: date) -> dict:
     """ returns article from a previous game given language and date """
     con = open_games_db_con()
@@ -103,6 +104,8 @@ def get_previous_article(lang: str, d: date) -> dict:
                 "SELECT article_id, article_title FROM daily_articles WHERE date = ? AND lang = ?",
                 [date_str, lang]
                 ).fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail=f"No article found at {date_str} in {lang} database")
     finally:
         con.close()
     return {"date": d, "id": row[0], "title": row[1]}
