@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 
 from datetime import date, timedelta
 
-from main import app, get_daily_article_cached, _cached_daily_targets
+from main import app, get_daily_article_cached, get_yesterdays_article_cached, _cached_daily_targets, _cached_yesterday_targets
 
 
 def make_con_mock(fetchone=None, fetchall=None):
@@ -22,6 +22,11 @@ def make_db_mock(article_id=42, title="Toto", count=1000):
     ]
     return con
 
+def make_games_con_mock(article_id=12, title="Titi"):
+    con = MagicMock()
+    con.execute.return_value.fetchone.return_value = (article_id, title)
+    return con
+
 
 @pytest.fixture
 def client():
@@ -36,14 +41,14 @@ class TestNotFound:
         assert res.status_code == 404
 
     def test_article_id_not_found(self, client):
-        with patch("main.open_con", return_value=make_con_mock(fetchone=None)):
+        with patch("main.open_wiki_db_con", return_value=make_con_mock(fetchone=None)):
             res = client.get("/api/en/article-id?title=Toto")
         assert res.status_code == 404
 
 
 class TestMissingParams:
     def test_articles_missing_query(self, client):
-        with patch("main.open_con", return_value=make_con_mock()):
+        with patch("main.open_wiki_db_con", return_value=make_con_mock()):
             res = client.get("/api/en/articles")
         assert res.status_code == 422
 
@@ -52,7 +57,7 @@ class TestMissingParams:
         assert res.status_code == 422
 
     def test_article_id_missing_title(self, client):
-        with patch("main.open_con", return_value=make_con_mock()):
+        with patch("main.open_wiki_db_con", return_value=make_con_mock()):
             res = client.get("/api/en/article-id")
         assert res.status_code == 422
 
@@ -108,7 +113,7 @@ class TestDailyArticleCached:
 
     def test_uses_cache_on_second_call(self):
         con = make_db_mock()
-        with patch("main.open_con", return_value=con):
+        with patch("main.open_wiki_db_con", return_value=con):
             get_daily_article_cached("en")
             get_daily_article_cached("en")
         assert con.execute.call_count == 2
@@ -118,7 +123,7 @@ class TestDailyArticleCached:
         _cached_daily_targets["en"].update({"id": 12, "title": "Titi", "date": yesterday})
 
         con = make_db_mock(title="Toto")
-        with patch("main.open_con", return_value=con):
+        with patch("main.open_wiki_db_con", return_value=con):
             result = get_daily_article_cached("en")
 
         assert result["date"] == date.today()
@@ -128,7 +133,7 @@ class TestDailyArticleCached:
         con_en = make_db_mock(article_id=42, title="Toto")
         con_fr = make_db_mock(article_id=84, title="Bonjour")
 
-        with patch("main.open_con", side_effect=[con_en, con_fr]):
+        with patch("main.open_wiki_db_con", side_effect=[con_en, con_fr]):
             result_en = get_daily_article_cached("en")
             result_fr = get_daily_article_cached("fr")
 
@@ -162,22 +167,22 @@ class TestInvalidLang:
 
 class TestQueryValidation:
     def test_articles_query_too_long(self, client):
-        with patch("main.open_con", return_value=make_con_mock()):
+        with patch("main.open_wiki_db_con", return_value=make_con_mock()):
             res = client.get(f"/api/en/articles?query={'a' * 301}")
         assert res.status_code == 422
 
     def test_articles_query_empty(self, client):
-        with patch("main.open_con", return_value=make_con_mock()):
+        with patch("main.open_wiki_db_con", return_value=make_con_mock()):
             res = client.get("/api/en/articles?query=")
         assert res.status_code == 422
 
     def test_article_id_title_too_long(self, client):
-        with patch("main.open_con", return_value=make_con_mock()):
+        with patch("main.open_wiki_db_con", return_value=make_con_mock()):
             res = client.get(f"/api/en/article-id?title={'a' * 301}")
         assert res.status_code == 422
 
     def test_article_id_title_empty(self, client):
-        with patch("main.open_con", return_value=make_con_mock()):
+        with patch("main.open_wiki_db_con", return_value=make_con_mock()):
             res = client.get("/api/en/article-id?title=")
         assert res.status_code == 422
 
@@ -216,3 +221,41 @@ class TestNewTargetNeighbor:
         with daily_patch, neighbors_patch, titles_patch:
             res = client.post("/api/en/new-target-neighbor")
         assert res.status_code == 200
+
+
+class TestYesterdaysArticle:
+    def test_returns_yesterdays_article(self, client):
+        with patch("main.open_games_db_con", return_value=make_games_con_mock(article_id=12, title="Titi")):
+            res = client.get("/api/en/yesterdays-article")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["id"] == 12
+        assert data["title"] == "Titi"
+
+    def test_invalid_lang(self, client):
+        res = client.get("/api/xx/yesterdays-article")
+        assert res.status_code == 400
+
+class TestYesterdaysArticleCached:
+    def setup_method(self):
+        for lang in _cached_yesterday_targets:
+            _cached_yesterday_targets[lang].update({"id": None, "title": None, "date": None})
+
+    def test_uses_cache_on_second_call(self):
+        con = make_games_con_mock()
+        with patch("main.open_games_db_con", return_value=con) as mock_open:
+            get_yesterdays_article_cached("en")
+            get_yesterdays_article_cached("en")
+        assert mock_open.call_count == 1
+
+    def test_refreshes_cache_when_stale(self):
+        two_days_ago = date.today() - timedelta(days=2)
+        _cached_yesterday_targets["en"].update({"id": 99, "title": "Toutou", "date": two_days_ago})
+
+        con = make_games_con_mock(article_id=12, title="Titi")
+        with patch("main.open_games_db_con", return_value=con):
+            result = get_yesterdays_article_cached("en")
+
+        yesterday = date.today() - timedelta(days=1)
+        assert result["date"] == yesterday
+        assert result["title"] == "Titi"
