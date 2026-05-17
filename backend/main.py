@@ -37,6 +37,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 _cached_daily_targets = {lang: {"id": None, "title": None, "date": None} for lang in LANGUAGES}
 
+
+def format_date(d: date) -> str:
+    """ formats date in YYYY-MM-DD format """
+    return d.isoformat()
+    
+
 def valid_lang(lang: str) -> str:
     """ validates that @lang is a supported language, raises 400 if not, otherwise returns the language """
     if lang not in LANGUAGES:
@@ -153,7 +159,7 @@ def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid
         "common": [n1[nid] for nid in common],
         "is_target": is_target,
         "is_on_target": is_on_target,
-        "game_date": article["date"].isoformat()
+        "game_date": format_date(article["date"])
     }
 
 
@@ -184,7 +190,7 @@ def get_one_new_neighbor(request: Request, lang: str = Depends(valid_lang), know
     neighbor_ids = get_neighbors(lang, target["id"])
     neighbor_titles = set(get_article_titles(lang, neighbor_ids))
     n_not_guessed = neighbor_titles.difference(set(known_titles))
-    game_date = target["date"].isoformat()
+    game_date = format_date(target["date"])
     if not n_not_guessed:
         return {
             "title": None,
@@ -202,7 +208,7 @@ def get_one_new_neighbor(request: Request, lang: str = Depends(valid_lang), know
 def get_game_date(request: Request, lang: str = Depends(valid_lang)):
     """ API route to get the date of the current cached game """
     article = get_daily_article_cached(lang)
-    return {"date": article["date"].isoformat()}
+    return {"date": format_date(article["date"])}
 
 app.include_router(router)
 #app.mount("/", StaticFiles(directory=str(MAIN_DIR / "frontend"), html=True), name="frontend")
