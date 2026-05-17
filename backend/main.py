@@ -111,6 +111,18 @@ def get_previous_article(lang: str, d: date) -> dict:
     return {"date": d, "id": row[0], "title": row[1]}
 
 
+def add_article_to_games_db(day: date, lang: str, article_id: int, article_title: str):
+    """ add new article to previous games database """
+    con = open_games_db_con()
+    try:
+        con.execute(
+                "INSERT OR IGNORE INTO daily_articles VALUES (?, ?, ?, ?)",
+                [format_date(day), lang, article_id, article_title]
+        )
+    finally:
+        con.close()
+
+
 def get_yesterdays_article_cached(lang: str) -> dict:
     """ returns yesterday's article for the given language, refreshes the cache if needed """
     yesterday = date.today() - timedelta(days=1) 
@@ -132,6 +144,7 @@ def get_daily_article_cached(lang: str) -> dict:
                 f"SELECT id, title FROM articles WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
                 [seed, offset]
             ).fetchone()
+            add_article_to_games_db(day=today, lang=lang, article_id=row[0], article_title=row[1])
         finally:
             con.close()
         _cached_daily_targets[lang].update({"date": today, "id": row[0], "title": row[1]})

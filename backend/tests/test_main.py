@@ -113,7 +113,8 @@ class TestDailyArticleCached:
 
     def test_uses_cache_on_second_call(self):
         con = make_db_mock()
-        with patch("main.open_wiki_db_con", return_value=con):
+        with patch("main.open_wiki_db_con", return_value=con), \
+             patch("main.open_games_db_con", return_value=make_con_mock()):
             get_daily_article_cached("en")
             get_daily_article_cached("en")
         assert con.execute.call_count == 2
@@ -123,7 +124,8 @@ class TestDailyArticleCached:
         _cached_daily_targets["en"].update({"id": 12, "title": "Titi", "date": yesterday})
 
         con = make_db_mock(title="Toto")
-        with patch("main.open_wiki_db_con", return_value=con):
+        with patch("main.open_wiki_db_con", return_value=con), \
+             patch("main.open_games_db_con", return_value=make_con_mock()):
             result = get_daily_article_cached("en")
 
         assert result["date"] == date.today()
@@ -133,7 +135,8 @@ class TestDailyArticleCached:
         con_en = make_db_mock(article_id=42, title="Toto")
         con_fr = make_db_mock(article_id=84, title="Bonjour")
 
-        with patch("main.open_wiki_db_con", side_effect=[con_en, con_fr]):
+        with patch("main.open_wiki_db_con", side_effect=[con_en, con_fr]), \
+             patch("main.open_games_db_con", return_value=make_con_mock()):
             result_en = get_daily_article_cached("en")
             result_fr = get_daily_article_cached("fr")
 
@@ -141,7 +144,6 @@ class TestDailyArticleCached:
         assert result_en["title"] == "Toto"
         assert result_fr["id"] == 84
         assert result_fr["title"] == "Bonjour"
-
 
 class TestInvalidLang:
     def test_daily_article_invalid_lang(self, client):
