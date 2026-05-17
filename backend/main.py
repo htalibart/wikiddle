@@ -283,6 +283,7 @@ def get_game_date(request: Request, lang: str = Depends(valid_lang)):
 
 
 @router.get("/admin/refresh", include_in_schema=False)
+@limiter.limit("5/minute")
 def refresh_daily_articles(request: Request, token: str = Query(default=None)):
     ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN")
     if not ADMIN_TOKEN or token != ADMIN_TOKEN:
