@@ -219,6 +219,30 @@ sudo systemctl enable wikiddle  # start wikiddle automatically on boot
 sudo systemctl start wikiddle  # start wikiddle now
 ```
 
+
+### 9. Auto refresh
+The database of previous games is updated every day with a crontab job that calls an API endpoint. To set it up I generated a token with:
+```bash
+openssl rand -hex 32
+```
+
+and copied it into `/etc/wikiddle/secrets`
+```
+ADMIN_TOKEN=<my_secret_token>
+```
+
+The file is referenced in the wikiddle systemd file (`EnvironmentFile=/etc/wikiddle/secrets`).
+
+Then configured a crontab job that calls the endpoint every day at 1AM:
+```bash
+crontab -e
+```
+
+```
+0 1 * * * curl -s "http://127.0.0.1:8000/api/admin/refresh?token=<my_secret_token>"
+```
+
+
 ---
 
 ## Deploying a new version

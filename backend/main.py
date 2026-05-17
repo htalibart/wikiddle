@@ -281,4 +281,14 @@ def get_game_date(request: Request, lang: str = Depends(valid_lang)):
     article = get_daily_article_cached(lang)
     return {"date": format_date(article["date"])}
 
+
+@router.get("/admin/refresh")
+def refresh_daily_articles(request: Request, token: str = Query(...)):
+    ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN")
+    if not ADMIN_TOKEN or token != ADMIN_TOKEN:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    for lang in LANGUAGES:
+        get_daily_article_cached(lang)
+    return {"status": "ok"}
+
 app.include_router(router)
