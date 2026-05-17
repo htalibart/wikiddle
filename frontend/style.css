@@ -109,24 +109,18 @@ body {
 
 #top-panel {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-larger);
+  flex-direction: column;
+  gap: var(--space-medium);
   padding: var(--space-larger) var(--space-largest);
   background-color: var(--surface-background);
   border-bottom: 1px solid var(--very-light-color);
 }
 
-#top-panel h1 {
-  font-size: var(--font-size-title);
-  font-weight: normal;
-  letter-spacing: 0.05em;
-}
-
 #title-area {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: var(--space-large);
+  flex-wrap: wrap;
 }
 
 #title-logo {
@@ -134,9 +128,12 @@ body {
   width: auto;
 }
 
+#lang-switcher {
+  margin-left: auto;
+}
+
 #input-area {
   display: flex;
-  flex: 1;
   flex-wrap: wrap;
   gap: var(--space-medium);
   min-width: 0;
@@ -181,7 +178,7 @@ body {
   border: none;
   cursor: pointer;
   border-radius: var(--border-radius);
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
 }
 
 .btn-primary {
@@ -215,6 +212,27 @@ body {
   background-color: var(--disabled-button-background);
 }
 
+/* How-to button */
+
+#howto-btn {
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--very-light-color);
+  border-radius: 999px;
+  background-color: var(--surface-background);
+  color: var(--main-medium-color);
+  font-size: var(--font-size-small);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+#howto-btn:hover,
+#howto-btn:focus-visible {
+  border-color: var(--wikipedia-blue);
+  color: var(--wikipedia-blue);
+  background-color: var(--almost-white);
+  outline: none;
+}
+
 /* Tom Select */
 
 .ts-wrapper,
@@ -223,7 +241,7 @@ body {
 .ts-dropdown-content,
 .ts-control input {
   font-size: var(--font-size-control) !important;
-  font-family: var(--font-serif) !important;
+  font-family: var(--font-sans) !important;
 }
 
 .ts-dropdown .option {
@@ -309,8 +327,6 @@ body {
   font-style: italic;
 }
 
-
-
 /* Target card */
 
 .target-guess-card {
@@ -351,7 +367,6 @@ body {
   color: var(--main-light-color);
   font-style: italic;
 }
-
 
 /* Target card when found */
 
@@ -441,24 +456,9 @@ body {
   margin-bottom: var(--space-largest);
 }
 
-
 #howto-example {
   padding-top: var(--space-larger);
   border-top: 1px solid var(--very-light-color);
-}
-
-#howto-btn {
-  padding: 0;
-  font-size: var(--font-size-small);
-  background: none;
-  border: none;
-  color: var(--main-medium-color);
-  cursor: pointer;
-  text-decoration: none;
-}
-
-#howto-btn:hover {
-  font-weight: bold;
 }
 
 .howto-annotation {
@@ -547,8 +547,29 @@ body {
 /* Responsive */
 
 @media (max-width: 600px) {
+  #top-panel {
+    padding: var(--space-larger);
+  }
+
   #title-area {
-    width: 100%;
+    gap: var(--space-medium);
+    flex-wrap: nowrap;
+  }
+
+  #title-logo {
+    height: 1.5rem;
+    min-width: 0;
+  }
+
+  #howto-btn {
+    padding: 0.2rem 0.55rem;
+    font-size: var(--font-size-smallest);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  #lang-switcher {
+    flex-shrink: 0;
   }
 
   #input-area .ts-wrapper {
