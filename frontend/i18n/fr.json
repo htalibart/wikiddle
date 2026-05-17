@@ -33,5 +33,9 @@
   "win_message": "Vous avez trouvé !",
   "win_article": "L'article mystère du jour était {title}",
   "win_game_stats": "Trouvé en {nbGuesses} coups, {nbHints} indices.",
+  "win_share_label": "Partagez votre score",
+  "win_share": "Partager",
+  "win_share_text": "J'ai trouvé le Wikiddle du jour en {nbGuesses} coups ({nbHints} indices) !\nhttps://wikiddle.com/fr",
+  "copied_to_clipboard": "Copié dans le presse-papier",
   "yesterdays_answer": "L'article mystère d'hier était : {title}."
 }

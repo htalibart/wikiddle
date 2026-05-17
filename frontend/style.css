@@ -513,6 +513,36 @@ body {
   margin-bottom: var(--space-largest);
 }
 
+#win-share-section {
+  text-align: left;
+  border-top: 1px solid var(--very-light-color);
+  padding-top: var(--space-large);
+  margin-top: var(--space-medium);
+}
+
+#win-share-label {
+  font-size: var(--font-size-small);
+  color: var(--main-light-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-sans);
+  margin-bottom: var(--space-small);
+}
+
+#win-share-preview {
+  width: 100%;
+  border: 1px solid var(--input-border-color);
+  border-radius: var(--border-radius);
+  padding: var(--space-small) var(--space-large);
+  font-size: var(--font-size-small);
+  font-family: var(--font-sans);
+  color: var(--main-medium-color);
+  background-color: var(--surface-background);
+  resize: none;
+  outline: none;
+  margin-bottom: var(--space-large);
+}
+
 #howto-example {
   padding-top: var(--space-larger);
   border-top: 1px solid var(--very-light-color);

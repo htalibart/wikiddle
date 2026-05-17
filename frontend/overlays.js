@@ -1,4 +1,16 @@
 /**
+ * Shows a toast notification message
+ * @param {string} message - message to show
+ */
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("visible");
+  setTimeout(() => toast.classList.remove("visible"), 3000);
+}
+
+
+/**
  * Builds the "how to play" overlay
  * @param {Object} translations - translations for the current language
  * @param {string} lang - language code
@@ -132,20 +144,22 @@ function showMidnightOverlay() {
  * @param {Object} translations - translations for the current language
  */
 function buildWinOverlay(translations) {
-    document.getElementById("win-message").textContent = translations.win_message;
-    
-    document.getElementById("win-overlay").addEventListener("click", () => {
-        document.getElementById("win-overlay").style.display = "none";
-    });
-    document.getElementById("win-box").addEventListener("click", e => e.stopPropagation());
-    document.getElementById("win-close-btn").addEventListener("click", () => {
-        document.getElementById("win-overlay").style.display = "none";
-     });
-    document.addEventListener("keydown", e => {
-        if (e.key === "Escape") {
-            document.getElementById("win-overlay").style.display = "none";
-        }
-    });
+  document.getElementById("win-message").textContent = translations.win_message;
+  document.getElementById("win-share-btn").textContent = translations.win_share;
+  document.getElementById("win-share-label").textContent = translations.win_share_label;
+  
+  document.getElementById("win-overlay").addEventListener("click", () => {
+      document.getElementById("win-overlay").style.display = "none";
+  });
+  document.getElementById("win-box").addEventListener("click", e => e.stopPropagation());
+  document.getElementById("win-close-btn").addEventListener("click", () => {
+      document.getElementById("win-overlay").style.display = "none";
+   });
+  document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+          document.getElementById("win-overlay").style.display = "none";
+      }
+  });
 }
 
 
@@ -156,10 +170,26 @@ function buildWinOverlay(translations) {
  */
 function showWinOverlay(state, translations) {
   confetti();
+
   const nbGuesses = 1 + state.guesses.length + (state.lastGuess ? 1 : 0);
   const mysteryTitle = state.knowledgeTarget.title;
   const nbHints = state.nbHints;
+
   document.getElementById("win-article").innerHTML = translations.win_article.replace("{title}", `<a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank">${mysteryTitle}</a>`);
   document.getElementById("win-game-stats").textContent = translations.win_game_stats.replace("{nbGuesses}", nbGuesses).replace("{nbHints}", nbHints);
+
+  const shareText = translations.win_share_text.replace("{nbGuesses}", nbGuesses).replace("{nbHints}", nbHints);
+  document.getElementById("win-share-preview").value = shareText;
+
+  document.getElementById("win-share-btn").addEventListener("click", () => {
+    if (navigator.share) {
+      navigator.share({ text: shareText });
+    } else {
+      navigator.clipboard.writeText(shareText).then(() =>
+        showToast(translations.copied_to_clipboard)
+      );
+    }
+    });
+
   document.getElementById("win-overlay").style.display = "flex";
 }

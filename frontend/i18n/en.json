@@ -33,5 +33,9 @@
   "win_message": "You found it!",
   "win_article": "Today's mystery article was {title}",
   "win_game_stats": "Found in {nbGuesses} guesses, {nbHints} hints.",
+  "win_share_label": "Share your result",
+  "win_share": "Share",
+  "win_share_text": "I found today's Wikiddle in {nbGuesses} guesses ({nbHints} hints)!\nhttps://wikiddle.com",
+  "copied_to_clipboard": "Copied to clipboard",
   "yesterdays_answer": "Yesterday's mystery article was {title}."
 }
