@@ -43,7 +43,8 @@ class TestNotFound:
 
 class TestMissingParams:
     def test_articles_missing_query(self, client):
-        res = client.get("/api/en/articles")
+        with patch("main.open_con", return_value=make_con_mock()):
+            res = client.get("/api/en/articles")
         assert res.status_code == 422
 
     def test_article_title_missing_id(self, client):
@@ -51,7 +52,8 @@ class TestMissingParams:
         assert res.status_code == 422
 
     def test_article_id_missing_title(self, client):
-        res = client.get("/api/en/article-id")
+        with patch("main.open_con", return_value=make_con_mock()):
+            res = client.get("/api/en/article-id")
         assert res.status_code == 422
 
     def test_common_neighbors_missing_id(self, client):
@@ -160,21 +162,23 @@ class TestInvalidLang:
 
 class TestQueryValidation:
     def test_articles_query_too_long(self, client):
-        long_query = 'a' * 301
-        res = client.get(f"/api/en/articles?query={long_query}")
+        with patch("main.open_con", return_value=make_con_mock()):
+            res = client.get(f"/api/en/articles?query={'a' * 301}")
         assert res.status_code == 422
 
     def test_articles_query_empty(self, client):
-        res = client.get("/api/en/articles?query=")
+        with patch("main.open_con", return_value=make_con_mock()):
+            res = client.get("/api/en/articles?query=")
         assert res.status_code == 422
 
     def test_article_id_title_too_long(self, client):
-        long_query = 'a' * 301
-        res = client.get(f"/api/en/article-id?title={long_query}")
+        with patch("main.open_con", return_value=make_con_mock()):
+            res = client.get(f"/api/en/article-id?title={'a' * 301}")
         assert res.status_code == 422
 
     def test_article_id_title_empty(self, client):
-        res = client.get("/api/en/article-id?title=")
+        with patch("main.open_con", return_value=make_con_mock()):
+            res = client.get("/api/en/article-id?title=")
         assert res.status_code == 422
 
 
