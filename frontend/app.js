@@ -197,7 +197,11 @@ function checkGameDate(state, currentDate) {
 }
 
 
-
+/**
+ * Shows yesterday's answer in a banner 
+ * @param {State} state 
+ * @param {Object} translations
+ */
 async function showYesterdaysAnswer(state, translations) {
   const banner = document.getElementById("yesterdays-banner");
   const dismissBtn = document.getElementById("yesterdays-banner-dismiss");
