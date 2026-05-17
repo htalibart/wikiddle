@@ -196,6 +196,14 @@ function checkGameDate(state, currentDate) {
   }
 }
 
+
+async function showYesterdaysAnswer(state, translations) {
+  const res = await fetch(`${API_URL}/${state.lang}/yesterdays-article`);
+  const { title } = await res.json();
+  const title_link = `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`
+  document.getElementById("yesterdays-article").innerHTML = translations.yesterdays_answer.replace("{title}", title_link) 
+}
+
 /**
  * Handles a guess proposed by the user.
  * Fetches common neighbors from the API, updates the state, re-renders the cards.
@@ -456,6 +464,8 @@ async function main() {
   const howtoBtn = document.getElementById("howto-btn");
   const howtoOverlay = document.getElementById("howto-overlay");
   howtoBtn.addEventListener("click", () => howtoOverlay.style.display = "flex");
+
+  showYesterdaysAnswer(state, translations);
 
   // Search
   const tomSelect = new TomSelect("#guess-input", {

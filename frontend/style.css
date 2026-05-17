@@ -132,6 +132,20 @@ body {
   margin-left: auto;
 }
 
+#yesterdays-article {
+  color: var(--main-light-color);
+  font-size: var(--font-size-small);
+}
+
+#yesterdays-article a {
+  color: var(--wikipedia-blue);
+  text-decoration: none;
+}
+
+#yesterdays-article a:hover {
+  text-decoration: underline;
+}
+
 #input-area {
   display: flex;
   flex-wrap: wrap;
