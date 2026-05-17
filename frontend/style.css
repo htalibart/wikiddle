@@ -137,14 +137,6 @@ body {
   font-size: var(--font-size-small);
 }
 
-#yesterdays-article a {
-  color: var(--wikipedia-blue);
-  text-decoration: none;
-}
-
-#yesterdays-article a:hover {
-  text-decoration: underline;
-}
 
 #input-area {
   display: flex;
@@ -261,6 +253,61 @@ body {
 .ts-dropdown .option {
   padding: var(--space-small) var(--space-large) !important;
 }
+
+
+
+/* Yesterday's article banner */
+
+#yesterdays-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-large);
+  padding: var(--space-small) var(--space-larger);
+  background-color: #EBF2FA;
+  border: 1px solid var(--wikipedia-light-blue);
+  border-radius: var(--border-radius);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-small);
+}
+
+#yesterdays-banner-text {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-medium);
+  flex: 1;
+  min-width: 0;
+}
+
+#yesterdays-banner-message {
+  color: var(--main-light-color);
+  letter-spacing: 0.05em;
+}
+
+#yesterdays-banner-message a {
+  color: var(--wikipedia-blue);
+  text-decoration: none;
+  font-family: var(--font-serif);
+}
+
+#yesterdays-banner-message a:hover {
+  text-decoration: underline;
+}
+
+#yesterdays-banner-dismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-medium);
+  color: var(--main-light-color);
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+#yesterdays-banner-dismiss:hover {
+  color: var(--main-dark-color);
+}
+
 
 /* Guess cards */
 
@@ -584,6 +631,10 @@ body {
 
   #lang-switcher {
     flex-shrink: 0;
+  }
+
+  #yesterdays-banner {
+    flex-wrap: wrap;
   }
 
   #input-area .ts-wrapper {

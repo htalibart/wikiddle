@@ -197,12 +197,24 @@ function checkGameDate(state, currentDate) {
 }
 
 
+
+
 async function showYesterdaysAnswer(state, translations) {
+  const banner = document.getElementById("yesterdays-banner");
+  const label = document.getElementById("yesterdays-banner-message");
+  const dismissBtn = document.getElementById("yesterdays-banner-dismiss");
+
   const res = await fetch(`${API_URL}/${state.lang}/yesterdays-article`);
   const { title } = await res.json();
-  const title_link = `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`
-  document.getElementById("yesterdays-article").innerHTML = translations.yesterdays_answer.replace("{title}", title_link) 
+
+  const titleLink = `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`
+  document.getElementById("yesterdays-banner-message").innerHTML = translations.yesterdays_answer.replace("{title}", titleLink)
+
+  dismissBtn.addEventListener("click", () => {
+    banner.style.display = "none";
+  });
 }
+
 
 /**
  * Handles a guess proposed by the user.
