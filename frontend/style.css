@@ -271,9 +271,6 @@ body {
 }
 
 #yesterdays-banner-text {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-medium);
   flex: 1;
   min-width: 0;
 }
@@ -307,7 +304,6 @@ body {
 #yesterdays-banner-dismiss:hover {
   color: var(--main-dark-color);
 }
-
 
 /* Guess cards */
 
