@@ -4,7 +4,12 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-os.environ["WIKI_DB_DIR"] = str(Path(__file__).parent.parent.parent/"data"/"db")
+DATA_DIR = Path(__file__).parent.parent.parent/"data"
+
+os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR/"db"/"wiki"))
+os.environ.setdefault("WIKI_VERSION", "1")
+os.environ.setdefault("GAMES_DB", str(DATA_DIR/"db"/"games"/"v1.db"))
+
 
 from main import app, _cached_daily_targets
 
