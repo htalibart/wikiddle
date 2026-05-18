@@ -114,7 +114,8 @@ class TestDailyArticleCached:
     def test_uses_cache_on_second_call(self):
         con = make_db_mock()
         with patch("main.open_wiki_db_con", return_value=con), \
-             patch("main.open_games_db_con", return_value=make_con_mock()):
+             patch("main.open_games_db_con", return_value=make_con_mock()), \
+             patch("main.get_schema_version", return_value=1):
             get_daily_article_cached("en")
             get_daily_article_cached("en")
         assert con.execute.call_count == 2
@@ -125,7 +126,8 @@ class TestDailyArticleCached:
 
         con = make_db_mock(title="Toto")
         with patch("main.open_wiki_db_con", return_value=con), \
-             patch("main.open_games_db_con", return_value=make_con_mock()):
+             patch("main.open_games_db_con", return_value=make_con_mock()), \
+             patch("main.get_schema_version", return_value=1):
             result = get_daily_article_cached("en")
 
         assert result["date"] == date.today()
@@ -136,7 +138,8 @@ class TestDailyArticleCached:
         con_fr = make_db_mock(article_id=84, title="Bonjour")
 
         with patch("main.open_wiki_db_con", side_effect=[con_en, con_fr]), \
-             patch("main.open_games_db_con", return_value=make_con_mock()):
+             patch("main.open_games_db_con", return_value=make_con_mock()), \
+             patch("main.get_schema_version", return_value=1):
             result_en = get_daily_article_cached("en")
             result_fr = get_daily_article_cached("fr")
 

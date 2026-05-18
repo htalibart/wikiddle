@@ -56,6 +56,14 @@ def valid_lang(lang: str) -> str:
         raise HTTPException(status_code=400, detail=f"Language not supported: {lang}")
     return lang
 
+def get_schema_version(con: duckdb.DuckDBPyConnection) -> int:
+    """ get schema database version (introduced categories in v2) """
+    try:
+        row = con.execute("SELECT value FROM metadata WHERE key = 'schema_version'").fetchone()
+    except duckdb.CatalogException:
+        return 1
+    return int(row[0])
+
 def open_games_db_con() -> duckdb.DuckDBPyConnection:
     """ opens a DuckDB connection to the games stats database, raises 500 if database file is not found """
     db_path = os.environ.get("GAMES_DB")
@@ -130,17 +138,28 @@ def get_yesterdays_article_cached(lang: str) -> dict:
     return _cached_yesterday_targets[lang]
 
 
+def get_daily_article_filter(schema_version: int) -> str:
+    """ return SQL filter for the daily article choice """
+    if schema_version == 1:
+        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET}"
+    else:
+        raise ValueError(f"Unsupported schema version: {schema_version}")
+
+
+
 def get_daily_article_cached(lang: str) -> dict:
     """ returns today's daily article for the given language, refreshes the cache if needed """
     today = date.today()
     if _cached_daily_targets[lang]["date"] != today:
         seed = int(today.strftime("%Y%m%d"))
         con = open_wiki_db_con(lang)
+        schema_version = get_schema_version(con)
+        article_filter = get_daily_article_filter(schema_version)
         try:
-            count = con.execute(f"SELECT COUNT(*) FROM articles WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET}").fetchone()[0]
+            count = con.execute(f"SELECT COUNT(*) FROM articles WHERE {article_filter}").fetchone()[0]
             offset = seed % count
             row = con.execute(
-                f"SELECT id, title FROM articles WHERE nb_links >= {MIN_NB_LINKS_FOR_TARGET} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
+                f"SELECT id, title FROM articles WHERE {article_filter} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
                 [seed, offset]
             ).fetchone()
             add_article_to_games_db(day=today, lang=lang, article_id=row[0], article_title=row[1])
