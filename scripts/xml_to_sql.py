@@ -50,12 +50,11 @@ def fetch_namespaces(language: str) -> set[str]:
                 namespaces.add(name + ":")
     return namespaces
 
-
-def fetch_disambiguation_templates(language: str) -> set[str]:
+def fetch_page_content(language: str, title: str) -> str:
     url = f"https://{language}.wikipedia.org/w/api.php"
     params = {
         "action": "query",
-        "titles": "MediaWiki:Disambiguationspage",
+        "titles": title,
         "prop": "revisions",
         "rvprop": "content",
         "format": "json",
@@ -64,10 +63,25 @@ def fetch_disambiguation_templates(language: str) -> set[str]:
     res.raise_for_status()
     data = res.json()
     page = next(iter(data["query"]["pages"].values()))
-    content = page["revisions"][0]["*"]
+    return page["revisions"][0]["*"]
+
+
+def fetch_english_disambiguation_templates() -> set[str]:
+    lua_code = fetch_page_content("en", "Module:Disambiguation/templates")
+    templates = re.findall(r'\["([^"]+)"\]', lua_code)
+    return {t.strip().lower() for t in templates}
+
+
+def fetch_mediawiki_disambiguation_templates(language: str) -> set[str]:
+    content = fetch_page_content(language, "MediaWiki:Disambiguationspage")
     templates = re.findall(r'\{\{(?:Template:)?([^}|]+)', content, re.IGNORECASE)
     return {t.strip().lower() for t in templates}
 
+
+def fetch_disambiguation_templates(language: str) -> set[str]:
+    if language == "en":
+        return fetch_english_disambiguation_templates()
+    return fetch_mediawiki_disambiguation_templates(language)
 
 def load_or_fetch_json(path: Path, fetch_fn, *args) -> set[str]:
     if path.exists():
