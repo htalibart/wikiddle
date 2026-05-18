@@ -77,9 +77,12 @@ def open_games_db_con() -> duckdb.DuckDBPyConnection:
 def open_wiki_db_con(lang: str) -> duckdb.DuckDBPyConnection:
     """ opens a DuckDB connection to the appropriate database depending on language, raises 500 if database file is not found """
     db_dir = os.environ.get("WIKI_DB_DIR")
+    db_version = os.environ.get("WIKI_VERSION")
     if db_dir is None:
         raise HTTPException(status_code=500, detail="WIKI_DB_DIR environment variable is not set")
-    db_path = Path(db_dir) / lang / 'wiki.db'
+    if db_version is None:
+        raise HTTPException(status_code=500, detail="WIKI_VERSION environment variable is not set")
+    db_path = Path(db_dir) / f'v{db_version}' / f'{lang}.db'
     if not db_path.is_file():
         raise HTTPException(status_code=500, detail=f"Database not found: {db_path}")
     return duckdb.connect(db_path, read_only=True)

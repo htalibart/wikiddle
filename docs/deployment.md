@@ -126,7 +126,7 @@ This downloads Wikipedia dump files. Replace `${LANGUAGE}` with `en` for English
 python3 scripts/xml_to_sql.py ${LANGUAGE}
 ```
 
-This reads the XML dump files and generates a SQLite database.
+This reads the XML dump files and generates a SQL database.
 
 
 ### 7. Set up Caddy and HTTPS
