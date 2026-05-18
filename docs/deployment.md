@@ -114,7 +114,7 @@ venv/bin/pip install -r backend/requirements.txt
 
 ### 6. Generate the database
 
-The database is not in the repo (too large). It is generated from Wikipedia dumps using two scripts in `scripts/`:
+The database is not in the repo (too large). It is generated from Wikipedia dumps using scripts in `scripts/`:
 
 ```bash
 bash scripts/download_wikipedia.sh ${LANGUAGE}
@@ -127,6 +127,13 @@ python3 scripts/xml_to_sql.py ${LANGUAGE}
 ```
 
 This reads the XML dump files and generates a SQL database.
+
+```bash
+python3 scripts/add_is_target_candidate.py ${LANGUAGE}
+```
+
+This adds the `is_target_candidate` column to the database based on filters (to remove articles no one cares about such as sport-related pages from candidate daily targets).
+
 
 
 ### 7. Set up Caddy and HTTPS
