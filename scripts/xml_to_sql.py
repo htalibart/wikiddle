@@ -13,10 +13,22 @@ import requests
 THIS_DIR = Path(__file__).parent
 MAIN_DIR = THIS_DIR.parent
 
+SCHEMA_VERSION = 2
+
 LINK_RE = re.compile(r"\[\[([^|\]#]+)")
 TEMPLATE_RE = re.compile(r'\{\{\s*([^|}]+?)\s*[|}]')
 
+CATEGORY_PREFIX = {
+    'en': 'Category',
+    'fr': 'Catégorie',
+}
+
 MIN_PAGE_LENGTH = 200
+
+
+def get_category_re(language: str) -> re.Pattern:
+    prefix = CATEGORY_PREFIX.get(language, 'Category')
+    return re.compile(r'\[\[' + re.escape(prefix) + r':([^\]|]+)', re.IGNORECASE)
 
 
 def fetch_namespaces(language: str) -> set[str]:
@@ -38,6 +50,7 @@ def fetch_namespaces(language: str) -> set[str]:
                 namespaces.add(name + ":")
     return namespaces
 
+
 def fetch_disambiguation_templates(language: str) -> set[str]:
     url = f"https://{language}.wikipedia.org/w/api.php"
     params = {
@@ -52,7 +65,6 @@ def fetch_disambiguation_templates(language: str) -> set[str]:
     data = res.json()
     page = next(iter(data["query"]["pages"].values()))
     content = page["revisions"][0]["*"]
-    # extract template names from lines like "* {{Template:Homonymie}}"
     templates = re.findall(r'\{\{(?:Template:)?([^}|]+)', content, re.IGNORECASE)
     return {t.strip().lower() for t in templates}
 
@@ -120,7 +132,7 @@ def iter_pages(xml_file: Path, namespaces: set[str], disambig_templates: set[str
             yield page_id, title, text
 
 
-def read_nodes_and_edges(xml_file: Path, articles_writer, links_writer, namespaces: set[str], disambig_templates: set[str]):
+def read_nodes_edges_and_categories(xml_file: Path, articles_writer, links_writer, categories_writer, namespaces: set[str], disambig_templates: set[str], category_re: re.Pattern):
     start_time = time.time()
     for page_count, (page_id, title, text) in enumerate(iter_pages(xml_file, namespaces, disambig_templates)):
         links = set()
@@ -133,6 +145,15 @@ def read_nodes_and_edges(xml_file: Path, articles_writer, links_writer, namespac
                 links.add(link)
         for link in links:
             links_writer.writerow((page_id, link))
+
+        categories = set()
+        for category in category_re.findall(text):
+            category = category.strip()
+            if category:
+                categories.add(category)
+        for category in categories:
+            categories_writer.writerow((page_id, category))
+
         articles_writer.writerow((page_id, title, len(text), len(links)))
         if page_count % 10_000 == 0 and page_count > 0:
             elapsed = time.time() - start_time
@@ -145,49 +166,63 @@ if __name__ == "__main__":
     args = parser.parse_args()
     language = args.language
 
-    data_dir = MAIN_DIR / 'data'
-    lang_data_dir = data_dir / 'metadata' / language
+    category_re = get_category_re(language)
+
+    data_dir = MAIN_DIR/"data"
+    lang_data_dir = data_dir/"metadata"/language
     lang_data_dir.mkdir(parents=True, exist_ok=True)
 
     print("Loading namespaces...")
     namespaces = load_or_fetch_json(
-        lang_data_dir / 'namespaces.json',
+        lang_data_dir/"namespaces.json",
         fetch_namespaces,
         language
     )
 
     print("Loading disambiguation templates...")
     disambig_templates = load_or_fetch_json(
-        lang_data_dir / 'disambiguation_templates.json',
+        lang_data_dir/"disambiguation_templates.json",
         fetch_disambiguation_templates,
         language
     )
 
-    xml_dir = data_dir / 'xml' / language
+    xml_dir = data_dir/"xml"/language
     xml_files = sorted(xml_dir.glob(f'{language}wiki-*.xml*.bz2'))
     assert xml_files, "No XML files found in data_dir"
 
-    output_dir = data_dir / 'db' / language
-    output_dir.mkdir(parents=True, exist_ok=True)
-    db_file = output_dir / 'wiki.db'
-    articles_file = output_dir / 'articles.csv'
-    links_file = output_dir / 'links_raw.csv'
+    db_dir = data_dir/"db"/"wiki"/f"v{SCHEMA_VERSION}"
+    tmp_dir = data_dir/"tmp"/"wiki"/f"v{SCHEMA_VERSION}"/language
+    db_dir.mkdir(parents=True, exist_ok=True)
+    tmp_dir.mkdir(parents=True, exist_ok=True)
 
-    with open(articles_file, 'w', newline='') as af, open(links_file, 'w', newline='') as lf:
+    db_file = db_dir/f"{language}.db"
+    articles_file = tmp_dir/"articles.csv"
+    links_file = tmp_dir/"links_raw.csv"
+    categories_file = tmp_dir/"categories_raw.csv"
+
+    with open(articles_file, 'w', newline='') as af, open(links_file, 'w', newline='') as lf, open(categories_file, 'w', newline='') as cf:
         articles_writer = csv.writer(af, delimiter='\t')
         links_writer = csv.writer(lf, delimiter='\t')
+        categories_writer = csv.writer(cf, delimiter='\t')
         for xml_file in xml_files:
             print(f"Reading {xml_file.name}...")
-            read_nodes_and_edges(xml_file, articles_writer, links_writer, namespaces, disambig_templates)
+            read_nodes_edges_and_categories(xml_file, articles_writer, links_writer, categories_writer, namespaces, disambig_templates, category_re)
 
     print("Loading into DuckDB...")
     con = duckdb.connect(str(db_file))
+    con.execute("""
+        CREATE TABLE metadata (
+            key TEXT PRIMARY KEY,
+            value TEXT
+        )
+    """)
+    con.execute("INSERT INTO metadata VALUES ('schema_version', ?)", [str(SCHEMA_VERSION)])
     con.execute("""
         CREATE TABLE articles (
             id BIGINT,
             title TEXT NOT NULL,
             article_length INTEGER,
-            nb_links INTEGER,
+            nb_links INTEGER
         )
     """)
     con.execute("""
@@ -196,8 +231,15 @@ if __name__ == "__main__":
             target_title TEXT
         )
     """)
+    con.execute("""
+        CREATE TABLE categories_raw (
+            article_id BIGINT,
+            category_name TEXT
+        )
+    """)
     con.execute(f"COPY articles FROM '{articles_file}' (DELIMITER '\t')")
     con.execute(f"COPY links_raw FROM '{links_file}' (DELIMITER '\t', QUOTE '\"')")
+    con.execute(f"COPY categories_raw FROM '{categories_file}' (DELIMITER '\t', QUOTE '\"')")
 
     print("Resolving link targets...")
     con.execute("""
@@ -209,7 +251,28 @@ if __name__ == "__main__":
     con.execute("DROP TABLE links_raw")
     print("Done with link targets.")
 
+    print("Resolving categories...")
+    con.execute("""
+        CREATE TABLE categories AS
+        SELECT row_number() OVER (ORDER BY category_name) AS id, category_name AS name
+        FROM (
+            SELECT DISTINCT category_name
+            FROM categories_raw
+        )
+    """)
+    con.execute("""
+        CREATE TABLE article_categories AS
+        SELECT cr.article_id, c.id AS category_id
+        FROM categories_raw cr
+        JOIN categories c ON c.name = cr.category_name
+    """)
+    con.execute("DROP TABLE categories_raw")
+    print("Done with categories.")
+
     con.execute("CREATE INDEX idx_source ON links(source_id)")
     con.execute("CREATE INDEX idx_target ON links(target_id)")
+    con.execute("CREATE INDEX idx_category_name ON categories(name)")
+    con.execute("CREATE INDEX idx_article_category_article ON article_categories(article_id)")
+    con.execute("CREATE INDEX idx_article_category_category ON article_categories(category_id)")
     con.close()
     print("Done.")
