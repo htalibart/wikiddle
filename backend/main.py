@@ -145,8 +145,9 @@ def get_daily_article_filter(schema_version: int) -> str:
     """ return SQL filter for the daily article choice """
     if schema_version == 1:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET}"
-    else:
-        raise ValueError(f"Unsupported schema version: {schema_version}")
+    elif schema_version >= 2:
+        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE"
+    raise ValueError(f"Unsupported schema version: {schema_version}")
 
 
 
