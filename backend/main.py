@@ -154,22 +154,32 @@ def get_daily_article_filter(schema_version: int) -> str:
 def get_daily_article_cached(lang: str) -> dict:
     """ returns today's daily article for the given language, refreshes the cache if needed """
     today = date.today()
+    
+    # if cache is stale, update it
     if _cached_daily_targets[lang]["date"] != today:
-        seed = int(today.strftime("%Y%m%d"))
-        con = open_wiki_db_con(lang)
-        schema_version = get_schema_version(con)
-        article_filter = get_daily_article_filter(schema_version)
+        # first, try games database
         try:
-            count = con.execute(f"SELECT COUNT(*) FROM articles WHERE {article_filter}").fetchone()[0]
-            offset = seed % count
-            row = con.execute(
-                f"SELECT id, title FROM articles WHERE {article_filter} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
-                [seed, offset]
-            ).fetchone()
-            add_article_to_games_db(day=today, lang=lang, article_id=row[0], article_title=row[1])
-        finally:
-            con.close()
-        _cached_daily_targets[lang].update({"date": today, "id": row[0], "title": row[1]})
+            article = get_article_from_date(lang, today)
+        except HTTPException as e:
+            if e.status_code != 404:
+                raise
+            # if daily article is not in games database, create it
+            seed = int(today.strftime("%Y%m%d"))
+            con = open_wiki_db_con(lang)
+            schema_version = get_schema_version(con)
+            article_filter = get_daily_article_filter(schema_version)
+            try:
+                count = con.execute(f"SELECT COUNT(*) FROM articles WHERE {article_filter}").fetchone()[0]
+                offset = seed % count
+                row = con.execute(
+                    f"SELECT id, title FROM articles WHERE {article_filter} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
+                    [seed, offset]
+                ).fetchone()
+                article = {"date": today, "id": row[0], "title": row[1]}
+                add_article_to_games_db(day=article["date"], lang=lang, article_id=article["id"], article_title=article["title"])
+            finally:
+                con.close()
+        _cached_daily_targets[lang].update(article)
     return _cached_daily_targets[lang]
 
 
