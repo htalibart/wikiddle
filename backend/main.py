@@ -105,7 +105,7 @@ def get_games_db_con():
         con.close()
 
 
-def get_previous_article(lang: str, d: date) -> dict:
+def get_article_from_date(lang: str, d: date) -> dict:
     """ returns article from a previous game given language and date """
     con = open_games_db_con()
     date_str = format_date(d)
@@ -137,7 +137,7 @@ def get_yesterdays_article_cached(lang: str) -> dict:
     """ returns yesterday's article for the given language, refreshes the cache if needed """
     yesterday = date.today() - timedelta(days=1) 
     if _cached_yesterday_targets[lang]["date"] != yesterday:
-        _cached_yesterday_targets[lang].update(get_previous_article(lang, yesterday))
+        _cached_yesterday_targets[lang].update(get_article_from_date(lang, yesterday))
     return _cached_yesterday_targets[lang]
 
 
