@@ -144,9 +144,128 @@ def keep_category_fr(c: str) -> bool:
     return True
 
 
+def keep_category_en(c: str) -> bool:
+    if c.startswith((
+        "Championship",
+        "Cup",
+        "Grand Prix",
+        "League",
+        "Match",
+        "Season",
+        "Sport",
+        "Tour of",
+        "Tournament",
+        "Album",
+        "Battalion",
+        "Electoral district",
+        "Election ",
+        "Regiment",
+        "Tour ",
+    )):
+        return False
+
+    if any(s in c.lower() for s in (
+        "athlete",
+        "athletics",
+        "badminton",
+        "baseball",
+        "basketball",
+        "biathlon",
+        "boxer",
+        "boxing",
+        "champion",
+        "championship",
+        "chess player",
+        "coach",
+        "competition",
+        "cricket",
+        "cricketer",
+        "cycling",
+        "cyclist",
+        "darts",
+        "diver",
+        "equestrian",
+        "fencer",
+        "fencing",
+        "field hockey",
+        "figure skater",
+        "football",
+        "formula one",
+        "futsal",
+        "golf",
+        "golfer",
+        "gymnast",
+        "handball",
+        "hockey",
+        "jockey",
+        "judo",
+        "karate",
+        "karting",
+        "lacrosse",
+        "league",
+        "marathon",
+        "martial art",
+        "medalist",
+        "medallist",
+        "motorsport",
+        "olympic",
+        "paralympic",
+        "pentathlon",
+        "player",
+        "racing",
+        "rally",
+        "referee",
+        "rugby",
+        "sailor",
+        "sailing",
+        "ski jumper",
+        "skier",
+        "snowboard",
+        "sport",
+        "sporting",
+        "sports",
+        "squash",
+        "surfer",
+        "swimmer",
+        "swimming",
+        "taekwondo",
+        "tennis",
+        "tournament",
+        "triathlon",
+        "volleyball",
+        "wrestler",
+        "wrestling",
+        "ceremony",
+    )):
+        return False
+
+    if re.search(r"Sport .+ \d{4}", c):
+        return False
+    if re.search(r"Championship .+ \d{4}", c):
+        return False
+    if re.search(r"club .+sport", c, re.IGNORECASE):
+        return False
+    if re.search(r"sports? club", c, re.IGNORECASE):
+        return False
+    if re.search(r"sports? centre", c, re.IGNORECASE):
+        return False
+    if re.search(r"sports? center", c, re.IGNORECASE):
+        return False
+    if re.search(r"\d{4} in sport", c):
+        return False
+    if re.search(r"\d{4} in sports", c):
+        return False
+    if re.search(r"\d{4}-\d{2,4} in", c):
+        return False
+
+    return True
+
+
 def keep_category(lang: str, c: str) -> bool:
     if lang == "fr":
         return keep_category_fr(c)
+    elif lang == 'en':
+        return keep_category_en(c)
     raise NotImplementedError(lang)
 
 
