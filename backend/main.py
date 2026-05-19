@@ -317,4 +317,10 @@ def refresh_daily_articles(request: Request, token: str = Query(default=None)):
         get_daily_article_cached(lang)
     return {"status": "ok"}
 
+
+@router.get("/admin/{lang}/version", include_in_schema=False)
+@limiter.limit("10/minute")
+def get_db_version(request: Request, con = Depends(get_wiki_db_con)):
+    return {"schema_version": get_schema_version(con)}
+
 app.include_router(router)
