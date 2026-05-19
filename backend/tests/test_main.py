@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 
 from datetime import date, timedelta
 
-from main import app, get_daily_article_cached, get_yesterdays_article_cached, _cached_daily_targets, _cached_yesterday_targets
+from main import app, get_daily_article_cached, get_yesterdays_article_cached, get_daily_article_filter, _cached_daily_targets, _cached_yesterday_targets
 
 
 def make_con_mock(fetchone=None, fetchall=None):
@@ -22,6 +22,7 @@ def make_db_mock(article_id=42, title="Toto", count=1000):
     ]
     return con
 
+
 def make_games_con_mock(article_id=12, title="Titi"):
     con = MagicMock()
     con.execute.return_value.fetchone.return_value = (article_id, title)
@@ -32,6 +33,17 @@ def make_games_con_mock(article_id=12, title="Titi"):
 def client():
     with TestClient(app) as c:
         yield c
+
+
+class TestDailyArticleFilter:
+    def test_v1_filter(self):
+        assert get_daily_article_filter(1) == "nb_links >= 20"
+
+    def test_v2_filter(self):
+        assert get_daily_article_filter(2) == "nb_links >= 20 AND is_target_candidate IS TRUE"
+
+    def test_future_versions_use_v2_filter(self):
+        assert get_daily_article_filter(3) == "nb_links >= 20 AND is_target_candidate IS TRUE"
 
 
 class TestNotFound:
@@ -120,6 +132,16 @@ class TestDailyArticleCached:
             get_daily_article_cached("en")
         assert con.execute.call_count == 2
 
+    def test_uses_v2_filter(self):
+        con = make_db_mock()
+        with patch("main.open_wiki_db_con", return_value=con), \
+             patch("main.open_games_db_con", return_value=make_con_mock()), \
+             patch("main.get_schema_version", return_value=2):
+            get_daily_article_cached("en")
+
+        queries = [call.args[0] for call in con.execute.call_args_list]
+        assert any("is_target_candidate IS TRUE" in query for query in queries)
+
     def test_refreshes_cache_next_day(self):
         yesterday = date.today() - timedelta(days=1)
         _cached_daily_targets["en"].update({"id": 12, "title": "Titi", "date": yesterday})
@@ -147,6 +169,7 @@ class TestDailyArticleCached:
         assert result_en["title"] == "Toto"
         assert result_fr["id"] == 84
         assert result_fr["title"] == "Bonjour"
+
 
 class TestInvalidLang:
     def test_daily_article_invalid_lang(self, client):
@@ -190,6 +213,31 @@ class TestQueryValidation:
         with patch("main.open_wiki_db_con", return_value=make_con_mock()):
             res = client.get("/api/en/article-id?title=")
         assert res.status_code == 422
+
+
+class TestSearchArticles:
+    def test_search_articles_v1(self, client):
+        con = make_con_mock(fetchall=[(42, "Toto")])
+        with patch("main.open_wiki_db_con", return_value=con), \
+             patch("main.get_schema_version", return_value=1):
+            res = client.get("/api/en/articles?query=To")
+
+        assert res.status_code == 200
+        assert res.json() == [{"id": 42, "title": "Toto"}]
+        query = con.execute.call_args[0][0]
+        assert "nb_links >= 20" in query
+        assert "is_target_candidate" not in query
+
+    def test_search_articles_v2(self, client):
+        con = make_con_mock(fetchall=[(42, "Toto")])
+        with patch("main.open_wiki_db_con", return_value=con), \
+             patch("main.get_schema_version", return_value=2):
+            res = client.get("/api/en/articles?query=To")
+
+        assert res.status_code == 200
+        assert res.json() == [{"id": 42, "title": "Toto"}]
+        query = con.execute.call_args[0][0]
+        assert "nb_links >= 20 AND is_target_candidate IS TRUE" in query
 
 
 class TestNewTargetNeighbor:
@@ -249,6 +297,7 @@ class TestYesterdaysArticle:
     def test_invalid_lang(self, client):
         res = client.get("/api/xx/yesterdays-article")
         assert res.status_code == 400
+
 
 class TestYesterdaysArticleCached:
     def setup_method(self):

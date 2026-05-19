@@ -105,7 +105,7 @@ def get_games_db_con():
         con.close()
 
 
-def get_previous_article(lang: str, d: date) -> dict:
+def get_article_from_date(lang: str, d: date) -> dict:
     """ returns article from a previous game given language and date """
     con = open_games_db_con()
     date_str = format_date(d)
@@ -137,7 +137,7 @@ def get_yesterdays_article_cached(lang: str) -> dict:
     """ returns yesterday's article for the given language, refreshes the cache if needed """
     yesterday = date.today() - timedelta(days=1) 
     if _cached_yesterday_targets[lang]["date"] != yesterday:
-        _cached_yesterday_targets[lang].update(get_previous_article(lang, yesterday))
+        _cached_yesterday_targets[lang].update(get_article_from_date(lang, yesterday))
     return _cached_yesterday_targets[lang]
 
 
@@ -145,30 +145,41 @@ def get_daily_article_filter(schema_version: int) -> str:
     """ return SQL filter for the daily article choice """
     if schema_version == 1:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET}"
-    else:
-        raise ValueError(f"Unsupported schema version: {schema_version}")
+    elif schema_version >= 2:
+        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE"
+    raise ValueError(f"Unsupported schema version: {schema_version}")
 
 
 
 def get_daily_article_cached(lang: str) -> dict:
     """ returns today's daily article for the given language, refreshes the cache if needed """
     today = date.today()
+    
+    # if cache is stale, update it
     if _cached_daily_targets[lang]["date"] != today:
-        seed = int(today.strftime("%Y%m%d"))
-        con = open_wiki_db_con(lang)
-        schema_version = get_schema_version(con)
-        article_filter = get_daily_article_filter(schema_version)
+        # first, try games database
         try:
-            count = con.execute(f"SELECT COUNT(*) FROM articles WHERE {article_filter}").fetchone()[0]
-            offset = seed % count
-            row = con.execute(
-                f"SELECT id, title FROM articles WHERE {article_filter} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
-                [seed, offset]
-            ).fetchone()
-            add_article_to_games_db(day=today, lang=lang, article_id=row[0], article_title=row[1])
-        finally:
-            con.close()
-        _cached_daily_targets[lang].update({"date": today, "id": row[0], "title": row[1]})
+            article = get_article_from_date(lang, today)
+        except HTTPException as e:
+            if e.status_code != 404:
+                raise
+            # if daily article is not in games database, create it
+            seed = int(today.strftime("%Y%m%d"))
+            con = open_wiki_db_con(lang)
+            schema_version = get_schema_version(con)
+            article_filter = get_daily_article_filter(schema_version)
+            try:
+                count = con.execute(f"SELECT COUNT(*) FROM articles WHERE {article_filter}").fetchone()[0]
+                offset = seed % count
+                row = con.execute(
+                    f"SELECT id, title FROM articles WHERE {article_filter} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
+                    [seed, offset]
+                ).fetchone()
+                article = {"date": today, "id": row[0], "title": row[1]}
+                add_article_to_games_db(day=article["date"], lang=lang, article_id=article["id"], article_title=article["title"])
+            finally:
+                con.close()
+        _cached_daily_targets[lang].update(article)
     return _cached_daily_targets[lang]
 
 
@@ -315,5 +326,11 @@ def refresh_daily_articles(request: Request, token: str = Query(default=None)):
     for lang in LANGUAGES:
         get_daily_article_cached(lang)
     return {"status": "ok"}
+
+
+@router.get("/admin/{lang}/version", include_in_schema=False)
+@limiter.limit("10/minute")
+def get_db_version(request: Request, con = Depends(get_wiki_db_con)):
+    return {"schema_version": get_schema_version(con)}
 
 app.include_router(router)
