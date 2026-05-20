@@ -7,11 +7,10 @@ from fastapi.testclient import TestClient
 DATA_DIR = Path(__file__).parent.parent.parent/"data"
 
 os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR/"db"/"wiki"))
-os.environ.setdefault("WIKI_VERSION", "1")
+os.environ.setdefault("WIKI_VERSION", "2")
 os.environ.setdefault("GAMES_DB", str(DATA_DIR/"db"/"games"/"v1.db"))
 
-
-from main import app, _cached_daily_targets
+from main import app, _cached_daily_targets, open_wiki_db_con, get_schema_version, get_daily_article_filter
 
 
 @pytest.fixture(autouse=True)
@@ -88,3 +87,55 @@ class TestCommonNeighbors:
         data = res.json()
         assert "is_target" in data
         assert "common" in data
+
+
+class TestArticleFilters:
+
+    def can_be_daily_target(self, lang: str, title: str):
+        con = open_wiki_db_con(lang)
+        try:
+            schema_version = get_schema_version(con)
+            article_filter = get_daily_article_filter(schema_version)
+            row = con.execute(
+                f"""
+                SELECT id
+                FROM articles
+                WHERE title = ?
+                AND {article_filter}
+                """,
+                [title]
+            ).fetchone()
+        finally:
+            con.close()
+
+        return row is not None
+
+
+    @pytest.mark.parametrize("lang,title", [
+        ("fr", "Bruxelles"),
+        ("en", "Brussels"),
+        ("fr", "Paris"),
+        ("en", "Paris"),
+        ("fr", "Marseille"),
+        ("en", "Marseille"),
+        ("fr", "Londres"),
+        ("en", "London"),
+        ("fr", "Liverpool"),
+        ("en", "Liverpool"),
+        ("fr", "Belgique"),
+        ("en", "Belgium"),
+        ("fr", "France"),
+        ("en", "France"),
+        ("fr", "Anvers"),
+        ("en", "Antwerp"),
+        ("fr", "Cinéma"),
+        ])
+    def test_article_can_be_daily_target(self, lang: str, title: str):
+        assert self.can_be_daily_target(lang, title)
+
+
+    @pytest.mark.parametrize("lang,title", [
+        ("en", "2022–23 Bangladesh Premier League (football)")
+        ])
+    def test_article_cant_be_daily_target(self, lang: str, title: str):
+        assert not self.can_be_daily_target(lang, title)
