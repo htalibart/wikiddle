@@ -135,7 +135,12 @@ class TestArticleFilters:
 
 
     @pytest.mark.parametrize("lang,title", [
-        ("en", "2022–23 Bangladesh Premier League (football)")
+        ("en", "2022–23 Bangladesh Premier League (football)"),
+        ("fr", "Suture lacrymo-maxillaire"),
+        ("fr", "Jay Christianson"),
+        ("fr", "Slalom géant parallèle féminin de snowboard aux Jeux olympiques de 2022"),
+        ("fr", "14ymedio"),
+        ("fr", "Église Saint-Pierre d'Anères"),
         ])
     def test_article_cant_be_daily_target(self, lang: str, title: str):
         assert not self.can_be_daily_target(lang, title)

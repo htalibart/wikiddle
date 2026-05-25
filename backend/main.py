@@ -13,6 +13,7 @@ from slowapi.errors import RateLimitExceeded
 
 LANGUAGES = {'en', 'fr'}
 MIN_NB_LINKS_FOR_TARGET = 20
+MIN_ARTICLE_LENGTH_FOR_TARGET = 7_000
 MAX_NB_SEARCH_RESULTS = 30
 MAX_TITLE_LENGTH = 300
 
@@ -141,12 +142,15 @@ def get_yesterdays_article_cached(lang: str) -> dict:
     return _cached_yesterday_targets[lang]
 
 
-def get_daily_article_filter(schema_version: int) -> str:
+def get_daily_article_filter(schema_version: int, temp_relax=False) -> str:
     """ return SQL filter for the daily article choice """
     if schema_version == 1:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET}"
     elif schema_version >= 2:
-        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE"
+        if temp_relax:
+            return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE"
+        else:
+            return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET}"
     raise ValueError(f"Unsupported schema version: {schema_version}")
 
 
@@ -273,7 +277,7 @@ def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid
 def search_articles(request: Request, con = Depends(get_wiki_db_con), query: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
     """ API route to search in the database (called by TomSelect) """
     schema_version = get_schema_version(con)
-    article_filter = get_daily_article_filter(schema_version)
+    article_filter = get_daily_article_filter(schema_version, temp_relax=True)
     rows = con.execute(
     f"""SELECT id, title FROM articles 
         WHERE {article_filter} AND title ILIKE ?
