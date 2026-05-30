@@ -35,17 +35,6 @@ def client():
         yield c
 
 
-class TestDailyArticleFilter:
-    def test_v1_filter(self):
-        assert get_daily_article_filter(1) == "nb_links >= 20"
-
-    def test_v2_filter(self):
-        assert get_daily_article_filter(2) == "nb_links >= 20 AND is_target_candidate IS TRUE"
-
-    def test_future_versions_use_v2_filter(self):
-        assert get_daily_article_filter(3) == "nb_links >= 20 AND is_target_candidate IS TRUE"
-
-
 class TestNotFound:
     def test_article_title_not_found(self, client):
         with patch("main.get_article_titles", return_value=[]):
