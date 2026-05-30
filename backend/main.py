@@ -3,8 +3,9 @@ from pathlib import Path
 import duckdb
 from datetime import date, timedelta
 import random
+import secrets
 
-from fastapi import FastAPI, HTTPException, Query, APIRouter, Request, Depends, Body
+from fastapi import FastAPI, HTTPException, Query, APIRouter, Request, Depends, Body, Header
 from fastapi.middleware.cors import CORSMiddleware
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -321,12 +322,18 @@ def get_game_date(request: Request, lang: str = Depends(valid_lang)):
     return {"date": format_date(article["date"])}
 
 
-@router.get("/admin/refresh", include_in_schema=False)
+@router.post("/admin/refresh", include_in_schema=False)
 @limiter.limit("5/minute")
-def refresh_daily_articles(request: Request, token: str = Query(default=None)):
+def refresh_daily_articles(request: Request, authorization: str = Header(default=None)):
     ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN")
-    if not ADMIN_TOKEN or token != ADMIN_TOKEN:
+
+    if not ADMIN_TOKEN or authorization is None:
         raise HTTPException(status_code=403, detail="Forbidden")
+
+    expected = f"Bearer {ADMIN_TOKEN}"
+    if not secrets.compare_digest(authorization, expected):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     for lang in LANGUAGES:
         get_daily_article_cached(lang)
     return {"status": "ok"}
