@@ -2,6 +2,8 @@
 
 Wikiddle is a daily Wikipedia puzzle game. The player has to guess a random mystery page by finding out the links that are on it.
 
+Available at: [wikiddle.com](https://wikiddle.com)
+
 ## Tech stack
 
 - JavaScript frontend
