@@ -1,4 +1,3 @@
-import pytest
 from playwright.sync_api import Page, expect
 
 BASE_URL = "http://localhost:5173"
