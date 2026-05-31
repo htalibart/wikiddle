@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pip'
-      - run: pip install -r backend/requirements.txt
+      - run: pip install -r backend/requirements.txt pytest
       - run: pytest backend/tests/ -m "not integration"
 
   build:
