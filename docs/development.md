@@ -3,8 +3,7 @@ This document describes how to run Wikiddle locally.
 
 ## Prerequisites
 - Python 3.x
-- Caddy
-- A local copy of the database at `data/wiki.db`
+- Node.js 24+
 
 ## Backend
 Create a virtual environment and install dependencies:
@@ -26,27 +25,80 @@ curl "http://localhost:8080/api/admin/refresh?token=dev"
 ```
 
 ## Frontend
-First, stop the system Caddy service if it is running:
-```bash
-sudo systemctl stop caddy
-```
-Then serve the frontend with the local Caddy config from the project root:
-```bash
-caddy run --config config/Caddyfile.dev
-```
-The site will be available at `http://localhost:8080`.
 
-## Updating External Dependencies
+The frontend is a plain HTML/CSS/JS app using ES modules, bundled with [Vite](https://vite.dev). Vite serves two purposes:
 
-External scripts and stylesheets are loaded from jsdelivr with [Subresource Integrity (SRI)](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) hashes to prevent tampering.
+- **In development** — it provides a local dev server with hot reload, and proxies `/api` requests to the backend
+- **In production** — it bundles the JS files into `dist/`, which Caddy serves
 
-To update a dependency:
-1. Find the latest version:
+### Initial setup (already done, documented for reference)
+
+Install Node.js 24:
 ```bash
-   curl https://cdn.jsdelivr.net/npm/${package}/package.json | grep '"version"'
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
 ```
-2. For each file of the package loaded in `frontend/index.html`, replace the version number in the URL with the new one (e.g. `tom-select@2.5.0` -> `tom-select@2.6.0`)
-3. Paste each updated URL into https://srihash.org and copy the generated `integrity` attribute back into `frontend/index.html`
+
+Create `package.json` from the project root:
+```bash
+npm init -y
+```
+
+Install Vite:
+```bash
+npm install --save-dev vite
+```
+
+Add the following scripts to `package.json`:
+```json
+"scripts": {
+  "dev": "cd frontend && vite",
+  "build": "cd frontend && vite build"
+}
+```
+
+Install the frontend npm packages (tom-select and canvas-confetti):
+```bash
+npm install tom-select canvas-confetti
+```
+
+Create `frontend/vite.config.js` to proxy `/api` requests to the backend in development:
+```js
+export default {
+  server: {
+    proxy: {
+      '/api': 'http://127.0.0.1:8000'
+    }
+  }
+}
+```
+
+`package.json`, `package-lock.json`, and `vite.config.js` are versioned in the repo. `node_modules/` — the directory where npm installs the actual package files — is not, because it is large and can be fully reproduced from `package.json`.
+
+### Running locally
+
+Install packages listed in `package.json` into `node_modules/`:
+```bash
+npm install
+```
+
+Re-run `npm install` whenever `package.json` changes (e.g. after a `git pull` that adds or updates a dependency). You do not need to re-run it when your own JS files change — Vite picks those up automatically.
+
+To add a new dependency:
+```bash
+npm install <package>         # runtime dependency
+npm install --save-dev <package>  # dev-only dependency (linters, bundlers, etc.)
+```
+
+This updates `package.json` and `package-lock.json` — commit both.
+
+Run the development server:
+```bash
+npm run dev
+```
+
+The site will be available at `http://localhost:5173`. Make sure the backend is running first.
 
 ## Tests
 Run from the root of the project:
@@ -55,18 +107,30 @@ python -m pytest
 ```
 Unit tests (`tests/test_main.py`) mock the database and can be run without it. Integration tests (`tests/test_integration.py`) require the database to be present at `data/wiki.db`.
 
-
 ## Documentation
 ```bash
 npx jsdoc frontend/*.js -d docs/jsdoc
 ```
 
-
 ## Linter
-
-Python:
+For Python, it's simple, install `ruff`:
 ```bash
-ruff check
+pip install ruff
 ```
+then:
+```bash
+ruff check backend/
+```
+It was added to pre-commit hooks (`.git/hooks/pre-commit`) and to CI (`.github/workflows/ci.yml`).
 
-added to pre-commit hooks (`.git/hooks/pre-commit`) and to CI (`.github/workflows/ci.yml`)
+For JavaScript, to install ESLint, we need to install Node >= 20:
+```bash
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
+```
+Then:
+```bash
+npx eslint frontend/
+```
+It was added to pre-commit hooks (`.git/hooks/pre-commit`) and to CI (`.github/workflows/ci.yml`).

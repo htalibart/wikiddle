@@ -8,7 +8,7 @@ This document describes how to set up and deploy Wikiddle on a bare VPS.
 - **OS:** Debian 13 (trixie)
 - **Web server:** Caddy (reverse proxy + static file server)
 - **Backend:** FastAPI running via uvicorn, managed by systemd
-- **Frontend:** Static HTML/CSS/JS served directly from the repo
+- **Frontend:** Static HTML/CSS/JS bundled with Vite, served from `frontend/dist/`
 - **TLS:** Cloudflare Origin Certificate (SSL/TLS mode: Full strict)
 
 ---
@@ -90,6 +90,14 @@ sudo apt update
 sudo apt install python3 python3-pip python3-venv git -y
 ```
 
+To build the frontend, we need to install Node >= 24:
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
+```
+
 ### 2. Install Caddy
 
 Caddy is not in the default Debian repositories, so add the official Caddy repository first:
@@ -157,7 +165,19 @@ This adds the `is_target_candidate` column to the database based on filters (to 
 
 
 
-### 7. Set up Caddy and HTTPS
+### 7. Build the frontend
+
+`package.json` and `package-lock.json` are versioned in the repo, but `node_modules/` (the actual installed packages) is not. Install them first:
+
+```bash
+cd /var/www/wikiddle/frontend
+npm ci
+npm run build
+```
+
+`npm ci` installs the exact versions specified in `package-lock.json`. `npm run build` runs Vite, which bundles the JS files into `frontend/dist/`, which is what Caddy serves.
+
+### 8. Set up Caddy and HTTPS
 
 #### Step 1 — Point the domain to the server
 
@@ -231,7 +251,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart caddy
 ```
 
-### 8. Configure the systemd service
+### 9. Configure the systemd service
 
 The service file is versioned in the repo at `config/wikiddle.service`. Create a symlink so systemd picks it up:
 
@@ -253,7 +273,7 @@ Grant the `deploy` user the right to restart wikiddle without a password:
 echo "deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart wikiddle" | sudo tee /etc/sudoers.d/deploy-wikiddle
 ```
 
-### 9. Auto refresh
+### 10. Auto refresh
 The database of previous games is updated every day with a crontab job that calls an API endpoint. To set it up I generated a token with:
 ```bash
 openssl rand -hex 32
@@ -284,6 +304,7 @@ crontab -e
 cd /var/www/wikiddle
 git pull origin main
 venv/bin/pip install -r backend/requirements.txt  # only if dependencies changed; no need to activate the venv
+cd frontend && npm ci && npm run build && cd ..  # only if frontend changed
 sudo systemctl restart wikiddle
 sudo systemctl restart caddy  # only if Caddyfile.prod changed
 ```
