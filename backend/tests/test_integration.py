@@ -4,13 +4,13 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from main import app, _cached_daily_targets, open_wiki_db_con, get_schema_version, get_daily_article_filter
+
 DATA_DIR = Path(__file__).parent.parent.parent/"data"
 
 os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR/"db"/"wiki"))
 os.environ.setdefault("WIKI_VERSION", "2")
 os.environ.setdefault("GAMES_DB", str(DATA_DIR/"db"/"games"/"v1.db"))
-
-from main import app, _cached_daily_targets, open_wiki_db_con, get_schema_version, get_daily_article_filter
 
 
 @pytest.fixture(autouse=True)
