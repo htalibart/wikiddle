@@ -121,11 +121,35 @@ caddy run --config config/Caddyfile.dev
 The site will be available at `http://localhost:8080`. Unlike `npm run dev`, changes to JS files are not picked up automatically (re-run `npm run build` each time).
 
 ## Tests
-Run from the root of the project:
+For unit tests and integration tests, run from the root of the project:
+
 ```bash
 python -m pytest
 ```
 Unit tests (`tests/test_main.py`) mock the database and can be run without it. Integration tests (`tests/test_integration.py`) require the database to be present at `data/wiki.db`.
+
+
+For end-to-end tests with Firefox, first install Playwright:
+
+```bash 
+pip install pytest-playwright
+playwright install firefox
+```
+
+then:
+
+```bash
+python -m pytest tests/test_e2e.py --browser firefox
+```
+
+Or to run with Chromium (the default):
+
+```bash 
+playwright install chromium
+python -m pytest tests/test_e2e.py
+```
+
+
 
 ## Documentation
 ```bash
