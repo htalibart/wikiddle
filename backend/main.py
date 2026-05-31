@@ -242,7 +242,7 @@ def get_article_title(request: Request, lang: str = Depends(valid_lang), id: int
 
 
 
-def get_neighbors(lang: str, article_id: int) -> dict:
+def get_links(lang: str, article_id: int) -> dict:
     """ returns a dict {id: title} articles that article with id @article_id links to in language @lang """
     con = open_wiki_db_con(lang)
     try:
@@ -254,13 +254,13 @@ def get_neighbors(lang: str, article_id: int) -> dict:
         con.close()
 
 
-@router.get("/{lang}/common-neighbors")
+@router.get("/{lang}/common-links")
 @limiter.limit("60/minute")
-def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)):
+def get_common_links_with_target(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)):
     """ API route to get the links that are common to the user guess and the target article """
     article = get_daily_article_cached(lang)
-    n1 = get_neighbors(lang, article["id"])
-    n2 = get_neighbors(lang, id)
+    n1 = get_links(lang, article["id"])
+    n2 = get_links(lang, id)
     common = set(n1.keys()) & set(n2.keys())
     is_target = (article["id"] == id)
     is_on_target = (id in n1)
@@ -293,14 +293,14 @@ def search_articles(request: Request, con = Depends(get_wiki_db_con), query: str
     return [{"id": row[0], "title": row[1]} for row in rows]
 
 
-@router.post("/{lang}/new-target-neighbor")
+@router.post("/{lang}/new-target-link")
 @limiter.limit("300/minute")
-def get_one_new_neighbor(request: Request, lang: str = Depends(valid_lang), known_titles: list = Body(default=[])):
+def get_one_new_link(request: Request, lang: str = Depends(valid_lang), known_titles: list = Body(default=[])):
     """ API route to get one random link target that was not already found """
     target = get_daily_article_cached(lang)
-    neighbor_ids = get_neighbors(lang, target["id"])
-    neighbor_titles = set(get_article_titles(lang, neighbor_ids))
-    n_not_guessed = neighbor_titles.difference(set(known_titles))
+    link_ids = get_links(lang, target["id"])
+    link_titles = set(get_article_titles(lang, link_ids))
+    n_not_guessed = link_titles.difference(set(known_titles))
     game_date = format_date(target["date"])
     if not n_not_guessed:
         return {

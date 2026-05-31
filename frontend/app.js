@@ -237,7 +237,7 @@ async function showYesterdaysAnswer(state, translations) {
 
 /**
  * Handles a guess proposed by the user.
- * Fetches common neighbors from the API, updates the state, re-renders the cards.
+ * Fetches common links from the API, updates the state, re-renders the cards.
  * If the guess is the target, triggers the win popup.
  * @param {State} state - current application state 
  * @param {TomSelect} tomSelect - the TomSelect search input instance
@@ -251,7 +251,7 @@ async function handleGuessInput(state, tomSelect, translations) {
   tomSelect.clear();
   tomSelect.clearOptions();
   
-  fetch(`${API_URL}/${state.lang}/common-neighbors?id=${guessId}`)
+  fetch(`${API_URL}/${state.lang}/common-links?id=${guessId}`)
     .then(res => {
       if (!res.ok) {
         showToast(translations.error_message);
@@ -341,7 +341,7 @@ async function addHint(state, translations) {
     return;
   }
 
-  await fetch(`${API_URL}/${state.lang}/new-target-neighbor`, {
+  await fetch(`${API_URL}/${state.lang}/new-target-link`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(state.knowledgeTarget.links)
@@ -380,8 +380,8 @@ async function addHint(state, translations) {
  * @typedef {Object} Guess
  * @property {string} id - article id
  * @property {string} title - article title
- * @property {string[]} common - common neighbors with the target
- * @property {number} score - number of common neighbors with the target
+ * @property {string[]} common - common links with the target
+ * @property {number} score - number of common links with the target
  * @property {boolean} isTarget - whether this guess is the target article
  * @property {boolean} isOnTarget - whether this guess is a link on the target article
  */

@@ -79,12 +79,12 @@ class TestSearchArticles:
 class TestCommonNeighbors:
     def test_correct_guess(self, client, lang):
         daily_id = client.get(f"/api/{lang}/daily-article").json()["id"]
-        res = client.get(f"/api/{lang}/common-neighbors?id={daily_id}")
+        res = client.get(f"/api/{lang}/common-links?id={daily_id}")
         assert res.status_code == 200
         assert res.json()["is_target"] is True
 
     def test_other_guess(self, client, lang):
-        res = client.get(f"/api/{lang}/common-neighbors?id=12")
+        res = client.get(f"/api/{lang}/common-links?id=12")
         assert res.status_code == 200
         data = res.json()
         assert "is_target" in data

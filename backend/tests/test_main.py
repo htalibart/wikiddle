@@ -62,47 +62,47 @@ class TestMissingParams:
             res = client.get("/api/en/article-id")
         assert res.status_code == 422
 
-    def test_common_neighbors_missing_id(self, client):
-        res = client.get("/api/en/common-neighbors")
+    def test_common_links_missing_id(self, client):
+        res = client.get("/api/en/common-links")
         assert res.status_code == 422
 
 
 class TestCommonNeighbors:
-    def _patches(self, daily_id, daily_neighbors, guess_neighbors):
+    def _patches(self, daily_id, daily_links, guess_links):
         article = {"id": daily_id, "title": "Toto", "date": date.today()}
 
-        def neighbors_side_effect(lang, article_id):
-            return daily_neighbors if article_id == daily_id else guess_neighbors
+        def links_side_effect(lang, article_id):
+            return daily_links if article_id == daily_id else guess_links
 
         def titles_side_effect(lang, ids):
             return [f"Article {id}" for id in ids]
 
         return (
             patch("main.get_daily_article_cached", return_value=article),
-            patch("main.get_neighbors", side_effect=neighbors_side_effect),
+            patch("main.get_links", side_effect=links_side_effect),
             patch("main.get_article_titles", side_effect=titles_side_effect),
         )
 
     def test_correct_guess(self, client):
-        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {1: "A", 2: "B", 3: "C"})
-        with daily_patch, neighbors_patch, titles_patch:
-            res = client.get("/api/en/common-neighbors?id=42")
+        daily_patch, links_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {1: "A", 2: "B", 3: "C"})
+        with daily_patch, links_patch, titles_patch:
+            res = client.get("/api/en/common-links?id=42")
         assert res.status_code == 200
         assert res.json()["is_target"] is True
 
     def test_wrong_guess(self, client):
-        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {2: "B", 3: "C", 4: "D"})
-        with daily_patch, neighbors_patch, titles_patch:
-            res = client.get("/api/en/common-neighbors?id=12")
+        daily_patch, links_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {2: "B", 3: "C", 4: "D"})
+        with daily_patch, links_patch, titles_patch:
+            res = client.get("/api/en/common-links?id=12")
         assert res.status_code == 200
         data = res.json()
         assert data["is_target"] is False
         assert len(data["common"]) == 2
 
-    def test_no_common_neighbors(self, client):
-        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1: "A", 2: "B"}, {3: "C", 4: "D"})
-        with daily_patch, neighbors_patch, titles_patch:
-            res = client.get("/api/en/common-neighbors?id=200")
+    def test_no_common_links(self, client):
+        daily_patch, links_patch, titles_patch = self._patches(42, {1: "A", 2: "B"}, {3: "C", 4: "D"})
+        with daily_patch, links_patch, titles_patch:
+            res = client.get("/api/en/common-links?id=200")
         assert res.status_code == 200
         assert res.json()["common"] == []
 
@@ -173,8 +173,8 @@ class TestInvalidLang:
         res = client.get("/api/xx/article-title?id=42")
         assert res.status_code == 400
 
-    def test_common_neighbors_invalid_lang(self, client):
-        res = client.get("/api/xx/common-neighbors?id=42")
+    def test_common_links_invalid_lang(self, client):
+        res = client.get("/api/xx/common-links?id=42")
         assert res.status_code == 400
 
     def test_articles_invalid_lang(self, client):
@@ -230,38 +230,38 @@ class TestSearchArticles:
 
 
 class TestNewTargetNeighbor:
-    def _patches(self, target, neighbors, titles):
+    def _patches(self, target, links, titles):
         return (
             patch("main.get_daily_article_cached", return_value=target),
-            patch("main.get_neighbors", return_value=neighbors),
+            patch("main.get_links", return_value=links),
             patch("main.get_article_titles", return_value=titles),
         )
 
     def test_returns_hint(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today()}
-        daily_patch, neighbors_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
-        with daily_patch, neighbors_patch, titles_patch:
-            res = client.post("/api/en/new-target-neighbor", json=[])
+        daily_patch, links_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
+        with daily_patch, links_patch, titles_patch:
+            res = client.post("/api/en/new-target-link", json=[])
         assert res.status_code == 200
         assert res.json()["title"] is not None
 
     def test_excludes_already_guessed(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today()}
-        daily_patch, neighbors_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
-        with daily_patch, neighbors_patch, titles_patch:
-            res = client.post("/api/en/new-target-neighbor", json=["Article 1", "Article 2", "Article 3"])
+        daily_patch, links_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
+        with daily_patch, links_patch, titles_patch:
+            res = client.post("/api/en/new-target-link", json=["Article 1", "Article 2", "Article 3"])
         assert res.status_code == 200
         assert res.json()["title"] is None
 
     def test_invalid_lang(self, client):
-        res = client.post("/api/xx/new-target-neighbor", json=[])
+        res = client.post("/api/xx/new-target-link", json=[])
         assert res.status_code == 400
 
     def test_empty_body(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today()}
-        daily_patch, neighbors_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
-        with daily_patch, neighbors_patch, titles_patch:
-            res = client.post("/api/en/new-target-neighbor")
+        daily_patch, links_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
+        with daily_patch, links_patch, titles_patch:
+            res = client.post("/api/en/new-target-link")
         assert res.status_code == 200
 
 
