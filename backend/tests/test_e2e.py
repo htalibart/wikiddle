@@ -1,7 +1,9 @@
+import pytest
 from playwright.sync_api import Page, expect
 
 BASE_URL = "http://localhost:5173"
 
+pytestmark = pytest.mark.integration
 
 def test_page_loads(page: Page):
     page.goto(BASE_URL)
