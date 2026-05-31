@@ -1,0 +1,38 @@
+{
+  "name": "wikiddle",
+  "version": "1.0.0",
+  "description": "Wikiddle is a daily Wikipedia puzzle game. The player has to guess a random mystery page by finding out the links that are on it.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "cd frontend && vite",
+    "build": "cd frontend && vite build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/htalibart/wikiddle.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/htalibart/wikiddle/issues"
+  },
+  "homepage": "https://github.com/htalibart/wikiddle#readme",
+  "devDependencies": {
+    "@eslint/css": "^1.3.0",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^2.0.0",
+    "@eslint/markdown": "^8.0.2",
+    "eslint": "^10.4.1",
+    "globals": "^17.6.0",
+    "vite": "^8.0.14"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "tom-select": "^2.6.1"
+  }
+}

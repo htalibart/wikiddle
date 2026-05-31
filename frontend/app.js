@@ -1,3 +1,8 @@
+import { titleToUrl, makeScoreColorFn } from './utils.js';
+import { showToast, buildHowtoExample, showMidnightOverlay, buildWinOverlay, showWinOverlay } from './overlays.js';
+import TomSelect from 'tom-select';
+import 'tom-select/dist/css/tom-select.css';
+
 const API_URL = "/api";
 const LANGUAGES = ["en", "fr"];
 const scoreToColor = makeScoreColorFn("#0C57A8");
@@ -453,7 +458,7 @@ async function loadOrCreateState() {
  * @param {State} state - current application state
  */
 function saveState(state) {
-  const { newLinks, ...knowledgeTarget } = state.knowledgeTarget;
+  const { _newLinks, ...knowledgeTarget } = state.knowledgeTarget;
   localStorage.setItem(`game-state-${state.lang}`, JSON.stringify({...state, knowledgeTarget}));
 }
 
