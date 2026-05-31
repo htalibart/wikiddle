@@ -4,7 +4,7 @@ Wikiddle is a daily Wikipedia puzzle game. The player has to guess a random myst
 
 Available at: [wikiddle.com](https://wikiddle.com)
 
-![Wikiddle preview](frontend/og_image.png)
+![Wikiddle preview](frontend/public/og_image.png)
 
 ## Tech stack
 
