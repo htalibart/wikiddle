@@ -21,7 +21,7 @@ ENV=dev WIKI_DB_DIR=../data/db/wiki/ WIKI_VERSION=2 GAMES_DB=../data/db/games/v1
 
 To manually trigger the daily refresh:
 ```bash
-curl "http://localhost:8080/api/admin/refresh?token=dev"
+curl -s -X POST -H "Authorization: Bearer dev" "http://127.0.0.1:8000/api/admin/refresh"
 ```
 
 ## Frontend
