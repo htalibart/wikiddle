@@ -468,7 +468,7 @@ body {
   padding: var(--space-overlay) 3rem;
   background-color: var(--overlay-box-background);
   border-radius: var(--border-radius);
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .overlay-close-btn {
