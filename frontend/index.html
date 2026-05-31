@@ -1,73 +1,78 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Every day, a new mystery Wikipedia article to find. Make guesses, follow the shared links, fall down the Wikipedia rabbit hole, and track down the answer.">
-  <meta property="og:title" content="Wikiddle - Daily Wikipedia Puzzle: Follow the Links, Find the Article">
-  <meta property="og:description" content="Every day, a new mystery Wikipedia article to find. Make guesses, follow the shared links, fall down the Wikipedia rabbit hole, and track down the answer.">
-  <meta property="og:image" content="https://wikiddle.com/og_image.png">
-  <meta property="og:url" content="https://wikiddle.com">
-  <meta property="og:type" content="website">
-  <title>Wikiddle - Daily Wikipedia Puzzle: Follow the Links, Find the Article</title>
-  <link rel="icon" href="/favicon.png" type="image/png">
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="toast"></div>
-  
-  <div id="top-panel">
-    <div id="title-area">
-      <img src="wikiddle.svg" alt="Wikiddle" id="title-logo">
-      <button id="howto-btn"></button>
-      <div id="lang-switcher">
-        <a href="/en">EN</a>
-        <a href="/fr">FR</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Every day, a new mystery Wikipedia article to find. Make guesses, follow the shared links, fall down the Wikipedia rabbit hole, and track down the answer."
+    />
+    <meta property="og:title" content="Wikiddle - Daily Wikipedia Puzzle: Follow the Links, Find the Article" />
+    <meta
+      property="og:description"
+      content="Every day, a new mystery Wikipedia article to find. Make guesses, follow the shared links, fall down the Wikipedia rabbit hole, and track down the answer."
+    />
+    <meta property="og:image" content="https://wikiddle.com/og_image.png" />
+    <meta property="og:url" content="https://wikiddle.com" />
+    <meta property="og:type" content="website" />
+    <title>Wikiddle - Daily Wikipedia Puzzle: Follow the Links, Find the Article</title>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="toast"></div>
+
+    <div id="top-panel">
+      <div id="title-area">
+        <img src="wikiddle.svg" alt="Wikiddle" id="title-logo" />
+        <button id="howto-btn"></button>
+        <div id="lang-switcher">
+          <a href="/en">EN</a>
+          <a href="/fr">FR</a>
+        </div>
+      </div>
+      <div id="input-area">
+        <label for="guess-input" id="guess-input-label" class="visually-hidden"></label>
+        <input type="text" id="guess-input" placeholder="" />
+        <button id="guess-btn" class="btn btn-primary"></button>
+        <button id="hint-btn" class="btn btn-secondary"></button>
       </div>
     </div>
-    <div id="input-area">
-      <label for="guess-input" id="guess-input-label" class="visually-hidden"></label>
-      <input type="text" id="guess-input" placeholder="" />
-      <button id="guess-btn" class="btn btn-primary"></button>
-      <button id="hint-btn" class="btn btn-secondary"></button>
+
+    <div id="yesterdays-banner">
+      <div id="yesterdays-banner-text">
+        <span id="yesterdays-banner-message"></span>
+      </div>
+      <button id="yesterdays-banner-dismiss">×</button>
     </div>
-  </div>
 
-  <div id="yesterdays-banner">
-    <div id="yesterdays-banner-text">
-      <span id="yesterdays-banner-message"></span>
+    <div id="guesses-panel">
+      <div id="guesses-list"></div>
     </div>
-    <button id="yesterdays-banner-dismiss">×</button>
-  </div>
 
-  <div id="guesses-panel">
-    <div id="guesses-list"></div>
-  </div>
-
-  <div id="win-overlay" class="overlay">
-    <div id="win-box" class="overlay-box">
-      <span id="win-close-btn" class="overlay-close-btn">×</span>
-      <div id="win-message"></div>
-      <div id="win-article"></div>
-      <div id="win-game-stats"></div>
-      <div id="win-share-label"></div>
-      <textarea id="win-share-preview" readonly rows="3"></textarea>
-      <button id="win-share-btn" class="btn btn-primary"></button>
+    <div id="win-overlay" class="overlay">
+      <div id="win-box" class="overlay-box">
+        <span id="win-close-btn" class="overlay-close-btn">×</span>
+        <div id="win-message"></div>
+        <div id="win-article"></div>
+        <div id="win-game-stats"></div>
+        <div id="win-share-label"></div>
+        <textarea id="win-share-preview" readonly rows="3"></textarea>
+        <button id="win-share-btn" class="btn btn-primary"></button>
+      </div>
     </div>
-  </div>
 
-<div id="howto-overlay" class="overlay">
-  <div id="howto-box" class="overlay-box"></div>
-</div>
-
-  <div id="midnight-overlay" class="overlay">
-    <div id="midnight-box" class="overlay-box">
-      <p id="midnight-message"></p>
-      <button id="midnight-btn" class="btn btn-primary"></button>
+    <div id="howto-overlay" class="overlay">
+      <div id="howto-box" class="overlay-box"></div>
     </div>
-  </div>
 
-  <script type="module" src="app.js"></script>
+    <div id="midnight-overlay" class="overlay">
+      <div id="midnight-box" class="overlay-box">
+        <p id="midnight-message"></p>
+        <button id="midnight-btn" class="btn btn-primary"></button>
+      </div>
+    </div>
 
-</body>
+    <script type="module" src="app.js"></script>
+  </body>
 </html>

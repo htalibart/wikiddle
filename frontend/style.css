@@ -1,15 +1,15 @@
 html {
   font-size: clamp(18px, 5vw, 30px);
 
-  --wikipedia-blue: #0C57A8;
-  --wikipedia-light-blue: #C3D8EF;
+  --wikipedia-blue: #0c57a8;
+  --wikipedia-light-blue: #c3d8ef;
   --wikipedia-dark-blue: #0a4a8f;
   --wikipedia-red: #970302;
-  --wikipedia-light-red: #E5C0C0;
-  --wikipedia-yellow: #F0BC00;
-  --wikipedia-light-yellow: #FBEEBF;
-  --wikipedia-orange: #EE8019;
-  --wikipedia-light-orange: #FBDFC5;
+  --wikipedia-light-red: #e5c0c0;
+  --wikipedia-yellow: #f0bc00;
+  --wikipedia-light-yellow: #fbeebf;
+  --wikipedia-orange: #ee8019;
+  --wikipedia-light-orange: #fbdfc5;
   --wikipedia-green: #308557;
   --main-dark-color: #333333;
   --main-medium-color: #666666;
@@ -137,7 +137,6 @@ body {
   font-size: var(--font-size-small);
 }
 
-
 #input-area {
   display: flex;
   flex-wrap: wrap;
@@ -256,7 +255,6 @@ body {
 }
 /* eslint-enable css/no-important */
 
-
 /* Yesterday's article banner */
 
 #yesterdays-banner {
@@ -264,7 +262,7 @@ body {
   align-items: center;
   gap: var(--space-large);
   padding: var(--space-small) var(--space-larger);
-  background-color: #EBF2FA;
+  background-color: #ebf2fa;
   border: 1px solid var(--wikipedia-light-blue);
   border-radius: var(--border-radius);
   font-family: var(--font-sans);
@@ -624,7 +622,6 @@ body {
 .no-pointer-events {
   pointer-events: none;
 }
-
 
 /* eslint-disable css/use-baseline */
 .visually-hidden {

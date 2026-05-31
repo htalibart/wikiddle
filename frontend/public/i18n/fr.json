@@ -21,7 +21,16 @@
   "howto_example_encyclopedia_links": ["Connaissance", "Impartialité", "Encyclopédie en ligne", "Denis Diderot"],
   "howto_example_internet_title": "Internet",
   "howto_example_internet_score": 8,
-  "howto_example_internet_links": ["World Wide Web", "Site web", "Navigateur web", "Adresse IP", "Protocole de communication", "Serveur informatique", "Hyperlien", "Web 2.0"],
+  "howto_example_internet_links": [
+    "World Wide Web",
+    "Site web",
+    "Navigateur web",
+    "Adresse IP",
+    "Protocole de communication",
+    "Serveur informatique",
+    "Hyperlien",
+    "Web 2.0"
+  ],
   "howto_example_europe_title": "Europe",
   "howto_example_europe_score": 3,
   "howto_example_europe_links": ["Allemand", "Français", "Néerlandais"],
