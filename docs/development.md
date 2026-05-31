@@ -139,14 +139,14 @@ playwright install firefox
 then:
 
 ```bash
-python -m pytest backend/tests/test_e2e.py --browser firefox
+python -m pytest tests/test_e2e.py --browser firefox
 ```
 
 Or to run with Chromium (the default):
 
 ```bash 
 playwright install chromium
-python -m pytest backend/tests/test_e2e.py
+python -m pytest tests/test_e2e.py
 ```
 
 
