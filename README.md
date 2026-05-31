@@ -1,3 +1,5 @@
+![CI](https://github.com/htalibart/wikiddle/actions/workflows/ci.yml/badge.svg)
+
 # Wikiddle
 
 Wikiddle is a daily Wikipedia puzzle game. The player has to guess a random mystery page by finding out the links that are on it.
