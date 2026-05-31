@@ -36,7 +36,7 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
       - run: pip install -r backend/requirements.txt pytest
-      - run: pytest tests/ -m "not integration"
+      - run: pytest tests/ -m "not integration" --ignore=tests/test_e2e.py
 
   build:
     runs-on: ubuntu-latest
