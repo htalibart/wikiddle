@@ -254,18 +254,40 @@ def get_links(lang: str, article_id: int) -> dict:
         con.close()
 
 
-@router.get("/{lang}/common-links")
+def get_categories(lang: str, article_id: int) -> dict:
+    """ returns a dict {id: title} of categories that article @article_id belongs to in language @lang """ 
+    con = open_wiki_db_con(lang)
+    try:
+        rows = con.execute(
+            "SELECT ac.category_id, c.name FROM article_categories ac JOIN categories c ON ac.category_id = c.id WHERE ac.article_id = ?", [article_id]
+        ).fetchall()
+        return {row[0]: row[1] for row in rows}
+    finally:
+        con.close()
+
+
+
+@router.get("/{lang}/common-info")
 @limiter.limit("60/minute")
-def get_common_links_with_target(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)):
-    """ API route to get the links that are common to the user guess and the target article """
+def get_common_info_with_target(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)):
+    """ API route to get the links and categories that are common to the user guess and the target article """
     article = get_daily_article_cached(lang)
-    n1 = get_links(lang, article["id"])
-    n2 = get_links(lang, id)
-    common = set(n1.keys()) & set(n2.keys())
+
+    # common links
+    links1 = get_links(lang, article["id"])
+    links2 = get_links(lang, id)
+    common_links = set(links1.keys()) & set(links2.keys())
+
+    # common categories
+    cats1 = get_categories(lang, article["id"])
+    cats2 = get_categories(lang, id)
+    common_cats = set(cats1.keys()) & set(cats2.keys())
+
     is_target = (article["id"] == id)
-    is_on_target = (id in n1)
+    is_on_target = (id in links1)
     return {
-        "common": [n1[nid] for nid in common],
+        "common_links": [links1[lid] for lid in common_links],
+        "common_categories": [cats1[cid] for cid in common_cats],
         "is_target": is_target,
         "is_on_target": is_on_target,
         "game_date": format_date(article["date"])

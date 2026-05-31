@@ -62,49 +62,73 @@ class TestMissingParams:
             res = client.get("/api/en/article-id")
         assert res.status_code == 422
 
-    def test_common_links_missing_id(self, client):
-        res = client.get("/api/en/common-links")
+    def test_common_info_missing_id(self, client):
+        res = client.get("/api/en/common-info")
         assert res.status_code == 422
 
 
-class TestCommonNeighbors:
-    def _patches(self, daily_id, daily_links, guess_links):
+class TestCommonInfo:
+    def _patches(self, daily_id, daily_links, guess_links, daily_cats=None, guess_cats=None):
         article = {"id": daily_id, "title": "Toto", "date": date.today()}
+        daily_cats = daily_cats or {}
+        guess_cats = guess_cats or {}
 
         def links_side_effect(lang, article_id):
             return daily_links if article_id == daily_id else guess_links
 
-        def titles_side_effect(lang, ids):
-            return [f"Article {id}" for id in ids]
+        def cats_side_effect(lang, article_id):
+            return daily_cats if article_id == daily_id else guess_cats
 
         return (
             patch("main.get_daily_article_cached", return_value=article),
             patch("main.get_links", side_effect=links_side_effect),
-            patch("main.get_article_titles", side_effect=titles_side_effect),
+            patch("main.get_categories", side_effect=cats_side_effect),
         )
 
     def test_correct_guess(self, client):
-        daily_patch, links_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {1: "A", 2: "B", 3: "C"})
-        with daily_patch, links_patch, titles_patch:
-            res = client.get("/api/en/common-links?id=42")
+        daily_patch, links_patch, cats_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {1: "A", 2: "B", 3: "C"})
+        with daily_patch, links_patch, cats_patch:
+            res = client.get("/api/en/common-info?id=42")
         assert res.status_code == 200
         assert res.json()["is_target"] is True
 
     def test_wrong_guess(self, client):
-        daily_patch, links_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {2: "B", 3: "C", 4: "D"})
-        with daily_patch, links_patch, titles_patch:
-            res = client.get("/api/en/common-links?id=12")
+        daily_patch, links_patch, cats_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {2: "B", 3: "C", 4: "D"})
+        with daily_patch, links_patch, cats_patch:
+            res = client.get("/api/en/common-info?id=12")
         assert res.status_code == 200
         data = res.json()
         assert data["is_target"] is False
-        assert len(data["common"]) == 2
+        assert len(data["common_links"]) == 2
 
     def test_no_common_links(self, client):
-        daily_patch, links_patch, titles_patch = self._patches(42, {1: "A", 2: "B"}, {3: "C", 4: "D"})
-        with daily_patch, links_patch, titles_patch:
-            res = client.get("/api/en/common-links?id=200")
+        daily_patch, links_patch, cats_patch = self._patches(42, {1: "A", 2: "B"}, {3: "C", 4: "D"})
+        with daily_patch, links_patch, cats_patch:
+            res = client.get("/api/en/common-info?id=200")
         assert res.status_code == 200
-        assert res.json()["common"] == []
+        assert res.json()["common_links"] == []
+
+    def test_common_categories(self, client):
+        daily_patch, links_patch, cats_patch = self._patches(
+            42, {}, {},
+            daily_cats={10: "History", 20: "Science"},
+            guess_cats={20: "Science", 30: "Sports"}
+        )
+        with daily_patch, links_patch, cats_patch:
+            res = client.get("/api/en/common-info?id=12")
+        assert res.status_code == 200
+        assert res.json()["common_categories"] == ["Science"]
+
+    def test_no_common_categories(self, client):
+        daily_patch, links_patch, cats_patch = self._patches(
+            42, {}, {},
+            daily_cats={10: "History"},
+            guess_cats={20: "Science"}
+        )
+        with daily_patch, links_patch, cats_patch:
+            res = client.get("/api/en/common-info?id=12")
+        assert res.status_code == 200
+        assert res.json()["common_categories"] == []
 
 
 class TestDailyArticleCached:
@@ -173,8 +197,8 @@ class TestInvalidLang:
         res = client.get("/api/xx/article-title?id=42")
         assert res.status_code == 400
 
-    def test_common_links_invalid_lang(self, client):
-        res = client.get("/api/xx/common-links?id=42")
+    def test_common_info_invalid_lang(self, client):
+        res = client.get("/api/xx/common-info?id=42")
         assert res.status_code == 400
 
     def test_articles_invalid_lang(self, client):

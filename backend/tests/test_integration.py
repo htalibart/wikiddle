@@ -76,19 +76,27 @@ class TestSearchArticles:
 
 
 @pytest.mark.parametrize("lang", ["en", "fr"])
-class TestCommonNeighbors:
+class TestCommonInfo:
     def test_correct_guess(self, client, lang):
         daily_id = client.get(f"/api/{lang}/daily-article").json()["id"]
-        res = client.get(f"/api/{lang}/common-links?id={daily_id}")
+        res = client.get(f"/api/{lang}/common-info?id={daily_id}")
         assert res.status_code == 200
         assert res.json()["is_target"] is True
 
     def test_other_guess(self, client, lang):
-        res = client.get(f"/api/{lang}/common-links?id=12")
+        res = client.get(f"/api/{lang}/common-info?id=12")
         assert res.status_code == 200
         data = res.json()
         assert "is_target" in data
-        assert "common" in data
+        assert "common_links" in data
+        assert "common_categories" in data
+
+    def test_daily_target_has_categories(self, client, lang):
+        daily_id = client.get(f"/api/{lang}/daily-article").json()["id"]
+        res = client.get(f"/api/{lang}/common-info?id={daily_id}")
+        assert res.status_code == 200
+        # the daily target should share categories with itself
+        assert len(res.json()["common_categories"]) > 0
 
 
 class TestArticleFilters:

@@ -73,8 +73,8 @@ function renderGuessCard(state, guess, translations) {
     ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>`
     : "";
   
-  const linksHTML = guess.common.length > 0
-  ? `<div class="guess-card-links">${guess.common.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>`
+  const linksHTML = guess.commonLinks.length > 0
+  ? `<div class="guess-card-links">${guess.commonLinks.map(title => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>`
   : `<div class="guess-card-nolinks">${translations.no_common_links}</div>`;
 
   card.innerHTML = `
@@ -251,7 +251,7 @@ async function handleGuessInput(state, tomSelect, translations) {
   tomSelect.clear();
   tomSelect.clearOptions();
   
-  fetch(`${API_URL}/${state.lang}/common-links?id=${guessId}`)
+  fetch(`${API_URL}/${state.lang}/common-info?id=${guessId}`)
     .then(res => {
       if (!res.ok) {
         showToast(translations.error_message);
@@ -268,13 +268,13 @@ async function handleGuessInput(state, tomSelect, translations) {
       const guess = {
         id: guessId,
         title: guessTitle,
-        common: data.common,
-        score: data.common.length,
+        commonLinks: data.common_links,
+        score: data.common_links.length,
         isTarget: data.is_target,
         isOnTarget: data.is_on_target,
       };
 
-      const linksToAdd = [...guess.common];
+      const linksToAdd = [...guess.commonLinks];
       if (guess.isOnTarget) {
         linksToAdd.push(guess.title);
       }
@@ -380,7 +380,7 @@ async function addHint(state, translations) {
  * @typedef {Object} Guess
  * @property {string} id - article id
  * @property {string} title - article title
- * @property {string[]} common - common links with the target
+ * @property {string[]} commonLinks - common links with the target
  * @property {number} score - number of common links with the target
  * @property {boolean} isTarget - whether this guess is the target article
  * @property {boolean} isOnTarget - whether this guess is a link on the target article
