@@ -21,7 +21,7 @@ The firewall is configured in the Hetzner dashboard under **Firewalls**. The fol
 
 | Port | Protocol | Source        | Purpose    |
 |------|----------|---------------|------------|
-| 22   | TCP      | Your IPs only | SSH access |
+| 22   | TCP      | My IPs only | SSH access |
 | 80   | TCP      | Any           | HTTP       |
 | 443  | TCP      | Any           | HTTPS      |
 
@@ -45,18 +45,32 @@ Then restart SSH:
 sudo systemctl restart ssh
 ```
 
-### 3. Create a deploy user
+### 3. Create personal user
 
-Instead of using root, all operations run as a dedicated `deploy` user:
+Instead of using root, all operations run as a personal user with full sudo:
+
+```bash
+sudo adduser myname
+sudo usermod -aG sudo myname
+sudo mkdir /home/myname/.ssh
+sudo cp ~/.ssh/authorized_keys /home/myname/.ssh/
+sudo chown -R myname:myname /home/myname/.ssh
+```
+
+Open a new terminal and verify you can SSH in as `myname` before continuing.
+
+### 4. Create the deploy user and deployers group
+
+The `deploy` user is a restricted account used exclusively for deployments
 
 ```bash
 sudo adduser deploy
-sudo usermod -aG sudo deploy
+sudo groupadd deployers
+sudo usermod -aG deployers deploy
+sudo usermod -aG deployers myname
 ```
 
-Then log in as `deploy` for the rest of the setup.
-
-### 4. Enable automatic security updates
+### 5. Enable automatic security updates
 
 ```bash
 sudo apt install unattended-upgrades -y
@@ -90,6 +104,12 @@ sudo apt install caddy
 
 Caddy is automatically enabled on boot when installed this way.
 
+Caddy runs as the `caddy` system user and needs to read files in `/var/www/wikiddle`, which belongs to the `deployers` group:
+
+```bash
+sudo usermod -aG deployers caddy
+```
+
 ### 3. Set up the deploy key
 
 The repo is private, so the server needs a deploy key to pull from GitHub.
@@ -100,7 +120,8 @@ Add the server's public key (`~/.ssh/github_deploy.pub`) to the GitHub repo unde
 
 ```bash
 sudo mkdir -p /var/www/wikiddle
-sudo chown -R deploy:www-data /var/www/wikiddle
+sudo chown -R deploy:deployers /var/www/wikiddle
+sudo chmod -R g+rw /var/www/wikiddle
 git clone git@github.com:htalibart/wikiddle.git /var/www/wikiddle
 ```
 
@@ -226,6 +247,11 @@ sudo systemctl enable wikiddle  # start wikiddle automatically on boot
 sudo systemctl start wikiddle  # start wikiddle now
 ```
 
+Grant the `deploy` user the right to restart wikiddle without a password:
+
+```bash
+echo "deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart wikiddle" | sudo tee /etc/sudoers.d/deploy-wikiddle
+```
 
 ### 9. Auto refresh
 The database of previous games is updated every day with a crontab job that calls an API endpoint. To set it up I generated a token with:
