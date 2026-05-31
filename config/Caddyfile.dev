@@ -12,20 +12,20 @@
     # index.html — entry point, never cache
     handle /index.html {
         header Cache-Control "no-cache"
-        root * frontend
+        root * frontend/dist
         file_server
     }
 
     # Translation files — always revalidate with server
     handle /i18n/* {
         header Cache-Control "no-cache"
-        root * frontend
+        root * frontend/dist
         file_server
     }
 
     # Everything else — static files (JS, CSS, images)
     handle {
-        root * frontend
+        root * frontend/dist
         try_files {path} /index.html
         file_server
     }

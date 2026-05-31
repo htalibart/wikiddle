@@ -100,6 +100,26 @@ npm run dev
 
 The site will be available at `http://localhost:5173`. Make sure the backend is running first.
 
+### Testing the production build locally
+
+To test an environment closer to production, build the frontend and serve it with Caddy:
+
+```bash
+npm run build
+```
+
+Then, stop the system Caddy service if it is running:
+```bash
+sudo systemctl stop caddy
+```
+
+Serve the built frontend with the local Caddy config from the project root:
+```bash
+caddy run --config config/Caddyfile.dev
+```
+
+The site will be available at `http://localhost:8080`. Unlike `npm run dev`, changes to JS files are not picked up automatically (re-run `npm run build` each time).
+
 ## Tests
 Run from the root of the project:
 ```bash
