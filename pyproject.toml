@@ -1,2 +1,5 @@
 [tool.pytest.ini_options]
 pythonpath = ["backend"]
+
+[tool.ruff]
+include = ["backend/**/*.py"]
