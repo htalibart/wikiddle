@@ -1,4 +1,4 @@
-![CI](https://github.com/htalibart/wikiddle/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/htalibart/wikiddle/actions/workflows/ci.yml/badge.svg) ![License](https://img.shields.io/github/license/htalibart/wikiddle)
 
 # Wikiddle
 
