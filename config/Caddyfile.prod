@@ -14,20 +14,20 @@ wikiddle.com {
     # index.html — entry point, never cache so users always get the latest version after a deployment
     handle /index.html {
         header Cache-Control "no-cache"
-        root * /var/www/wikiddle/frontend
+        root * /var/www/wikiddle/frontend/dist
         file_server
     }
 
     # Translation files — always revalidate with server so users always get the latest translations
     handle /i18n/* {
         header Cache-Control "no-cache"
-        root * /var/www/wikiddle/frontend
+        root * /var/www/wikiddle/frontend/dist
         file_server
     }
 
     # Everything else — static files (JS, CSS, images) served with default caching
     handle {
-        root * /var/www/wikiddle/frontend
+        root * /var/www/wikiddle/frontend/dist
         try_files {path} /index.html
         file_server
     }
@@ -47,20 +47,20 @@ wikiddle.com {
     # index.html — entry point, never cache so users always get the latest version after a deployment
     handle /index.html {
         header Cache-Control "no-cache"
-        root * /var/www/wikiddle/frontend
+        root * /var/www/wikiddle/frontend/dist
         file_server
     }
 
     # Translation files — always revalidate with server so users always get the latest translations
     handle /i18n/* {
         header Cache-Control "no-cache"
-        root * /var/www/wikiddle/frontend
+        root * /var/www/wikiddle/frontend/dist
         file_server
     }
 
     # Everything else — static files (JS, CSS, images) served with default caching
     handle {
-        root * /var/www/wikiddle/frontend
+        root * /var/www/wikiddle/frontend/dist
         try_files {path} /index.html
         file_server
     }
