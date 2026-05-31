@@ -12,6 +12,8 @@ os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR/"db"/"wiki"))
 os.environ.setdefault("WIKI_VERSION", "2")
 os.environ.setdefault("GAMES_DB", str(DATA_DIR/"db"/"games"/"v1.db"))
 
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture(autouse=True)
 def reset_cache():

@@ -11,41 +11,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - run: pip install ruff
-
       - run: ruff check backend/
 
   lint-js:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-
       - run: npm ci
         working-directory: ./frontend
-
       - run: npx eslint frontend/
+
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -r backend/requirements.txt
+      - run: pytest backend/tests/ -m "not integration"
 
   build:
     runs-on: ubuntu-latest
-    needs: [lint-python, lint-js]
+    needs: [lint-python, lint-js, test-backend]
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-
       - run: npm ci
         working-directory: ./frontend
-
       - run: npm run build
         working-directory: ./frontend
