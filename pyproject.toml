@@ -1,5 +1,8 @@
 [tool.pytest.ini_options]
 pythonpath = ["backend"]
+markers = [
+    "integration: marks tests as integration tests",
+]
 
 [tool.ruff]
 include = ["backend/**/*.py"]
