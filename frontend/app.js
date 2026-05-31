@@ -39,15 +39,15 @@ function renderTargetCard(state, translations) {
 
   const linksHTML = links.length > 0
     ? links.map(title => {
-        const isNew = newLinks && newLinks.has(title) && (!targetFound);
-        return `<a href="${titleToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-link"' : ''}>${title} </a>`
+	const isNew = newLinks && newLinks.has(title) && (!targetFound);
+	return `<a href="${titleToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-link"' : ''}>${title} </a>`
       }).join(" ")
     : `<span class="target-placeholder">${translations.target_placeholder}</span>`;
 
   card.innerHTML = `
       <div class="guess-card-header">
-        ${titleHTML}
-        ${knowsHTML}
+	${titleHTML}
+	${knowsHTML}
       </div>
       <div class="guess-card-links">${linksHTML}</div>
     `;
@@ -254,8 +254,8 @@ async function handleGuessInput(state, tomSelect, translations) {
   fetch(`${API_URL}/${state.lang}/common-neighbors?id=${guessId}`)
     .then(res => {
       if (!res.ok) {
-        showToast(translations.error_message);
-        return;
+	showToast(translations.error_message);
+	return;
       }
       return res.json();
       })
@@ -266,33 +266,33 @@ async function handleGuessInput(state, tomSelect, translations) {
       checkGameDate(state, data.game_date);
 
       const guess = {
-        id: guessId,
-        title: guessTitle,
-        common: data.common,
-        score: data.common.length,
-        isTarget: data.is_target,
-        isOnTarget: data.is_on_target,
+	id: guessId,
+	title: guessTitle,
+	common: data.common,
+	score: data.common.length,
+	isTarget: data.is_target,
+	isOnTarget: data.is_on_target,
       };
 
       const linksToAdd = [...guess.common];
       if (guess.isOnTarget) {
-        linksToAdd.push(guess.title);
+	linksToAdd.push(guess.title);
       }
       updateKnownLinks(state, linksToAdd);
 
       if (guess.isTarget) {
-        state.knowledgeTarget.title = guess.title;
-        if (state.lastGuess) {
-          insertSorted(state.lastGuess, state);
-        }
-        state.lastGuess = null;
-        showWinOverlay(state, translations);
+	state.knowledgeTarget.title = guess.title;
+	if (state.lastGuess) {
+	  insertSorted(state.lastGuess, state);
+	}
+	state.lastGuess = null;
+	showWinOverlay(state, translations);
       }
       else { // update last guess, sort the rest of the cards
-        if (state.lastGuess != null) {
-          insertSorted(state.lastGuess, state);
-        }
-        state.lastGuess = guess;
+	if (state.lastGuess != null) {
+	  insertSorted(state.lastGuess, state);
+	}
+	state.lastGuess = guess;
       }
       renderCards(state, translations);
       saveState(state);
@@ -360,8 +360,8 @@ async function addHint(state, translations) {
       checkGameDate(state, data.game_date);
 
       if (data.title === null) {
-        state.knowsAllLinks = true;
-        return;
+	state.knowsAllLinks = true;
+	return;
       }
       updateKnownLinks(state, [data.title]);
       state.nbHints += 1;
@@ -498,14 +498,14 @@ async function main() {
       maxItems: 1,
       closeAfterSelect: true,
       load: function(query, callback) {
-        fetch(`${API_URL}/${state.lang}/articles?query=${encodeURIComponent(query)}`)
-          .then(res => res.json())
-          .then(data => data.filter(article => (!state.guesses.some(g => g.id == article.id)) && (article.id != state.lastGuess?.id) ))
-          .then(data => callback(data))
-          .catch(() => callback());
+	fetch(`${API_URL}/${state.lang}/articles?query=${encodeURIComponent(query)}`)
+	  .then(res => res.json())
+	  .then(data => data.filter(article => (!state.guesses.some(g => g.id == article.id)) && (article.id != state.lastGuess?.id) ))
+	  .then(data => callback(data))
+	  .catch(() => callback());
       },
       onItemAdd: function() {
-        handleGuessInput(state, tomSelect, translations);
+	handleGuessInput(state, tomSelect, translations);
       }
     });
 
