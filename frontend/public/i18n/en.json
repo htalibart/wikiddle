@@ -18,10 +18,26 @@
   "howto_annotation_previous_guesses": "The score next to each guess is the number of links in common with the mystery article. Guesses are sorted by score: the higher, the closer. A blue title means the guess is itself a link on the mystery article.",
   "howto_example_encyclopedia_title": "Encyclopedia",
   "howto_example_encyclopedia_score": 5,
-  "howto_example_encyclopedia_links": ["Article (publishing)", "Copyleft", "Hierarchy", "Information retrieval", "Reference work"],
+  "howto_example_encyclopedia_links": [
+    "Article (publishing)",
+    "Copyleft",
+    "Hierarchy",
+    "Information retrieval",
+    "Reference work"
+  ],
   "howto_example_internet_title": "Internet",
   "howto_example_internet_score": 9,
-  "howto_example_internet_links": ["World Wide Web", "Social media", "Web browser", "Linux", "Cloud computing", "IP address", "Internet service provider", "Internet traffic", "Smartphone"],
+  "howto_example_internet_links": [
+    "World Wide Web",
+    "Social media",
+    "Web browser",
+    "Linux",
+    "Cloud computing",
+    "IP address",
+    "Internet service provider",
+    "Internet traffic",
+    "Smartphone"
+  ],
   "howto_example_europe_title": "Europe",
   "howto_example_europe_score": 3,
   "howto_example_europe_links": ["Amsterdam", "Croatia", "English language"],

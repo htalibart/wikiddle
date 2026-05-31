@@ -1,6 +1,5 @@
-import { titleToUrl } from './utils.js';
-import confetti from 'canvas-confetti'
-
+import { titleToUrl } from "./utils.js";
+import confetti from "canvas-confetti";
 
 /**
  * Shows a toast notification message
@@ -12,7 +11,6 @@ export function showToast(message) {
   toast.classList.add("visible");
   setTimeout(() => toast.classList.remove("visible"), 3000);
 }
-
 
 /**
  * Builds the "how to play" overlay
@@ -65,7 +63,7 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
         <div class="guess-card-score">${score}</div>
       </div>
       <div class="guess-card-links">
-        ${links.map(t => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
+        ${links.map((t) => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
       </div>
     `;
     card.querySelector(".guess-card-score").style.color = scoreToColor(score);
@@ -73,12 +71,15 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
   }
 
   box.appendChild(makeLabel(translations.section_last_guess));
-  box.appendChild(makeGuessCard(
-    translations.howto_example_encyclopedia_title,
-    translations.howto_example_encyclopedia_score,
-    translations.howto_example_encyclopedia_links,
-    true, true
-  ));
+  box.appendChild(
+    makeGuessCard(
+      translations.howto_example_encyclopedia_title,
+      translations.howto_example_encyclopedia_score,
+      translations.howto_example_encyclopedia_links,
+      true,
+      true,
+    ),
+  );
   box.appendChild(makeAnnotation(translations.howto_annotation_last_guess));
 
   box.appendChild(makeLabel(translations.section_mystery));
@@ -94,25 +95,31 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
       <div class="guess-card-title">?</div>
     </div>
     <div class="guess-card-links">
-      ${mysteryLinks.map(t => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
+      ${mysteryLinks.map((t) => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
     </div>
   `;
   box.appendChild(targetCard);
   box.appendChild(makeAnnotation(translations.howto_annotation_mystery));
 
   box.appendChild(makeLabel(translations.section_previous_guesses));
-  box.appendChild(makeGuessCard(
-    translations.howto_example_internet_title,
-    translations.howto_example_internet_score,
-    translations.howto_example_internet_links,
-    true, false
-  ));
-  box.appendChild(makeGuessCard(
-    translations.howto_example_europe_title,
-    translations.howto_example_europe_score,
-    translations.howto_example_europe_links,
-    false, false
-  ));
+  box.appendChild(
+    makeGuessCard(
+      translations.howto_example_internet_title,
+      translations.howto_example_internet_score,
+      translations.howto_example_internet_links,
+      true,
+      false,
+    ),
+  );
+  box.appendChild(
+    makeGuessCard(
+      translations.howto_example_europe_title,
+      translations.howto_example_europe_score,
+      translations.howto_example_europe_links,
+      false,
+      false,
+    ),
+  );
   box.appendChild(makeAnnotation(translations.howto_annotation_previous_guesses));
 
   const textAfter = document.createElement("p");
@@ -120,28 +127,26 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
   box.appendChild(textAfter);
 
   // Event listeners
-  closeBtn.addEventListener("click", () => overlay.style.display = "none");
-  overlay.addEventListener("click", () => overlay.style.display = "none");
-  box.addEventListener("click", e => e.stopPropagation());
-  document.addEventListener("keydown", e => {
+  closeBtn.addEventListener("click", () => (overlay.style.display = "none"));
+  overlay.addEventListener("click", () => (overlay.style.display = "none"));
+  box.addEventListener("click", (e) => e.stopPropagation());
+  document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") overlay.style.display = "none";
   });
 }
 
-
 /**
  * Shows an overlay when the target article changes mid-game
- * 
+ *
  */
 export function showMidnightOverlay() {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     document.getElementById("midnight-overlay").style.display = "flex";
     document.getElementById("midnight-btn").addEventListener("click", () => {
       resolve();
     });
   });
 }
-
 
 /**
  * Builds the win overlay
@@ -151,21 +156,20 @@ export function buildWinOverlay(translations) {
   document.getElementById("win-message").textContent = translations.win_message;
   document.getElementById("win-share-btn").textContent = translations.win_share;
   document.getElementById("win-share-label").textContent = translations.win_share_label;
-  
+
   document.getElementById("win-overlay").addEventListener("click", () => {
-      document.getElementById("win-overlay").style.display = "none";
+    document.getElementById("win-overlay").style.display = "none";
   });
-  document.getElementById("win-box").addEventListener("click", e => e.stopPropagation());
+  document.getElementById("win-box").addEventListener("click", (e) => e.stopPropagation());
   document.getElementById("win-close-btn").addEventListener("click", () => {
+    document.getElementById("win-overlay").style.display = "none";
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
       document.getElementById("win-overlay").style.display = "none";
-   });
-  document.addEventListener("keydown", e => {
-      if (e.key === "Escape") {
-          document.getElementById("win-overlay").style.display = "none";
-      }
+    }
   });
 }
-
 
 /**
  * Shows the win overlay
@@ -179,8 +183,13 @@ export function showWinOverlay(state, translations) {
   const mysteryTitle = state.knowledgeTarget.title;
   const nbHints = state.nbHints;
 
-  document.getElementById("win-article").innerHTML = translations.win_article.replace("{title}", `<a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank">${mysteryTitle}</a>`);
-  document.getElementById("win-game-stats").textContent = translations.win_game_stats.replace("{nbGuesses}", nbGuesses).replace("{nbHints}", nbHints);
+  document.getElementById("win-article").innerHTML = translations.win_article.replace(
+    "{title}",
+    `<a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank">${mysteryTitle}</a>`,
+  );
+  document.getElementById("win-game-stats").textContent = translations.win_game_stats
+    .replace("{nbGuesses}", nbGuesses)
+    .replace("{nbHints}", nbHints);
 
   const shareText = translations.win_share_text.replace("{nbGuesses}", nbGuesses).replace("{nbHints}", nbHints);
   document.getElementById("win-share-preview").value = shareText;
@@ -189,11 +198,9 @@ export function showWinOverlay(state, translations) {
     if (navigator.share) {
       navigator.share({ text: shareText });
     } else {
-      navigator.clipboard.writeText(shareText).then(() =>
-        showToast(translations.copied_to_clipboard)
-      );
+      navigator.clipboard.writeText(shareText).then(() => showToast(translations.copied_to_clipboard));
     }
-    });
+  });
 
   document.getElementById("win-overlay").style.display = "flex";
 }
