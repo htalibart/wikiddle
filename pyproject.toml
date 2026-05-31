@@ -6,3 +6,4 @@ markers = [
 
 [tool.ruff]
 include = ["backend/**/*.py"]
+line-length = 120

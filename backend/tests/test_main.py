@@ -4,7 +4,13 @@ from fastapi.testclient import TestClient
 
 from datetime import date, timedelta
 
-from main import app, get_daily_article_cached, get_yesterdays_article_cached, _cached_daily_targets, _cached_yesterday_targets
+from main import (
+    app,
+    get_daily_article_cached,
+    get_yesterdays_article_cached,
+    _cached_daily_targets,
+    _cached_yesterday_targets,
+)
 
 
 def make_con_mock(fetchone=None, fetchall=None):
@@ -84,14 +90,18 @@ class TestCommonNeighbors:
         )
 
     def test_correct_guess(self, client):
-        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {1: "A", 2: "B", 3: "C"})
+        daily_patch, neighbors_patch, titles_patch = self._patches(
+            42, {1: "A", 2: "B", 3: "C"}, {1: "A", 2: "B", 3: "C"}
+        )
         with daily_patch, neighbors_patch, titles_patch:
             res = client.get("/api/en/common-neighbors?id=42")
         assert res.status_code == 200
         assert res.json()["is_target"] is True
 
     def test_wrong_guess(self, client):
-        daily_patch, neighbors_patch, titles_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {2: "B", 3: "C", 4: "D"})
+        daily_patch, neighbors_patch, titles_patch = self._patches(
+            42, {1: "A", 2: "B", 3: "C"}, {2: "B", 3: "C", 4: "D"}
+        )
         with daily_patch, neighbors_patch, titles_patch:
             res = client.get("/api/en/common-neighbors?id=12")
         assert res.status_code == 200
@@ -114,18 +124,22 @@ class TestDailyArticleCached:
 
     def test_uses_cache_on_second_call(self):
         con = make_db_mock()
-        with patch("main.open_wiki_db_con", return_value=con), \
-             patch("main.open_games_db_con", return_value=make_con_mock()), \
-             patch("main.get_schema_version", return_value=1):
+        with (
+            patch("main.open_wiki_db_con", return_value=con),
+            patch("main.open_games_db_con", return_value=make_con_mock()),
+            patch("main.get_schema_version", return_value=1),
+        ):
             get_daily_article_cached("en")
             get_daily_article_cached("en")
         assert con.execute.call_count == 2
 
     def test_uses_v2_filter(self):
         con = make_db_mock()
-        with patch("main.open_wiki_db_con", return_value=con), \
-             patch("main.open_games_db_con", return_value=make_con_mock()), \
-             patch("main.get_schema_version", return_value=2):
+        with (
+            patch("main.open_wiki_db_con", return_value=con),
+            patch("main.open_games_db_con", return_value=make_con_mock()),
+            patch("main.get_schema_version", return_value=2),
+        ):
             get_daily_article_cached("en")
 
         queries = [call.args[0] for call in con.execute.call_args_list]
@@ -136,9 +150,11 @@ class TestDailyArticleCached:
         _cached_daily_targets["en"].update({"id": 12, "title": "Titi", "date": yesterday})
 
         con = make_db_mock(title="Toto")
-        with patch("main.open_wiki_db_con", return_value=con), \
-             patch("main.open_games_db_con", return_value=make_con_mock()), \
-             patch("main.get_schema_version", return_value=1):
+        with (
+            patch("main.open_wiki_db_con", return_value=con),
+            patch("main.open_games_db_con", return_value=make_con_mock()),
+            patch("main.get_schema_version", return_value=1),
+        ):
             result = get_daily_article_cached("en")
 
         assert result["date"] == date.today()
@@ -148,9 +164,11 @@ class TestDailyArticleCached:
         con_en = make_db_mock(article_id=42, title="Toto")
         con_fr = make_db_mock(article_id=84, title="Bonjour")
 
-        with patch("main.open_wiki_db_con", side_effect=[con_en, con_fr]), \
-             patch("main.open_games_db_con", return_value=make_con_mock()), \
-             patch("main.get_schema_version", return_value=1):
+        with (
+            patch("main.open_wiki_db_con", side_effect=[con_en, con_fr]),
+            patch("main.open_games_db_con", return_value=make_con_mock()),
+            patch("main.get_schema_version", return_value=1),
+        ):
             result_en = get_daily_article_cached("en")
             result_fr = get_daily_article_cached("fr")
 
@@ -207,8 +225,7 @@ class TestQueryValidation:
 class TestSearchArticles:
     def test_search_articles_v1(self, client):
         con = make_con_mock(fetchall=[(42, "Toto")])
-        with patch("main.open_wiki_db_con", return_value=con), \
-             patch("main.get_schema_version", return_value=1):
+        with patch("main.open_wiki_db_con", return_value=con), patch("main.get_schema_version", return_value=1):
             res = client.get("/api/en/articles?query=To")
 
         assert res.status_code == 200
@@ -219,8 +236,7 @@ class TestSearchArticles:
 
     def test_search_articles_v2(self, client):
         con = make_con_mock(fetchall=[(42, "Toto")])
-        with patch("main.open_wiki_db_con", return_value=con), \
-             patch("main.get_schema_version", return_value=2):
+        with patch("main.open_wiki_db_con", return_value=con), patch("main.get_schema_version", return_value=2):
             res = client.get("/api/en/articles?query=To")
 
         assert res.status_code == 200
@@ -239,7 +255,9 @@ class TestNewTargetNeighbor:
 
     def test_returns_hint(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today()}
-        daily_patch, neighbors_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
+        daily_patch, neighbors_patch, titles_patch = self._patches(
+            target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"]
+        )
         with daily_patch, neighbors_patch, titles_patch:
             res = client.post("/api/en/new-target-neighbor", json=[])
         assert res.status_code == 200
@@ -247,7 +265,9 @@ class TestNewTargetNeighbor:
 
     def test_excludes_already_guessed(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today()}
-        daily_patch, neighbors_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
+        daily_patch, neighbors_patch, titles_patch = self._patches(
+            target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"]
+        )
         with daily_patch, neighbors_patch, titles_patch:
             res = client.post("/api/en/new-target-neighbor", json=["Article 1", "Article 2", "Article 3"])
         assert res.status_code == 200
@@ -259,7 +279,9 @@ class TestNewTargetNeighbor:
 
     def test_empty_body(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today()}
-        daily_patch, neighbors_patch, titles_patch = self._patches(target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"])
+        daily_patch, neighbors_patch, titles_patch = self._patches(
+            target, [1, 2, 3], ["Article 1", "Article 2", "Article 3"]
+        )
         with daily_patch, neighbors_patch, titles_patch:
             res = client.post("/api/en/new-target-neighbor")
         assert res.status_code == 200

@@ -12,7 +12,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-LANGUAGES = {'en', 'fr'}
+LANGUAGES = {"en", "fr"}
 MIN_NB_LINKS_FOR_TARGET = 20
 MIN_ARTICLE_LENGTH_FOR_TARGET = 7_000
 MAX_NB_SEARCH_RESULTS = 30
@@ -41,33 +41,39 @@ _cached_yesterday_targets = {lang: {"id": None, "title": None, "date": None} for
 
 
 def format_date(d: date) -> str:
-    """ formats date in YYYY-MM-DD format """
+    """formats date in YYYY-MM-DD format"""
     return d.isoformat()
 
+
 def valid_date(date_str: str) -> str:
-    """ validates that @date_str is in isoformat, raises 400 if not, otherwise returns the date """
+    """validates that @date_str is in isoformat, raises 400 if not, otherwise returns the date"""
     try:
         date.fromisoformat(date_str)
     except ValueError:
-        raise HTTPException(status_code=400, detail=f"Incorrect date format: {date_str} (should be isoformat: YYYY-MM-DD)")
+        raise HTTPException(
+            status_code=400, detail=f"Incorrect date format: {date_str} (should be isoformat: YYYY-MM-DD)"
+        )
     return date_str
 
+
 def valid_lang(lang: str) -> str:
-    """ validates that @lang is a supported language, raises 400 if not, otherwise returns the language """
+    """validates that @lang is a supported language, raises 400 if not, otherwise returns the language"""
     if lang not in LANGUAGES:
         raise HTTPException(status_code=400, detail=f"Language not supported: {lang}")
     return lang
 
+
 def get_schema_version(con: duckdb.DuckDBPyConnection) -> int:
-    """ get schema database version (introduced categories in v2) """
+    """get schema database version (introduced categories in v2)"""
     try:
         row = con.execute("SELECT value FROM metadata WHERE key = 'schema_version'").fetchone()
     except duckdb.CatalogException:
         return 1
     return int(row[0])
 
+
 def open_games_db_con() -> duckdb.DuckDBPyConnection:
-    """ opens a DuckDB connection to the games stats database, raises 500 if database file is not found """
+    """opens a DuckDB connection to the games stats database, raises 500 if database file is not found"""
     db_path = os.environ.get("GAMES_DB")
     if db_path is None:
         raise HTTPException(status_code=500, detail="GAMES_DB environment variable is not set")
@@ -76,30 +82,32 @@ def open_games_db_con() -> duckdb.DuckDBPyConnection:
         raise HTTPException(status_code=500, detail=f"Database not found: {db_path}")
     return duckdb.connect(db_path)
 
+
 def open_wiki_db_con(lang: str) -> duckdb.DuckDBPyConnection:
-    """ opens a DuckDB connection to the appropriate database depending on language, raises 500 if database file is not found """
+    """opens a DuckDB connection to the appropriate database depending on language, raises 500 if database file is not found"""
     db_dir = os.environ.get("WIKI_DB_DIR")
     db_version = os.environ.get("WIKI_VERSION")
     if db_dir is None:
         raise HTTPException(status_code=500, detail="WIKI_DB_DIR environment variable is not set")
     if db_version is None:
         raise HTTPException(status_code=500, detail="WIKI_VERSION environment variable is not set")
-    db_path = Path(db_dir) / f'v{db_version}' / f'{lang}.db'
+    db_path = Path(db_dir) / f"v{db_version}" / f"{lang}.db"
     if not db_path.is_file():
         raise HTTPException(status_code=500, detail=f"Database not found: {db_path}")
     return duckdb.connect(db_path, read_only=True)
 
 
 def get_wiki_db_con(lang: str = Depends(valid_lang)):
-    """ FastAPI dependency to yield a DuckDB connection to the wiki database for the given language, closes it after the request """
+    """FastAPI dependency to yield a DuckDB connection to the wiki database for the given language, closes it after the request"""
     con = open_wiki_db_con(lang)
     try:
         yield con
     finally:
         con.close()
 
+
 def get_games_db_con():
-    """ FastAPI dependency to yield a DuckDB connection to the games database, closes it after the request """
+    """FastAPI dependency to yield a DuckDB connection to the games database, closes it after the request"""
     con = open_games_db_con()
     try:
         yield con
@@ -108,14 +116,13 @@ def get_games_db_con():
 
 
 def get_article_from_date(lang: str, d: date) -> dict:
-    """ returns article from a previous game given language and date """
+    """returns article from a previous game given language and date"""
     con = open_games_db_con()
     date_str = format_date(d)
     try:
         row = con.execute(
-                "SELECT article_id, article_title FROM daily_articles WHERE date = ? AND lang = ?",
-                [date_str, lang]
-                ).fetchone()
+            "SELECT article_id, article_title FROM daily_articles WHERE date = ? AND lang = ?", [date_str, lang]
+        ).fetchone()
         if row is None:
             raise HTTPException(status_code=404, detail=f"No article found at {date_str} in {lang} database")
     finally:
@@ -124,27 +131,27 @@ def get_article_from_date(lang: str, d: date) -> dict:
 
 
 def add_article_to_games_db(day: date, lang: str, article_id: int, article_title: str):
-    """ add new article to previous games database """
+    """add new article to previous games database"""
     con = open_games_db_con()
     try:
         con.execute(
-                "INSERT OR IGNORE INTO daily_articles VALUES (?, ?, ?, ?)",
-                [format_date(day), lang, article_id, article_title]
+            "INSERT OR IGNORE INTO daily_articles VALUES (?, ?, ?, ?)",
+            [format_date(day), lang, article_id, article_title],
         )
     finally:
         con.close()
 
 
 def get_yesterdays_article_cached(lang: str) -> dict:
-    """ returns yesterday's article for the given language, refreshes the cache if needed """
-    yesterday = date.today() - timedelta(days=1) 
+    """returns yesterday's article for the given language, refreshes the cache if needed"""
+    yesterday = date.today() - timedelta(days=1)
     if _cached_yesterday_targets[lang]["date"] != yesterday:
         _cached_yesterday_targets[lang].update(get_article_from_date(lang, yesterday))
     return _cached_yesterday_targets[lang]
 
 
 def get_daily_article_filter(schema_version: int, temp_relax=False) -> str:
-    """ return SQL filter for the daily article choice """
+    """return SQL filter for the daily article choice"""
     if schema_version == 1:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET}"
     elif schema_version >= 2:
@@ -155,11 +162,10 @@ def get_daily_article_filter(schema_version: int, temp_relax=False) -> str:
     raise ValueError(f"Unsupported schema version: {schema_version}")
 
 
-
 def get_daily_article_cached(lang: str) -> dict:
-    """ returns today's daily article for the given language, refreshes the cache if needed """
+    """returns today's daily article for the given language, refreshes the cache if needed"""
     today = date.today()
-    
+
     # if cache is stale, update it
     if _cached_daily_targets[lang]["date"] != today:
         # first, try games database
@@ -178,10 +184,12 @@ def get_daily_article_cached(lang: str) -> dict:
                 offset = seed % count
                 row = con.execute(
                     f"SELECT id, title FROM articles WHERE {article_filter} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
-                    [seed, offset]
+                    [seed, offset],
                 ).fetchone()
                 article = {"date": today, "id": row[0], "title": row[1]}
-                add_article_to_games_db(day=article["date"], lang=lang, article_id=article["id"], article_title=article["title"])
+                add_article_to_games_db(
+                    day=article["date"], lang=lang, article_id=article["id"], article_title=article["title"]
+                )
             finally:
                 con.close()
         _cached_daily_targets[lang].update(article)
@@ -205,10 +213,10 @@ def get_daily_article(request: Request, lang: str = Depends(valid_lang)):
 
 @router.get("/{lang}/article-id")
 @limiter.limit("30/minute")
-def get_article_id(request: Request, con = Depends(get_wiki_db_con), title: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
-    row = con.execute(
-        "SELECT id FROM articles WHERE title = ?", [title]
-    ).fetchone()
+def get_article_id(
+    request: Request, con=Depends(get_wiki_db_con), title: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)
+):
+    row = con.execute("SELECT id FROM articles WHERE title = ?", [title]).fetchone()
 
     if row is None:
         raise HTTPException(status_code=404, detail="Article not found")
@@ -217,19 +225,15 @@ def get_article_id(request: Request, con = Depends(get_wiki_db_con), title: str 
 
 
 def get_article_titles(lang: str, ids: set[int]):
-    """ returns the titles of the articles for language @lang with given ids @ids """
+    """returns the titles of the articles for language @lang with given ids @ids"""
     if not ids:
         return []
     con = open_wiki_db_con(lang)
     try:
-        rows = con.execute(
-            "SELECT title FROM articles WHERE id IN (SELECT * FROM UNNEST(?))",
-            [list(ids)]
-        ).fetchall()
+        rows = con.execute("SELECT title FROM articles WHERE id IN (SELECT * FROM UNNEST(?))", [list(ids)]).fetchall()
         return [row[0] for row in rows]
     finally:
         con.close()
-
 
 
 @router.get("/{lang}/article-title")
@@ -241,13 +245,13 @@ def get_article_title(request: Request, lang: str = Depends(valid_lang), id: int
     return {"id": id, "title": titles[0]}
 
 
-
 def get_neighbors(lang: str, article_id: int) -> dict:
-    """ returns a dict {id: title} articles that article with id @article_id links to in language @lang """
+    """returns a dict {id: title} articles that article with id @article_id links to in language @lang"""
     con = open_wiki_db_con(lang)
     try:
         rows = con.execute(
-            "SELECT l.target_id, p.title FROM links l JOIN articles p ON l.target_id = p.id WHERE l.source_id = ?", [article_id]
+            "SELECT l.target_id, p.title FROM links l JOIN articles p ON l.target_id = p.id WHERE l.source_id = ?",
+            [article_id],
         ).fetchall()
         return {row[0]: row[1] for row in rows}
     finally:
@@ -257,30 +261,31 @@ def get_neighbors(lang: str, article_id: int) -> dict:
 @router.get("/{lang}/common-neighbors")
 @limiter.limit("60/minute")
 def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)):
-    """ API route to get the links that are common to the user guess and the target article """
+    """API route to get the links that are common to the user guess and the target article"""
     article = get_daily_article_cached(lang)
     n1 = get_neighbors(lang, article["id"])
     n2 = get_neighbors(lang, id)
     common = set(n1.keys()) & set(n2.keys())
-    is_target = (article["id"] == id)
-    is_on_target = (id in n1)
+    is_target = article["id"] == id
+    is_on_target = id in n1
     return {
         "common": [n1[nid] for nid in common],
         "is_target": is_target,
         "is_on_target": is_on_target,
-        "game_date": format_date(article["date"])
+        "game_date": format_date(article["date"]),
     }
-
 
 
 @router.get("/{lang}/articles")
 @limiter.limit("300/minute")
-def search_articles(request: Request, con = Depends(get_wiki_db_con), query: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)):
-    """ API route to search in the database (called by TomSelect) """
+def search_articles(
+    request: Request, con=Depends(get_wiki_db_con), query: str = Query(..., min_length=1, max_length=MAX_TITLE_LENGTH)
+):
+    """API route to search in the database (called by TomSelect)"""
     schema_version = get_schema_version(con)
     article_filter = get_daily_article_filter(schema_version, temp_relax=True)
     rows = con.execute(
-    f"""SELECT id, title FROM articles 
+        f"""SELECT id, title FROM articles 
         WHERE {article_filter} AND title ILIKE ?
         ORDER BY CASE 
             WHEN title ILIKE ? THEN 0
@@ -288,7 +293,7 @@ def search_articles(request: Request, con = Depends(get_wiki_db_con), query: str
             ELSE 2
         END, nb_links DESC, LENGTH(title)
         LIMIT {MAX_NB_SEARCH_RESULTS}""",
-    [f"%{query}%", query, f"{query}%"]
+        [f"%{query}%", query, f"{query}%"],
     ).fetchall()
     return [{"id": row[0], "title": row[1]} for row in rows]
 
@@ -296,28 +301,22 @@ def search_articles(request: Request, con = Depends(get_wiki_db_con), query: str
 @router.post("/{lang}/new-target-neighbor")
 @limiter.limit("300/minute")
 def get_one_new_neighbor(request: Request, lang: str = Depends(valid_lang), known_titles: list = Body(default=[])):
-    """ API route to get one random link target that was not already found """
+    """API route to get one random link target that was not already found"""
     target = get_daily_article_cached(lang)
     neighbor_ids = get_neighbors(lang, target["id"])
     neighbor_titles = set(get_article_titles(lang, neighbor_ids))
     n_not_guessed = neighbor_titles.difference(set(known_titles))
     game_date = format_date(target["date"])
     if not n_not_guessed:
-        return {
-            "title": None,
-            "game_date": game_date
-            }
+        return {"title": None, "game_date": game_date}
     hint_title = random.choice(list(n_not_guessed))
-    return {
-        "title": hint_title,
-        "game_date": game_date
-        }
+    return {"title": hint_title, "game_date": game_date}
 
 
 @router.get("/{lang}/game-date")
 @limiter.limit("10/minute")
 def get_game_date(request: Request, lang: str = Depends(valid_lang)):
-    """ API route to get the date of the current cached game """
+    """API route to get the date of the current cached game"""
     article = get_daily_article_cached(lang)
     return {"date": format_date(article["date"])}
 
@@ -341,7 +340,8 @@ def refresh_daily_articles(request: Request, authorization: str = Header(default
 
 @router.get("/admin/{lang}/version", include_in_schema=False)
 @limiter.limit("10/minute")
-def get_db_version(request: Request, con = Depends(get_wiki_db_con)):
+def get_db_version(request: Request, con=Depends(get_wiki_db_con)):
     return {"schema_version": get_schema_version(con)}
+
 
 app.include_router(router)
