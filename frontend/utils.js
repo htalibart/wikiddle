@@ -4,7 +4,7 @@
  * @param {string} lang - active language code
  * @returns {string} Wikipedia url
  */
-function titleToUrl(title, lang) {
+export function titleToUrl(title, lang) {
   return `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title.replaceAll(" ", "_"))}`;
 }
 
@@ -14,7 +14,7 @@ function titleToUrl(title, lang) {
  * @param {number} [maxScore=20] - score that maps to the target color
  * @returns {function(number): string} a function that takes a score and returns a CSS color string
  */
-function makeScoreColorFn(targetHex, maxScore = 20) {
+export function makeScoreColorFn(targetHex, maxScore = 20) {
   const r2 = parseInt(targetHex.slice(1,3), 16);
   const g2 = parseInt(targetHex.slice(3,5), 16);
   const b2 = parseInt(targetHex.slice(5,7), 16);

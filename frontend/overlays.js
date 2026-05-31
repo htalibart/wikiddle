@@ -1,8 +1,12 @@
+import { titleToUrl } from './utils.js';
+import confetti from 'canvas-confetti'
+
+
 /**
  * Shows a toast notification message
  * @param {string} message - message to show
  */
-function showToast(message) {
+export function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
   toast.classList.add("visible");
@@ -16,7 +20,7 @@ function showToast(message) {
  * @param {string} lang - language code
  * @param {function} scoreToColor - function that maps a score to a CSS color string
  */
-function buildHowtoExample(translations, lang, scoreToColor) {
+export function buildHowtoExample(translations, lang, scoreToColor) {
   const box = document.getElementById("howto-box");
   const overlay = document.getElementById("howto-overlay");
   box.innerHTML = "";
@@ -129,7 +133,7 @@ function buildHowtoExample(translations, lang, scoreToColor) {
  * Shows an overlay when the target article changes mid-game
  * 
  */
-function showMidnightOverlay() {
+export function showMidnightOverlay() {
   return new Promise(resolve => {
     document.getElementById("midnight-overlay").style.display = "flex";
     document.getElementById("midnight-btn").addEventListener("click", () => {
@@ -143,7 +147,7 @@ function showMidnightOverlay() {
  * Builds the win overlay
  * @param {Object} translations - translations for the current language
  */
-function buildWinOverlay(translations) {
+export function buildWinOverlay(translations) {
   document.getElementById("win-message").textContent = translations.win_message;
   document.getElementById("win-share-btn").textContent = translations.win_share;
   document.getElementById("win-share-label").textContent = translations.win_share_label;
@@ -168,7 +172,7 @@ function buildWinOverlay(translations) {
  * @param {State} state - current application state
  * @param {Object} translations - translations for the current language
  */
-function showWinOverlay(state, translations) {
+export function showWinOverlay(state, translations) {
   confetti();
 
   const nbGuesses = 1 + state.guesses.length + (state.lastGuess ? 1 : 0);

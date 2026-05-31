@@ -211,3 +211,5 @@ __marimo__/
 debug/*
 data/
 todo
+node_modules/
+frontend/dist/
