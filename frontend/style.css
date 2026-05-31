@@ -241,6 +241,7 @@ body {
 
 /* Tom Select */
 
+/* eslint-disable css/no-important */
 .ts-wrapper,
 .ts-control,
 .ts-dropdown,
@@ -253,7 +254,7 @@ body {
 .ts-dropdown .option {
   padding: var(--space-small) var(--space-large) !important;
 }
-
+/* eslint-enable css/no-important */
 
 
 /* Yesterday's article banner */
@@ -529,6 +530,7 @@ body {
   margin-bottom: var(--space-small);
 }
 
+/* eslint-disable css/use-baseline */
 #win-share-preview {
   width: 100%;
   border: 1px solid var(--input-border-color);
@@ -542,6 +544,7 @@ body {
   outline: none;
   margin-bottom: var(--space-large);
 }
+/* eslint-enable css/use-baseline */
 
 #howto-example {
   padding-top: var(--space-larger);
@@ -622,6 +625,8 @@ body {
   pointer-events: none;
 }
 
+
+/* eslint-disable css/use-baseline */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -630,6 +635,7 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
+/* eslint-enable css/use-baseline */
 
 /* Responsive */
 
@@ -667,9 +673,11 @@ body {
     flex: 1 1 100%;
   }
 
+  /* eslint-disable css/no-important */
   #input-area .ts-control {
     min-width: 0 !important;
   }
+  /* eslint-enable css/no-important */
 
   #guess-btn {
     flex: 1;
