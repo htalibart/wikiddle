@@ -60,3 +60,13 @@ Unit tests (`tests/test_main.py`) mock the database and can be run without it. I
 ```bash
 npx jsdoc frontend/*.js -d docs/jsdoc
 ```
+
+
+## Linter
+
+Python:
+```bash
+ruff check
+```
+
+added to pre-commit hooks (`.git/hooks/pre-commit`) and to CI (`.github/workflows/ci.yml`)
