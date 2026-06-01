@@ -432,3 +432,55 @@ def test_hint_all_links_found_flow(page: Page):
     assert state["gameDate"] == "2000-01-01"
     assert state["lastGuess"] is None
     assert state["nbHints"] == 0
+
+
+def test_duplicate_known_links_are_not_duplicated(page: Page):
+    common_neighbors_responses = [
+        {
+            "game_date": "2000-01-01",
+            "common": ["Electronic music", "French house"],
+            "is_target": False,
+            "is_on_target": False,
+        },
+        {
+            "game_date": "2000-01-01",
+            "common": ["Electronic music", "House music"],
+            "is_target": False,
+            "is_on_target": False,
+        },
+    ]
+
+    def handle_common_neighbors(route):
+        response = common_neighbors_responses.pop(0)
+        route.fulfill(
+            status=200,
+            content_type="application/json",
+            json=response,
+        )
+
+    page.route("**/api/en/common-neighbors?id=*", handle_common_neighbors)
+
+    page.goto(BASE_URL)
+
+    page.click(".ts-control")
+    page.keyboard.type("Daft Punk")
+    first_option = page.locator(".ts-dropdown .option").first
+    expect(first_option).to_be_visible(timeout=5000)
+    first_option.click()
+
+    page.click(".ts-control")
+    page.keyboard.type("Justice")
+    second_option = page.locator(".ts-dropdown .option").first
+    expect(second_option).to_be_visible(timeout=5000)
+    second_option.click()
+
+    target_card = get_target_card(page)
+    expect(target_card).to_have_count(1)
+    expect(target_card.locator(".guess-card-links a")).to_have_count(3)
+    expect(target_card.locator(".guess-card-links")).to_contain_text("Electronic music")
+    expect(target_card.locator(".guess-card-links")).to_contain_text("French house")
+    expect(target_card.locator(".guess-card-links")).to_contain_text("House music")
+
+    state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
+    assert state["knowledgeTarget"]["links"] == ["Electronic music", "French house", "House music"]
+    assert state["knowledgeTarget"]["links"].count("Electronic music") == 1
