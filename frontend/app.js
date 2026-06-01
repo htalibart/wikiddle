@@ -181,8 +181,15 @@ async function handleDateChange() {
 }
 
 /**
- * Checks that the date is still the same as before the player started the game, otherwise resets the game and returns false
- * @param {State} state
+ * Checks whether an API response belongs to the current game date.
+ *
+ * If no game date is stored yet, initializes state.gameDate with currentDate.
+ * If currentDate differs from the stored game date, shows the midnight overlay,
+ * schedules a page reload, and returns false
+ *
+ * @param {State} state - current application state
+ * @param {string} currentDate - game date returned by the API
+ * @returns {boolean} true if the caller may continue processing the response, false if processing should stop
  */
 function checkGameDate(state, currentDate) {
   if (state.gameDate == null) {

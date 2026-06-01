@@ -26,17 +26,19 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
+            <pre class="prettyprint source linenums"><code>import { titleToUrl } from "./utils.js";
+import confetti from "canvas-confetti";
+
+/**
  * Shows a toast notification message
  * @param {string} message - message to show
  */
-function showToast(message) {
+export function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
   toast.classList.add("visible");
   setTimeout(() => toast.classList.remove("visible"), 3000);
 }
-
 
 /**
  * Builds the "how to play" overlay
@@ -44,7 +46,7 @@ function showToast(message) {
  * @param {string} lang - language code
  * @param {function} scoreToColor - function that maps a score to a CSS color string
  */
-function buildHowtoExample(translations, lang, scoreToColor) {
+export function buildHowtoExample(translations, lang, scoreToColor) {
   const box = document.getElementById("howto-box");
   const overlay = document.getElementById("howto-overlay");
   box.innerHTML = "";
@@ -89,7 +91,7 @@ function buildHowtoExample(translations, lang, scoreToColor) {
         &lt;div class="guess-card-score">${score}&lt;/div>
       &lt;/div>
       &lt;div class="guess-card-links">
-        ${links.map(t => `&lt;a href="${titleToUrl(t, lang)}" target="_blank">${t}&lt;/a>`).join(" ")}
+        ${links.map((t) => `&lt;a href="${titleToUrl(t, lang)}" target="_blank">${t}&lt;/a>`).join(" ")}
       &lt;/div>
     `;
     card.querySelector(".guess-card-score").style.color = scoreToColor(score);
@@ -97,12 +99,15 @@ function buildHowtoExample(translations, lang, scoreToColor) {
   }
 
   box.appendChild(makeLabel(translations.section_last_guess));
-  box.appendChild(makeGuessCard(
-    translations.howto_example_encyclopedia_title,
-    translations.howto_example_encyclopedia_score,
-    translations.howto_example_encyclopedia_links,
-    true, true
-  ));
+  box.appendChild(
+    makeGuessCard(
+      translations.howto_example_encyclopedia_title,
+      translations.howto_example_encyclopedia_score,
+      translations.howto_example_encyclopedia_links,
+      true,
+      true,
+    ),
+  );
   box.appendChild(makeAnnotation(translations.howto_annotation_last_guess));
 
   box.appendChild(makeLabel(translations.section_mystery));
@@ -118,25 +123,31 @@ function buildHowtoExample(translations, lang, scoreToColor) {
       &lt;div class="guess-card-title">?&lt;/div>
     &lt;/div>
     &lt;div class="guess-card-links">
-      ${mysteryLinks.map(t => `&lt;a href="${titleToUrl(t, lang)}" target="_blank">${t}&lt;/a>`).join(" ")}
+      ${mysteryLinks.map((t) => `&lt;a href="${titleToUrl(t, lang)}" target="_blank">${t}&lt;/a>`).join(" ")}
     &lt;/div>
   `;
   box.appendChild(targetCard);
   box.appendChild(makeAnnotation(translations.howto_annotation_mystery));
 
   box.appendChild(makeLabel(translations.section_previous_guesses));
-  box.appendChild(makeGuessCard(
-    translations.howto_example_internet_title,
-    translations.howto_example_internet_score,
-    translations.howto_example_internet_links,
-    true, false
-  ));
-  box.appendChild(makeGuessCard(
-    translations.howto_example_europe_title,
-    translations.howto_example_europe_score,
-    translations.howto_example_europe_links,
-    false, false
-  ));
+  box.appendChild(
+    makeGuessCard(
+      translations.howto_example_internet_title,
+      translations.howto_example_internet_score,
+      translations.howto_example_internet_links,
+      true,
+      false,
+    ),
+  );
+  box.appendChild(
+    makeGuessCard(
+      translations.howto_example_europe_title,
+      translations.howto_example_europe_score,
+      translations.howto_example_europe_links,
+      false,
+      false,
+    ),
+  );
   box.appendChild(makeAnnotation(translations.howto_annotation_previous_guesses));
 
   const textAfter = document.createElement("p");
@@ -144,21 +155,20 @@ function buildHowtoExample(translations, lang, scoreToColor) {
   box.appendChild(textAfter);
 
   // Event listeners
-  closeBtn.addEventListener("click", () => overlay.style.display = "none");
-  overlay.addEventListener("click", () => overlay.style.display = "none");
-  box.addEventListener("click", e => e.stopPropagation());
-  document.addEventListener("keydown", e => {
+  closeBtn.addEventListener("click", () => (overlay.style.display = "none"));
+  overlay.addEventListener("click", () => (overlay.style.display = "none"));
+  box.addEventListener("click", (e) => e.stopPropagation());
+  document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") overlay.style.display = "none";
   });
 }
 
-
 /**
  * Shows an overlay when the target article changes mid-game
- * 
+ *
  */
-function showMidnightOverlay() {
-  return new Promise(resolve => {
+export function showMidnightOverlay() {
+  return new Promise((resolve) => {
     document.getElementById("midnight-overlay").style.display = "flex";
     document.getElementById("midnight-btn").addEventListener("click", () => {
       resolve();
@@ -166,45 +176,48 @@ function showMidnightOverlay() {
   });
 }
 
-
 /**
  * Builds the win overlay
  * @param {Object} translations - translations for the current language
  */
-function buildWinOverlay(translations) {
+export function buildWinOverlay(translations) {
   document.getElementById("win-message").textContent = translations.win_message;
   document.getElementById("win-share-btn").textContent = translations.win_share;
   document.getElementById("win-share-label").textContent = translations.win_share_label;
-  
+
   document.getElementById("win-overlay").addEventListener("click", () => {
-      document.getElementById("win-overlay").style.display = "none";
+    document.getElementById("win-overlay").style.display = "none";
   });
-  document.getElementById("win-box").addEventListener("click", e => e.stopPropagation());
+  document.getElementById("win-box").addEventListener("click", (e) => e.stopPropagation());
   document.getElementById("win-close-btn").addEventListener("click", () => {
+    document.getElementById("win-overlay").style.display = "none";
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
       document.getElementById("win-overlay").style.display = "none";
-   });
-  document.addEventListener("keydown", e => {
-      if (e.key === "Escape") {
-          document.getElementById("win-overlay").style.display = "none";
-      }
+    }
   });
 }
-
 
 /**
  * Shows the win overlay
  * @param {State} state - current application state
  * @param {Object} translations - translations for the current language
  */
-function showWinOverlay(state, translations) {
+export function showWinOverlay(state, translations) {
   confetti();
 
   const nbGuesses = 1 + state.guesses.length + (state.lastGuess ? 1 : 0);
   const mysteryTitle = state.knowledgeTarget.title;
   const nbHints = state.nbHints;
 
-  document.getElementById("win-article").innerHTML = translations.win_article.replace("{title}", `&lt;a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank">${mysteryTitle}&lt;/a>`);
-  document.getElementById("win-game-stats").textContent = translations.win_game_stats.replace("{nbGuesses}", nbGuesses).replace("{nbHints}", nbHints);
+  document.getElementById("win-article").innerHTML = translations.win_article.replace(
+    "{title}",
+    `&lt;a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank">${mysteryTitle}&lt;/a>`,
+  );
+  document.getElementById("win-game-stats").textContent = translations.win_game_stats
+    .replace("{nbGuesses}", nbGuesses)
+    .replace("{nbHints}", nbHints);
 
   const shareText = translations.win_share_text.replace("{nbGuesses}", nbGuesses).replace("{nbHints}", nbHints);
   document.getElementById("win-share-preview").value = shareText;
@@ -213,11 +226,9 @@ function showWinOverlay(state, translations) {
     if (navigator.share) {
       navigator.share({ text: shareText });
     } else {
-      navigator.clipboard.writeText(shareText).then(() =>
-        showToast(translations.copied_to_clipboard)
-      );
+      navigator.clipboard.writeText(shareText).then(() => showToast(translations.copied_to_clipboard));
     }
-    });
+  });
 
   document.getElementById("win-overlay").style.display = "flex";
 }
@@ -237,7 +248,7 @@ function showWinOverlay(state, translations) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun May 31 2026 11:42:54 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Jun 01 2026 20:12:10 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
