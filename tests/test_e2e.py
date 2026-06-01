@@ -1,6 +1,7 @@
 import pytest
 from playwright.sync_api import Page, Locator, expect
 import re
+import json
 
 BASE_URL = "http://localhost:5173"
 
@@ -770,3 +771,50 @@ def test_search_excludes_already_guessed_article(page: Page):
 
     option_texts = options.all_text_contents()
     assert option_texts == ["Daft Punk discography"]
+
+
+def test_saved_state_expires_when_game_date_differs(page: Page):
+    expired_state = {
+        "lang": "en",
+        "guesses": [],
+        "knowledgeTarget": {
+            "title": None,
+            "links": ["Electronic music", "French house"],
+        },
+        "knowsAllLinks": False,
+        "gameDate": "2000-01-01",
+        "lastGuess": {
+            "id": "1",
+            "title": "Daft Punk",
+            "common": ["Electronic music", "French house"],
+            "score": 2,
+            "isTarget": False,
+            "isOnTarget": False,
+        },
+        "nbHints": 0,
+    }
+
+    page.route(
+        "**/api/en/game-date",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            json={"date": "2000-01-02"},
+        ),
+    )
+
+    page.goto(BASE_URL)
+    page.evaluate(
+        f"localStorage.setItem('game-state-en', {json.dumps(json.dumps(expired_state))})"
+    )
+    page.reload()
+
+    target_card = get_target_card(page)
+    expect(target_card).to_have_count(1)
+    expect(target_card.locator(".guess-card-title")).to_have_text("?")
+    expect(target_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(target_card.locator(".target-placeholder")).to_be_visible()
+
+    expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
+    expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
+    expect(page.locator("#win-overlay")).to_be_hidden()
