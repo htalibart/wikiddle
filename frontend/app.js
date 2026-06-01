@@ -323,9 +323,11 @@ async function loadTranslations(lang) {
  * @param {Object} translations - translations for the current language
  */
 async function addHint(state, translations) {
+  const hintBtn = document.getElementById("hint-btn");
+
   if (state.knowsAllLinks) {
     showToast(translations.all_links_found);
-    document.getElementById("hint-btn").classList.toggle("disabled-btn", state.knowsAllLinks);
+    hintBtn.classList.add("disabled-btn");
     return;
   }
 
@@ -337,27 +339,29 @@ async function addHint(state, translations) {
     .then((res) => {
       if (!res.ok) {
         showToast(translations.error_message);
-        return;
+        return null;
       }
       return res.json();
     })
     .then((data) => {
-      if (!data) return;
+      if (data === null) return;
 
       checkGameDate(state, data.game_date);
 
       if (data.title === null) {
         state.knowsAllLinks = true;
-        return;
+        hintBtn.classList.add("disabled-btn");
+      } else {
+        updateKnownLinks(state, [data.title]);
+        state.nbHints += 1;
       }
-      updateKnownLinks(state, [data.title]);
-      state.nbHints += 1;
+
+      renderCards(state, translations);
+      saveState(state);
     })
     .catch(() => {
       showToast(translations.error_message);
     });
-  renderCards(state, translations);
-  saveState(state);
 }
 
 /**
