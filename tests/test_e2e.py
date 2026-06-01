@@ -75,7 +75,7 @@ def test_hint_flow(page: Page):
             status=200,
             content_type="application/json",
             body="""{
-                "game_date": "2001-01-01",
+                "game_date": "2000-01-01",
                 "title": "Electronic music"
             }""",
         ),
@@ -109,7 +109,7 @@ def test_hint_flow(page: Page):
     assert state["knowledgeTarget"]["title"] is None
     assert state["knowledgeTarget"]["links"] == ["Electronic music"]
     assert state["knowsAllLinks"] is False
-    assert state["gameDate"] == "2001-01-01"
+    assert state["gameDate"] == "2000-01-01"
     assert state["lastGuess"] is None
     assert state["nbHints"] == 1
 
@@ -121,7 +121,7 @@ def test_guess_flow(page: Page):
             status=200,
             content_type="application/json",
             body="""{
-                "game_date": "2001-01-01",
+                "game_date": "2000-01-01",
                 "common": ["Electronic music", "French house"],
                 "is_target": false,
                 "is_on_target": false
@@ -168,7 +168,7 @@ def test_guess_flow(page: Page):
     assert state["knowledgeTarget"]["title"] is None
     assert state["knowledgeTarget"]["links"] == ["Electronic music", "French house"]
     assert state["knowsAllLinks"] is False
-    assert state["gameDate"] == "2001-01-01"
+    assert state["gameDate"] == "2000-01-01"
     assert state["lastGuess"]["title"] == selected_title
     assert state["lastGuess"]["common"] == ["Electronic music", "French house"]
     assert state["lastGuess"]["score"] == 2
@@ -384,4 +384,51 @@ def test_second_guess_flow(page: Page):
     assert state["guesses"][0]["common"] == ["Electronic music", "French house"]
     assert state["guesses"][0]["isTarget"] is False
     assert state["guesses"][0]["isOnTarget"] is False
+    assert state["nbHints"] == 0
+
+
+def test_hint_all_links_found_flow(page: Page):
+    page.route(
+        "**/api/en/new-target-neighbor",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body="""{
+                "game_date": "2000-01-01",
+                "title": null
+            }""",
+        ),
+    )
+
+    page.goto(BASE_URL)
+
+    target_card = get_target_card(page)
+    expect(target_card).to_have_count(1)
+    expect(target_card.locator(".guess-card-title")).to_have_text("?")
+    expect(target_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(target_card.locator(".target-placeholder")).to_be_visible()
+    expect(target_card.locator(".guess-card-knows")).to_have_count(0)
+
+    page.click("#hint-btn")
+
+    expect(target_card.locator(".guess-card-title")).to_have_text("?")
+    expect(target_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(target_card.locator(".target-placeholder")).to_be_visible()
+    expect(target_card.locator(".guess-card-knows")).to_be_visible()
+
+    expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
+    expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
+    expect(page.locator("#win-overlay")).to_be_hidden()
+
+    storage_keys = page.evaluate("Object.keys(localStorage)")
+    assert storage_keys == ["game-state-en"]
+
+    state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
+    assert state["lang"] == "en"
+    assert state["guesses"] == []
+    assert state["knowledgeTarget"]["title"] is None
+    assert state["knowledgeTarget"]["links"] == []
+    assert state["knowsAllLinks"] is True
+    assert state["gameDate"] == "2000-01-01"
+    assert state["lastGuess"] is None
     assert state["nbHints"] == 0
