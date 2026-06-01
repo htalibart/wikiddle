@@ -181,18 +181,21 @@ async function handleDateChange() {
 }
 
 /**
- * Checks that the date is still the same as before the player started the game, otherwise resets the game
+ * Checks that the date is still the same as before the player started the game, otherwise resets the game and returns false
  * @param {State} state
  */
 function checkGameDate(state, currentDate) {
   if (state.gameDate == null) {
     state.gameDate = currentDate;
+    return true;
   } else {
     if (currentDate != state.gameDate) {
       handleDateChange();
-      return;
+      return false;
     }
   }
+
+  return true;
 }
 
 /**
@@ -254,7 +257,7 @@ async function handleGuessInput(state, tomSelect, translations) {
       if (!data) return;
 
       // Check that the date is still the same as before the player started the game, otherwise reset the game
-      checkGameDate(state, data.game_date);
+      if (!checkGameDate(state, data.game_date)) return;
 
       const guess = {
         id: guessId,
@@ -346,7 +349,7 @@ async function addHint(state, translations) {
     .then((data) => {
       if (data === null) return;
 
-      checkGameDate(state, data.game_date);
+      if (!checkGameDate(state, data.game_date)) return;
 
       if (data.title === null) {
         state.knowsAllLinks = true;
