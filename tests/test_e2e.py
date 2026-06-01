@@ -719,3 +719,54 @@ def test_saved_state_is_restored_after_reload(page: Page):
     assert state["lastGuess"]["isTarget"] is False
     assert state["lastGuess"]["isOnTarget"] is False
     assert state["nbHints"] == 0
+
+
+def test_search_excludes_already_guessed_article(page: Page):
+    articles_response = [
+        {"id": "1", "title": "Daft Punk"},
+        {"id": "2", "title": "Daft Punk discography"},
+    ]
+
+    def handle_articles(route):
+        route.fulfill(
+            status=200,
+            content_type="application/json",
+            json=articles_response,
+        )
+
+    page.route("**/api/en/articles?query=*", handle_articles)
+
+    page.route(
+        "**/api/en/common-neighbors?id=*",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            json={
+                "game_date": "2000-01-01",
+                "common": ["Electronic music", "French house"],
+                "is_target": False,
+                "is_on_target": False,
+            },
+        ),
+    )
+
+    page.goto(BASE_URL)
+
+    page.click(".ts-control")
+    page.keyboard.type("Daft Punk")
+    first_option = page.locator(".ts-dropdown .option").first
+    expect(first_option).to_be_visible(timeout=5000)
+    expect(first_option).to_have_text("Daft Punk")
+    first_option.click()
+
+    expect(page.locator("#guesses-list .last-guess-card .guess-card-title")).to_contain_text("Daft Punk")
+
+    page.click(".ts-control")
+    page.keyboard.type("Daft Punk")
+
+    options = page.locator(".ts-dropdown .option")
+    expect(options).to_have_count(1)
+    expect(options.first).to_have_text("Daft Punk discography")
+
+    option_texts = options.all_text_contents()
+    assert option_texts == ["Daft Punk discography"]
