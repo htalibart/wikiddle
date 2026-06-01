@@ -181,18 +181,28 @@ async function handleDateChange() {
 }
 
 /**
- * Checks that the date is still the same as before the player started the game, otherwise resets the game
- * @param {State} state
+ * Checks whether an API response belongs to the current game date.
+ *
+ * If no game date is stored yet, initializes state.gameDate with currentDate.
+ * If currentDate differs from the stored game date, shows the midnight overlay,
+ * schedules a page reload, and returns false
+ *
+ * @param {State} state - current application state
+ * @param {string} currentDate - game date returned by the API
+ * @returns {boolean} true if the caller may continue processing the response, false if processing should stop
  */
 function checkGameDate(state, currentDate) {
   if (state.gameDate == null) {
     state.gameDate = currentDate;
+    return true;
   } else {
     if (currentDate != state.gameDate) {
       handleDateChange();
-      return;
+      return false;
     }
   }
+
+  return true;
 }
 
 /**
@@ -254,7 +264,7 @@ async function handleGuessInput(state, tomSelect, translations) {
       if (!data) return;
 
       // Check that the date is still the same as before the player started the game, otherwise reset the game
-      checkGameDate(state, data.game_date);
+      if (!checkGameDate(state, data.game_date)) return;
 
       const guess = {
         id: guessId,
@@ -323,9 +333,11 @@ async function loadTranslations(lang) {
  * @param {Object} translations - translations for the current language
  */
 async function addHint(state, translations) {
+  const hintBtn = document.getElementById("hint-btn");
+
   if (state.knowsAllLinks) {
     showToast(translations.all_links_found);
-    document.getElementById("hint-btn").classList.toggle("disabled-btn", state.knowsAllLinks);
+    hintBtn.classList.add("disabled-btn");
     return;
   }
 
@@ -337,27 +349,29 @@ async function addHint(state, translations) {
     .then((res) => {
       if (!res.ok) {
         showToast(translations.error_message);
-        return;
+        return null;
       }
       return res.json();
     })
     .then((data) => {
-      if (!data) return;
+      if (data === null) return;
 
-      checkGameDate(state, data.game_date);
+      if (!checkGameDate(state, data.game_date)) return;
 
       if (data.title === null) {
         state.knowsAllLinks = true;
-        return;
+        hintBtn.classList.add("disabled-btn");
+      } else {
+        updateKnownLinks(state, [data.title]);
+        state.nbHints += 1;
       }
-      updateKnownLinks(state, [data.title]);
-      state.nbHints += 1;
+
+      renderCards(state, translations);
+      saveState(state);
     })
     .catch(() => {
       showToast(translations.error_message);
     });
-  renderCards(state, translations);
-  saveState(state);
 }
 
 /**
