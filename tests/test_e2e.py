@@ -647,3 +647,75 @@ def test_date_change_resets_game_before_next_guess(page: Page):
     assert state["lastGuess"]["title"] == third_guess_title
     assert state["lastGuess"]["common"] == ["Blog", "Website"]
     assert state["lastGuess"]["score"] == 2
+
+
+def test_saved_state_is_restored_after_reload(page: Page):
+    page.route(
+        "**/api/en/common-neighbors?id=*",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body="""{
+                "game_date": "2000-01-01",
+                "common": ["Electronic music", "French house"],
+                "is_target": false,
+                "is_on_target": false
+            }""",
+        ),
+    )
+
+    page.route(
+        "**/api/en/game-date",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body="""{"date": "2000-01-01"}""",
+        ),
+    )
+
+    page.goto(BASE_URL)
+
+    page.click(".ts-control")
+    page.keyboard.type("Daft Punk")
+    first_option = page.locator(".ts-dropdown .option").first
+    expect(first_option).to_be_visible(timeout=5000)
+    selected_title = first_option.text_content().strip()
+    first_option.click()
+
+    expect(page.locator("#guesses-list .guess-card")).to_have_count(2)
+    expect(page.locator("#guesses-list .last-guess-card")).to_have_count(1)
+
+    page.reload()
+
+    target_card = get_target_card(page)
+    expect(target_card).to_have_count(1)
+    expect(target_card.locator(".guess-card-title")).to_have_text("?")
+    expect(target_card.locator(".guess-card-links a")).to_have_count(2)
+    expect(target_card.locator(".guess-card-links")).to_contain_text("Electronic music")
+    expect(target_card.locator(".guess-card-links")).to_contain_text("French house")
+    expect(target_card.locator(".target-placeholder")).to_have_count(0)
+
+    last_guess_card = page.locator("#guesses-list .last-guess-card")
+    expect(last_guess_card).to_have_count(1)
+    expect(last_guess_card.locator(".guess-card-title")).to_contain_text(selected_title)
+    expect(last_guess_card.locator(".guess-card-score")).to_have_text("2")
+    expect(last_guess_card.locator(".guess-card-links a")).to_have_count(2)
+    expect(last_guess_card.locator(".guess-card-links")).to_contain_text("Electronic music")
+    expect(last_guess_card.locator(".guess-card-links")).to_contain_text("French house")
+
+    expect(page.locator("#guesses-list .guess-card")).to_have_count(2)
+    expect(page.locator("#win-overlay")).to_be_hidden()
+
+    state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
+    assert state["lang"] == "en"
+    assert state["guesses"] == []
+    assert state["knowledgeTarget"]["title"] is None
+    assert state["knowledgeTarget"]["links"] == ["Electronic music", "French house"]
+    assert state["knowsAllLinks"] is False
+    assert state["gameDate"] == "2000-01-01"
+    assert state["lastGuess"]["title"] == selected_title
+    assert state["lastGuess"]["common"] == ["Electronic music", "French house"]
+    assert state["lastGuess"]["score"] == 2
+    assert state["lastGuess"]["isTarget"] is False
+    assert state["lastGuess"]["isOnTarget"] is False
+    assert state["nbHints"] == 0
