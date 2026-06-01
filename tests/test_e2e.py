@@ -484,3 +484,68 @@ def test_duplicate_known_links_are_not_duplicated(page: Page):
     state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
     assert state["knowledgeTarget"]["links"] == ["Electronic music", "French house", "House music"]
     assert state["knowledgeTarget"]["links"].count("Electronic music") == 1
+
+
+def test_api_error_on_guess(page: Page):
+    page.route(
+        "**/api/en/common-neighbors?id=*",
+        lambda route: route.fulfill(
+            status=500,
+            content_type="application/json",
+            body="""{"error": "test error"}""",
+        ),
+    )
+
+    page.goto(BASE_URL)
+
+    page.click(".ts-control")
+    page.keyboard.type("Daft Punk")
+    first_option = page.locator(".ts-dropdown .option").first
+    expect(first_option).to_be_visible(timeout=5000)
+    first_option.click()
+
+    target_card = get_target_card(page)
+    expect(target_card).to_have_count(1)
+    expect(target_card.locator(".guess-card-title")).to_have_text("?")
+    expect(target_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(target_card.locator(".target-placeholder")).to_be_visible()
+
+    expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
+    expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
+    expect(page.locator("#win-overlay")).to_be_hidden()
+
+    expect(page.locator("#toast")).to_have_class(re.compile(r".*\bvisible\b.*"))
+    expect(page.locator("#toast")).to_have_text(re.compile(r".+"))
+
+    assert page.evaluate("Object.keys(localStorage)") == []
+
+
+def test_api_error_on_hint(page: Page):
+    page.route(
+        "**/api/en/new-target-neighbor",
+        lambda route: route.fulfill(
+            status=500,
+            content_type="application/json",
+            body="""{"error": "test error"}""",
+        ),
+    )
+
+    page.goto(BASE_URL)
+
+    page.click("#hint-btn")
+
+    target_card = get_target_card(page)
+    expect(target_card).to_have_count(1)
+    expect(target_card.locator(".guess-card-title")).to_have_text("?")
+    expect(target_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(target_card.locator(".target-placeholder")).to_be_visible()
+    expect(target_card.locator(".guess-card-knows")).to_have_count(0)
+
+    expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
+    expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
+    expect(page.locator("#win-overlay")).to_be_hidden()
+
+    expect(page.locator("#toast")).to_have_class(re.compile(r".*\bvisible\b.*"))
+    expect(page.locator("#toast")).to_have_text(re.compile(r".+"))
+
+    assert page.evaluate("Object.keys(localStorage)") == []
