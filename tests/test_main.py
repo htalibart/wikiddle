@@ -318,7 +318,7 @@ class TestNewTargetCategory:
         with daily_patch, categories_patch:
             res = client.post("/api/en/new-target-category", json=[])
         assert res.status_code == 200
-        assert res.json()["category"] is not None
+        assert res.json()["title"] is not None
 
     def test_excludes_already_guessed(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today()}
@@ -328,7 +328,7 @@ class TestNewTargetCategory:
         with daily_patch, categories_patch:
             res = client.post("/api/en/new-target-category", json=["Category 1", "Category 2", "Category 3"])
         assert res.status_code == 200
-        assert res.json()["category"] is None
+        assert res.json()["title"] is None
 
     def test_invalid_lang(self, client):
         res = client.post("/api/xx/new-target-category", json=[])

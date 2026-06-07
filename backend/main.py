@@ -347,9 +347,9 @@ def get_one_new_category(request: Request, lang: str = Depends(valid_lang), know
     categories_not_guessed = set(categories.values()).difference(set(known_categories))
     game_date = format_date(target["date"])
     if not categories_not_guessed:
-        return {"category": None, "game_date": game_date}
+        return {"title": None, "game_date": game_date}
     hint_category = random.choice(list(categories_not_guessed))
-    return {"category": hint_category, "game_date": game_date}
+    return {"title": hint_category, "game_date": game_date}
 
 
 
