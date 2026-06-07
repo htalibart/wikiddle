@@ -303,6 +303,47 @@ class TestNewTargetNeighbor:
         assert res.status_code == 200
 
 
+class TestNewTargetCategory:
+    def _patches(self, target, categories):
+        return (
+            patch("main.get_daily_article_cached", return_value=target),
+            patch("main.get_categories", return_value=categories),
+        )
+
+    def test_returns_hint(self, client):
+        target = {"id": 42, "title": "Toto", "date": date.today()}
+        daily_patch, categories_patch = self._patches(
+            target, {1: "Category 1", 2: "Category 2", 3: "Category 3"}
+        )
+        with daily_patch, categories_patch:
+            res = client.post("/api/en/new-target-category", json=[])
+        assert res.status_code == 200
+        assert res.json()["category"] is not None
+
+    def test_excludes_already_guessed(self, client):
+        target = {"id": 42, "title": "Toto", "date": date.today()}
+        daily_patch, categories_patch = self._patches(
+            target, {1: "Category 1", 2: "Category 2", 3: "Category 3"}
+        )
+        with daily_patch, categories_patch:
+            res = client.post("/api/en/new-target-category", json=["Category 1", "Category 2", "Category 3"])
+        assert res.status_code == 200
+        assert res.json()["category"] is None
+
+    def test_invalid_lang(self, client):
+        res = client.post("/api/xx/new-target-category", json=[])
+        assert res.status_code == 400
+
+    def test_empty_body(self, client):
+        target = {"id": 42, "title": "Toto", "date": date.today()}
+        daily_patch, categories_patch = self._patches(
+            target, {1: "Category 1", 2: "Category 2", 3: "Category 3"}
+        )
+        with daily_patch, categories_patch:
+            res = client.post("/api/en/new-target-category")
+        assert res.status_code == 200
+
+
 class TestYesterdaysArticle:
     def setup_method(self):
         for lang in _cached_yesterday_targets:

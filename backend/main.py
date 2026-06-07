@@ -330,12 +330,27 @@ def get_one_new_link(request: Request, lang: str = Depends(valid_lang), known_ti
     target = get_daily_article_cached(lang)
     link_ids = get_links(lang, target["id"])
     link_titles = set(get_article_titles(lang, link_ids))
-    n_not_guessed = link_titles.difference(set(known_titles))
+    links_not_guessed = link_titles.difference(set(known_titles))
     game_date = format_date(target["date"])
-    if not n_not_guessed:
+    if not links_not_guessed:
         return {"title": None, "game_date": game_date}
-    hint_title = random.choice(list(n_not_guessed))
+    hint_title = random.choice(list(links_not_guessed))
     return {"title": hint_title, "game_date": game_date}
+
+
+@router.post("/{lang}/new-target-category")
+@limiter.limit("300/minute")
+def get_one_new_category(request: Request, lang: str = Depends(valid_lang), known_categories: list = Body(default=[])) -> dict[str, Any]:
+    """API route to get one random category that was not already found"""
+    target = get_daily_article_cached(lang)
+    categories = get_categories(lang, target["id"])
+    categories_not_guessed = set(categories.values()).difference(set(known_categories))
+    game_date = format_date(target["date"])
+    if not categories_not_guessed:
+        return {"category": None, "game_date": game_date}
+    hint_category = random.choice(list(categories_not_guessed))
+    return {"category": hint_category, "game_date": game_date}
+
 
 
 @router.get("/{lang}/game-date")
