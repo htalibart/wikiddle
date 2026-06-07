@@ -1,5 +1,5 @@
 from typing import Any
-from collections.abc import Iterator
+from collections.abc import Iterator, Iterable
 
 import os
 from pathlib import Path
@@ -227,7 +227,7 @@ def get_article_id(
     return {"id": row[0], "title": title}
 
 
-def get_article_titles(lang: str, ids: set[int]) -> list[str]:
+def get_article_titles(lang: str, ids: Iterable[int]) -> list[str]:
     """returns the titles of the articles for language @lang with given ids @ids"""
     if not ids:
         return []
@@ -242,7 +242,7 @@ def get_article_titles(lang: str, ids: set[int]) -> list[str]:
 @router.get("/{lang}/article-title")
 @limiter.limit("300/minute")
 def get_article_title(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)) -> dict[str, Any]:
-    titles = get_article_titles(lang, {id})
+    titles = get_article_titles(lang, [id])
     if not titles:
         raise HTTPException(status_code=404, detail="Article not found")
     return {"id": id, "title": titles[0]}
