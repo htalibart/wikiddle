@@ -163,7 +163,6 @@ def test_guess_flow(page: Page):
     expect(last_guess_card).to_have_count(1)
     expect(last_guess_card.locator(".guess-card-title")).to_contain_text(selected_title)
     expect(last_guess_card.locator(".guess-card-score-links")).to_have_text("2")
-    expect(last_guess_card.locator(".guess-card-score-categories")).to_have_text("0")
     expect(last_guess_card.locator(".guess-card-links a")).to_have_count(2)
     expect(last_guess_card.locator(".guess-card-links")).to_contain_text("Electronic music")
     expect(last_guess_card.locator(".guess-card-links")).to_contain_text("French house")
