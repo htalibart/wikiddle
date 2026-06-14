@@ -1,4 +1,4 @@
-import { titleToUrl } from "./utils.js";
+import { titleToUrl, categoryToUrl } from "./utils.js";
 import confetti from "canvas-confetti";
 
 /**
@@ -51,22 +51,29 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
     return anno;
   }
 
-  function makeGuessCard(title, score, links, isOnTarget, isLastGuess) {
+  function makeGuessCard(title, score, links, categories, isOnTarget, isLastGuess) {
     const card = document.createElement("div");
     card.classList.add("guess-card");
     if (isLastGuess) card.classList.add("last-guess-card");
+    const categoriesHTML =
+      categories.length > 0
+        ? `<div class="guess-card-categories">${categories.map((t) => `<a href="${categoryToUrl(t, lang)}" target="_blank"># ${t}</a>`).join(" ")}</div>`
+        : "";
     card.innerHTML = `
       <div class="guess-card-header">
         <div class="guess-card-title${isOnTarget ? " guess-card-title-on-target" : ""}">
           <a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>${isOnTarget ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>` : ""}
         </div>
-        <div class="guess-card-score">${score}</div>
+        <div class="guess-card-score">
+          <span class="guess-card-score-links">${score}</span>
+        </div>
       </div>
       <div class="guess-card-links">
         ${links.map((t) => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
       </div>
+      ${categoriesHTML}
     `;
-    card.querySelector(".guess-card-score").style.color = scoreToColor(score);
+    card.querySelector(".guess-card-score-links").style.color = scoreToColor(score);
     return card;
   }
 
@@ -76,6 +83,7 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
       translations.howto_example_encyclopedia_title,
       translations.howto_example_encyclopedia_score,
       translations.howto_example_encyclopedia_links,
+      translations.howto_example_encyclopedia_categories,
       true,
       true,
     ),
@@ -90,12 +98,20 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
     ...translations.howto_example_encyclopedia_links,
     ...translations.howto_example_europe_links,
   ];
+  const mysteryCategories = [
+    ...translations.howto_example_encyclopedia_categories,
+    ...translations.howto_example_internet_categories,
+    ...translations.howto_example_europe_categories,
+  ];
   targetCard.innerHTML = `
     <div class="guess-card-header">
       <div class="guess-card-title">?</div>
     </div>
     <div class="guess-card-links">
       ${mysteryLinks.map((t) => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
+    </div>
+    <div class="guess-card-categories">
+      ${mysteryCategories.map((t) => `<a href="${categoryToUrl(t, lang)}" target="_blank"># ${t}</a>`).join(" ")}
     </div>
   `;
   box.appendChild(targetCard);
@@ -107,6 +123,7 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
       translations.howto_example_internet_title,
       translations.howto_example_internet_score,
       translations.howto_example_internet_links,
+      translations.howto_example_internet_categories,
       true,
       false,
     ),
@@ -116,6 +133,7 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
       translations.howto_example_europe_title,
       translations.howto_example_europe_score,
       translations.howto_example_europe_links,
+      translations.howto_example_europe_categories,
       false,
       false,
     ),
