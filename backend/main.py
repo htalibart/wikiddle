@@ -153,15 +153,12 @@ def get_yesterdays_article_cached(lang: str) -> dict[str, Any]:
     return _cached_yesterday_targets[lang]
 
 
-def get_daily_article_filter(schema_version: int, temp_relax=False) -> str:
+def get_daily_article_filter(schema_version: int) -> str:
     """return SQL filter for the daily article choice"""
     if schema_version == 1:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET}"
     elif schema_version >= 2:
-        if temp_relax:
-            return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE"
-        else:
-            return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET}"
+        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET}"
     raise ValueError(f"Unsupported schema version: {schema_version}")
 
 
@@ -286,7 +283,7 @@ def search_articles(
 ) -> list[dict[str, Any]]:
     """API route to search in the database (called by TomSelect)"""
     schema_version = get_schema_version(con)
-    article_filter = get_daily_article_filter(schema_version, temp_relax=True)
+    article_filter = get_daily_article_filter(schema_version)
     rows = con.execute(
         f"""SELECT id, title FROM articles 
         WHERE {article_filter} AND title ILIKE ?
