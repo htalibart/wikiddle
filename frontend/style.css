@@ -16,6 +16,7 @@ html {
   --main-light-color: #999999;
   --very-light-color: #dddddd;
   --almost-white: #f9f9f9;
+  --dark-gold: #9a6e00;
   --border-radius: 0.375em;
 
   --font-serif: Georgia, serif;
@@ -39,8 +40,10 @@ html {
 
   --pill-background: var(--almost-white);
   --pill-hover-background: #e0e0e0;
-  --pill-color: var(--wikipedia-blue);
-  --pill-hover-color: var(--wikipedia-dark-blue);
+  --pill-link-color: var(--wikipedia-blue);
+  --pill-link-hover-color: var(--wikipedia-dark-blue);
+  --pill-category-color: var(--dark-gold);
+  --pill-category-hover-color: var(--dark-gold);
 
   --card-background: var(--surface-background);
   --card-border-color: var(--very-light-color);
@@ -50,14 +53,16 @@ html {
   --target-card-border-color: var(--main-dark-color);
   --target-card-header-color: var(--main-dark-color);
   --target-card-pill-background: var(--pill-background);
-  --target-card-pill-color: var(--pill-color);
   --target-card-pill-hover-background: var(--pill-hover-background);
-  --target-card-pill-hover-color: var(--pill-hover-color);
+  --target-card-pill-link-color: var(--pill-link-color);
+  --target-card-pill-link-hover-color: var(--pill-link-hover-color);
+  --target-card-pill-category-color: var(--pill-category-color);
+  --target-card-pill-category-hover-color: var(--pill-category-hover-color);
 
   --last-guess-card-background: var(--surface-background);
   --last-guess-card-border-color: var(--wikipedia-blue);
   --last-guess-card-pill-background: var(--pill-background);
-  --last-guess-card-pill-color: var(--pill-color);
+  --last-guess-card-pill-link-color: var(--pill-link-color);
 
   --overlay-background: rgb(0 0 0 / 50%);
   --overlay-box-background: var(--surface-background);
@@ -340,25 +345,45 @@ body {
   text-decoration: underline;
 }
 
-.guess-card-links {
+.guess-card-links,
+.guess-card-categories {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
+}
+
+.guess-card-categories {
+  border-top: 1px solid var(--very-light-color);
+  padding-top: var(--space-small);
+  margin-top: var(--space-small);
+}
+
+.guess-card-categories:empty {
+  display: none;
 }
 
 .guess-card-links a {
   padding: var(--space-smallest) var(--space-medium);
   font-size: var(--font-size-smallest);
   background-color: var(--pill-background);
-  color: var(--pill-color);
   border-radius: 999px;
   text-decoration: none;
+  color: var(--pill-link-color);
 }
 
 .guess-card-links a:hover {
   background-color: var(--pill-hover-background);
-  color: var(--pill-hover-color);
+  color: var(--pill-link-hover-color);
+}
+
+.guess-card-categories a {
+  font-size: var(--font-size-smallest);
   text-decoration: none;
+  color: var(--pill-category-color);
+}
+
+.guess-card-categories a:hover {
+  border-bottom: 1.5px solid var(--pill-category-color);
 }
 
 .guess-card-title-on-target a {
@@ -377,7 +402,14 @@ body {
   color: var(--wikipedia-blue);
 }
 
-.guess-card-nolinks {
+.guess-card-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-smallest);
+}
+
+.guess-card-noinfo {
   font-size: var(--font-size-small);
   color: var(--main-light-color);
   font-style: italic;
@@ -396,12 +428,12 @@ body {
 
 .target-guess-card .guess-card-links a {
   background-color: var(--target-card-pill-background);
-  color: var(--target-card-pill-color);
+  color: var(--target-card-pill-link-color);
 }
 
 .target-guess-card .guess-card-links a:hover {
   background-color: var(--target-card-pill-hover-background);
-  color: var(--target-card-pill-hover-color);
+  color: var(--target-card-pill-link-hover-color);
 }
 
 .target-guess-card .guess-card-links a.new-link {
@@ -410,6 +442,23 @@ body {
 
 .target-guess-card .guess-card-links a.new-link:hover {
   background-color: var(--target-card-pill-hover-background);
+}
+
+.target-guess-card .guess-card-categories a {
+  color: var(--target-card-pill-category-color);
+}
+
+.target-guess-card .guess-card-categories a:hover {
+  border-bottom: 1.5px solid var(--target-card-pill-category-color);
+}
+
+.target-guess-card .guess-card-categories a.new-category {
+  color: var(--dark-gold);
+  font-weight: bold;
+}
+
+.target-guess-card .guess-card-categories a.new-category:hover {
+  border-bottom: 1.5px solid var(--dark-gold);
 }
 
 .target-placeholder {
@@ -439,12 +488,12 @@ body {
 
 .last-guess-card .guess-card-links a {
   background-color: var(--last-guess-card-pill-background);
-  color: var(--last-guess-card-pill-color);
+  color: var(--last-guess-card-pill-link-color);
 }
 
 .last-guess-card .guess-card-links a:hover {
   background-color: var(--pill-hover-background);
-  color: var(--pill-hover-color);
+  color: var(--pill-link-hover-color);
 }
 
 /* Overlay */

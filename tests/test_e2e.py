@@ -64,14 +64,25 @@ def test_initial_game_state(page: Page):
     expect(target_card.locator("#guess-card-links")).to_have_count(0)
     assert page.evaluate("Object.keys(localStorage)") == []
 
-def test_hint_reveals_link(page: Page):
+def test_hint_reveals_link_or_category(page: Page):
     page.goto(BASE_URL)
     page.click("#hint-btn")
-    expect(page.locator(".target-guess-card .guess-card-links a").first).to_be_visible(timeout=5000)
+    expect(page.locator(".target-guess-card .guess-card-links a, .target-guess-card .guess-card-categories a").first).to_be_visible(timeout=5000)
 
 def test_hint_flow(page: Page):
     page.route(
-        "**/api/en/new-target-neighbor",
+        "**/api/en/new-target-link",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body="""{
+                "game_date": "2000-01-01",
+                "title": "Electronic music"
+            }""",
+        ),
+    )
+    page.route(
+        "**/api/en/new-target-category",
         lambda route: route.fulfill(
             status=200,
             content_type="application/json",
@@ -87,14 +98,14 @@ def test_hint_flow(page: Page):
     target_card = get_target_card(page)
     expect(target_card).to_have_count(1)
     expect(target_card.locator(".guess-card-title")).to_have_text("?")
-    expect(target_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(target_card.locator(".guess-card-links a, .guess-card-categories a")).to_have_count(0)
     expect(target_card.locator(".target-placeholder")).to_be_visible()
 
     page.click("#hint-btn")
 
     expect(target_card.locator(".guess-card-title")).to_have_text("?")
-    expect(target_card.locator(".guess-card-links a")).to_have_count(1)
-    expect(target_card.locator(".guess-card-links")).to_contain_text("Electronic music")
+    expect(target_card.locator(".guess-card-links a, .guess-card-categories a")).to_have_count(1)
+    expect(target_card).to_contain_text("Electronic music")
     expect(target_card.locator(".target-placeholder")).to_have_count(0)
 
     expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
@@ -108,7 +119,7 @@ def test_hint_flow(page: Page):
     assert state["lang"] == "en"
     assert state["guesses"] == []
     assert state["knowledgeTarget"]["title"] is None
-    assert state["knowledgeTarget"]["links"] == ["Electronic music"]
+    assert "Electronic music" in state["knowledgeTarget"]["links"] + state["knowledgeTarget"]["categories"]
     assert state["knowsAllLinks"] is False
     assert state["gameDate"] == "2000-01-01"
     assert state["lastGuess"] is None
@@ -117,13 +128,14 @@ def test_hint_flow(page: Page):
 
 def test_guess_flow(page: Page):
     page.route(
-        "**/api/en/common-neighbors?id=*",
+        "**/api/en/common-info?id=*",
         lambda route: route.fulfill(
             status=200,
             content_type="application/json",
             body="""{
                 "game_date": "2000-01-01",
-                "common": ["Electronic music", "French house"],
+                "common_links": ["Electronic music", "French house"],
+                "common_categories": [],
                 "is_target": false,
                 "is_on_target": false
             }""",
@@ -150,7 +162,8 @@ def test_guess_flow(page: Page):
     last_guess_card = page.locator("#guesses-list .last-guess-card")
     expect(last_guess_card).to_have_count(1)
     expect(last_guess_card.locator(".guess-card-title")).to_contain_text(selected_title)
-    expect(last_guess_card.locator(".guess-card-score")).to_have_text("2")
+    expect(last_guess_card.locator(".guess-card-score-links")).to_have_text("2")
+    expect(last_guess_card.locator(".guess-card-score-categories")).to_have_text("0")
     expect(last_guess_card.locator(".guess-card-links a")).to_have_count(2)
     expect(last_guess_card.locator(".guess-card-links")).to_contain_text("Electronic music")
     expect(last_guess_card.locator(".guess-card-links")).to_contain_text("French house")
@@ -168,10 +181,12 @@ def test_guess_flow(page: Page):
     assert state["guesses"] == []
     assert state["knowledgeTarget"]["title"] is None
     assert state["knowledgeTarget"]["links"] == ["Electronic music", "French house"]
+    assert state["knowledgeTarget"]["categories"] == []
     assert state["knowsAllLinks"] is False
     assert state["gameDate"] == "2000-01-01"
     assert state["lastGuess"]["title"] == selected_title
-    assert state["lastGuess"]["common"] == ["Electronic music", "French house"]
+    assert state["lastGuess"]["commonLinks"] == ["Electronic music", "French house"]
+    assert state["lastGuess"]["commonCategories"] == []
     assert state["lastGuess"]["score"] == 2
     assert state["lastGuess"]["isTarget"] is False
     assert state["lastGuess"]["isOnTarget"] is False
@@ -180,13 +195,14 @@ def test_guess_flow(page: Page):
 
 def test_win_flow(page: Page):
     page.route(
-        "**/api/en/common-neighbors?id=*",
+        "**/api/en/common-info?id=*",
         lambda route: route.fulfill(
             status=200,
             content_type="application/json",
             body="""{
                 "game_date": "2000-01-01",
-                "common": ["Electronic music", "French house"],
+                "common_links": ["Electronic music", "French house"],
+                "common_categories": [],
                 "is_target": true,
                 "is_on_target": false
             }""",
@@ -239,13 +255,14 @@ def test_win_flow(page: Page):
 
 def test_guess_on_target_flow(page: Page):
     page.route(
-        "**/api/en/common-neighbors?id=*",
+        "**/api/en/common-info?id=*",
         lambda route: route.fulfill(
             status=200,
             content_type="application/json",
             body="""{
                 "game_date": "2002-01-01",
-                "common": ["Electronic music", "French house"],
+                "common_links": ["Electronic music", "French house"],
+                "common_categories": [],
                 "is_target": false,
                 "is_on_target": true
             }""",
@@ -273,7 +290,7 @@ def test_guess_on_target_flow(page: Page):
     last_guess_card = page.locator("#guesses-list .last-guess-card")
     expect(last_guess_card).to_have_count(1)
     expect(last_guess_card.locator(".guess-card-title")).to_contain_text(selected_title)
-    expect(last_guess_card.locator(".guess-card-score")).to_have_text("2")
+    expect(last_guess_card.locator(".guess-card-score-links")).to_have_text("2")
     expect(last_guess_card.locator(".guess-card-links a")).to_have_count(2)
     expect(last_guess_card.locator(".guess-card-links")).to_contain_text("Electronic music")
     expect(last_guess_card.locator(".guess-card-links")).to_contain_text("French house")
@@ -294,7 +311,8 @@ def test_guess_on_target_flow(page: Page):
     assert state["knowsAllLinks"] is False
     assert state["gameDate"] == "2002-01-01"
     assert state["lastGuess"]["title"] == selected_title
-    assert state["lastGuess"]["common"] == ["Electronic music", "French house"]
+    assert state["lastGuess"]["commonLinks"] == ["Electronic music", "French house"]
+    assert state["lastGuess"]["commonCategories"] == []
     assert state["lastGuess"]["score"] == 2
     assert state["lastGuess"]["isTarget"] is False
     assert state["lastGuess"]["isOnTarget"] is True
@@ -302,30 +320,32 @@ def test_guess_on_target_flow(page: Page):
 
 
 def test_second_guess_flow(page: Page):
-    common_neighbors_responses = [
+    common_info_responses = [
         {
             "game_date": "2003-01-01",
-            "common": ["Electronic music", "French house"],
+            "common_links": ["Electronic music", "French house"],
+            "common_categories": [],
             "is_target": False,
             "is_on_target": False,
         },
         {
             "game_date": "2003-01-01",
-            "common": ["Electronic music", "House music", "Synth-pop"],
+            "common_links": ["Electronic music", "House music", "Synth-pop"],
+            "common_categories": [],
             "is_target": False,
             "is_on_target": False,
         },
     ]
 
-    def handle_common_neighbors(route):
-        response = common_neighbors_responses.pop(0)
+    def handle_common_info(route):
+        response = common_info_responses.pop(0)
         route.fulfill(
             status=200,
             content_type="application/json",
             json=response,
         )
 
-    page.route("**/api/en/common-neighbors?id=*", handle_common_neighbors)
+    page.route("**/api/en/common-info?id=*", handle_common_info)
 
     page.goto(BASE_URL)
 
@@ -355,13 +375,13 @@ def test_second_guess_flow(page: Page):
     last_guess_card = page.locator("#guesses-list .last-guess-card")
     expect(last_guess_card).to_have_count(1)
     expect(last_guess_card.locator(".guess-card-title")).to_contain_text(second_guess_title)
-    expect(last_guess_card.locator(".guess-card-score")).to_have_text("3")
+    expect(last_guess_card.locator(".guess-card-score-links")).to_have_text("3")
     expect(last_guess_card.locator(".guess-card-links a")).to_have_count(3)
 
     previous_guess_card = page.locator("#guesses-list .guess-card:not(.target-guess-card):not(.last-guess-card)")
     expect(previous_guess_card).to_have_count(1)
     expect(previous_guess_card.locator(".guess-card-title")).to_contain_text(first_guess_title)
-    expect(previous_guess_card.locator(".guess-card-score")).to_have_text("2")
+    expect(previous_guess_card.locator(".guess-card-score-links")).to_have_text("2")
     expect(previous_guess_card.locator(".guess-card-links a")).to_have_count(2)
 
     expect(page.locator("#guesses-list .guess-card")).to_have_count(3)
@@ -376,21 +396,34 @@ def test_second_guess_flow(page: Page):
     assert state["gameDate"] == "2003-01-01"
     assert state["lastGuess"]["title"] == second_guess_title
     assert state["lastGuess"]["score"] == 3
-    assert state["lastGuess"]["common"] == ["Electronic music", "House music", "Synth-pop"]
+    assert state["lastGuess"]["commonLinks"] == ["Electronic music", "House music", "Synth-pop"]
+    assert state["lastGuess"]["commonCategories"] == []
     assert state["lastGuess"]["isTarget"] is False
     assert state["lastGuess"]["isOnTarget"] is False
     assert len(state["guesses"]) == 1
     assert state["guesses"][0]["title"] == first_guess_title
     assert state["guesses"][0]["score"] == 2
-    assert state["guesses"][0]["common"] == ["Electronic music", "French house"]
+    assert state["guesses"][0]["commonLinks"] == ["Electronic music", "French house"]
+    assert state["guesses"][0]["commonCategories"] == []
     assert state["guesses"][0]["isTarget"] is False
     assert state["guesses"][0]["isOnTarget"] is False
     assert state["nbHints"] == 0
 
 
-def test_hint_all_links_found_flow(page: Page):
+def test_hint_all_hints_of_type_found_flow(page: Page):
     page.route(
-        "**/api/en/new-target-neighbor",
+        "**/api/en/new-target-link",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body="""{
+                "game_date": "2000-01-01",
+                "title": null
+            }""",
+        ),
+    )
+    page.route(
+        "**/api/en/new-target-category",
         lambda route: route.fulfill(
             status=200,
             content_type="application/json",
@@ -406,16 +439,15 @@ def test_hint_all_links_found_flow(page: Page):
     target_card = get_target_card(page)
     expect(target_card).to_have_count(1)
     expect(target_card.locator(".guess-card-title")).to_have_text("?")
-    expect(target_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(target_card.locator(".guess-card-links a, .guess-card-categories a")).to_have_count(0)
     expect(target_card.locator(".target-placeholder")).to_be_visible()
     expect(target_card.locator(".guess-card-knows")).to_have_count(0)
 
     page.click("#hint-btn")
 
     expect(target_card.locator(".guess-card-title")).to_have_text("?")
-    expect(target_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(target_card.locator(".guess-card-links a, .guess-card-categories a")).to_have_count(0)
     expect(target_card.locator(".target-placeholder")).to_be_visible()
-    expect(target_card.locator(".guess-card-knows")).to_be_visible()
 
     expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
     expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
@@ -429,37 +461,40 @@ def test_hint_all_links_found_flow(page: Page):
     assert state["guesses"] == []
     assert state["knowledgeTarget"]["title"] is None
     assert state["knowledgeTarget"]["links"] == []
-    assert state["knowsAllLinks"] is True
+    assert state["knowledgeTarget"]["categories"] == []
+    assert state["knowsAllLinks"] is True or state["knowsAllCategories"] is True
     assert state["gameDate"] == "2000-01-01"
     assert state["lastGuess"] is None
     assert state["nbHints"] == 0
 
 
 def test_duplicate_known_links_are_not_duplicated(page: Page):
-    common_neighbors_responses = [
+    common_info_responses = [
         {
             "game_date": "2000-01-01",
-            "common": ["Electronic music", "French house"],
+            "common_links": ["Electronic music", "French house"],
+            "common_categories": [],
             "is_target": False,
             "is_on_target": False,
         },
         {
             "game_date": "2000-01-01",
-            "common": ["Electronic music", "House music"],
+            "common_links": ["Electronic music", "House music"],
+            "common_categories": [],
             "is_target": False,
             "is_on_target": False,
         },
     ]
 
-    def handle_common_neighbors(route):
-        response = common_neighbors_responses.pop(0)
+    def handle_common_info(route):
+        response = common_info_responses.pop(0)
         route.fulfill(
             status=200,
             content_type="application/json",
             json=response,
         )
 
-    page.route("**/api/en/common-neighbors?id=*", handle_common_neighbors)
+    page.route("**/api/en/common-info?id=*", handle_common_info)
 
     page.goto(BASE_URL)
 
@@ -489,7 +524,7 @@ def test_duplicate_known_links_are_not_duplicated(page: Page):
 
 def test_api_error_on_guess(page: Page):
     page.route(
-        "**/api/en/common-neighbors?id=*",
+        "**/api/en/common-info?id=*",
         lambda route: route.fulfill(
             status=500,
             content_type="application/json",
@@ -523,7 +558,15 @@ def test_api_error_on_guess(page: Page):
 
 def test_api_error_on_hint(page: Page):
     page.route(
-        "**/api/en/new-target-neighbor",
+        "**/api/en/new-target-link",
+        lambda route: route.fulfill(
+            status=500,
+            content_type="application/json",
+            body="""{"error": "test error"}""",
+        ),
+    )
+    page.route(
+        "**/api/en/new-target-category",
         lambda route: route.fulfill(
             status=500,
             content_type="application/json",
@@ -538,7 +581,7 @@ def test_api_error_on_hint(page: Page):
     target_card = get_target_card(page)
     expect(target_card).to_have_count(1)
     expect(target_card.locator(".guess-card-title")).to_have_text("?")
-    expect(target_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(target_card.locator(".guess-card-links a, .guess-card-categories a")).to_have_count(0)
     expect(target_card.locator(".target-placeholder")).to_be_visible()
     expect(target_card.locator(".guess-card-knows")).to_have_count(0)
 
@@ -553,36 +596,39 @@ def test_api_error_on_hint(page: Page):
 
 
 def test_date_change_resets_game_before_next_guess(page: Page):
-    common_neighbors_responses = [
+    common_info_responses = [
         {
             "game_date": "2000-01-01",
-            "common": ["Electronic music", "French house"],
+            "common_links": ["Electronic music", "French house"],
+            "common_categories": [],
             "is_target": False,
             "is_on_target": False,
         },
         {
             "game_date": "2000-01-02",
-            "common": ["House music", "Synth-pop"],
+            "common_links": ["House music", "Synth-pop"],
+            "common_categories": [],
             "is_target": False,
             "is_on_target": False,
         },
         {
             "game_date": "2000-01-02",
-            "common": ["Blog", "Website"],
+            "common_links": ["Blog", "Website"],
+            "common_categories": [],
             "is_target": False,
             "is_on_target": False,
         },
     ]
 
-    def handle_common_neighbors(route):
-        response = common_neighbors_responses.pop(0)
+    def handle_common_info(route):
+        response = common_info_responses.pop(0)
         route.fulfill(
             status=200,
             content_type="application/json",
             json=response,
         )
 
-    page.route("**/api/en/common-neighbors?id=*", handle_common_neighbors)
+    page.route("**/api/en/common-info?id=*", handle_common_info)
 
     page.route(
         "**/api/en/game-date",
@@ -646,19 +692,20 @@ def test_date_change_resets_game_before_next_guess(page: Page):
     assert state["knowledgeTarget"]["title"] is None
     assert state["knowledgeTarget"]["links"] == ["Blog", "Website"]
     assert state["lastGuess"]["title"] == third_guess_title
-    assert state["lastGuess"]["common"] == ["Blog", "Website"]
+    assert state["lastGuess"]["commonLinks"] == ["Blog", "Website"]
     assert state["lastGuess"]["score"] == 2
 
 
 def test_saved_state_is_restored_after_reload(page: Page):
     page.route(
-        "**/api/en/common-neighbors?id=*",
+        "**/api/en/common-info?id=*",
         lambda route: route.fulfill(
             status=200,
             content_type="application/json",
             body="""{
                 "game_date": "2000-01-01",
-                "common": ["Electronic music", "French house"],
+                "common_links": ["Electronic music", "French house"],
+                "common_categories": [],
                 "is_target": false,
                 "is_on_target": false
             }""",
@@ -699,7 +746,7 @@ def test_saved_state_is_restored_after_reload(page: Page):
     last_guess_card = page.locator("#guesses-list .last-guess-card")
     expect(last_guess_card).to_have_count(1)
     expect(last_guess_card.locator(".guess-card-title")).to_contain_text(selected_title)
-    expect(last_guess_card.locator(".guess-card-score")).to_have_text("2")
+    expect(last_guess_card.locator(".guess-card-score-links")).to_have_text("2")
     expect(last_guess_card.locator(".guess-card-links a")).to_have_count(2)
     expect(last_guess_card.locator(".guess-card-links")).to_contain_text("Electronic music")
     expect(last_guess_card.locator(".guess-card-links")).to_contain_text("French house")
@@ -715,7 +762,8 @@ def test_saved_state_is_restored_after_reload(page: Page):
     assert state["knowsAllLinks"] is False
     assert state["gameDate"] == "2000-01-01"
     assert state["lastGuess"]["title"] == selected_title
-    assert state["lastGuess"]["common"] == ["Electronic music", "French house"]
+    assert state["lastGuess"]["commonLinks"] == ["Electronic music", "French house"]
+    assert state["lastGuess"]["commonCategories"] == []
     assert state["lastGuess"]["score"] == 2
     assert state["lastGuess"]["isTarget"] is False
     assert state["lastGuess"]["isOnTarget"] is False
@@ -738,13 +786,14 @@ def test_search_excludes_already_guessed_article(page: Page):
     page.route("**/api/en/articles?query=*", handle_articles)
 
     page.route(
-        "**/api/en/common-neighbors?id=*",
+        "**/api/en/common-info?id=*",
         lambda route: route.fulfill(
             status=200,
             content_type="application/json",
             json={
                 "game_date": "2000-01-01",
-                "common": ["Electronic music", "French house"],
+                "common_links": ["Electronic music", "French house"],
+                "common_categories": [],
                 "is_target": False,
                 "is_on_target": False,
             },
@@ -780,13 +829,16 @@ def test_saved_state_expires_when_game_date_differs(page: Page):
         "knowledgeTarget": {
             "title": None,
             "links": ["Electronic music", "French house"],
+            "categories": [],
         },
         "knowsAllLinks": False,
+        "knowsAllCategories": False,
         "gameDate": "2000-01-01",
         "lastGuess": {
             "id": "1",
             "title": "Daft Punk",
-            "common": ["Electronic music", "French house"],
+            "commonLinks": ["Electronic music", "French house"],
+            "commonCategories": [],
             "score": 2,
             "isTarget": False,
             "isOnTarget": False,

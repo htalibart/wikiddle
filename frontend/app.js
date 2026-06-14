@@ -1,4 +1,4 @@
-import { titleToUrl, makeScoreColorFn } from "./utils.js";
+import { titleToUrl, categoryToUrl, makeScoreColorFn } from "./utils.js";
 import { showToast, buildHowtoExample, showMidnightOverlay, buildWinOverlay, showWinOverlay } from "./overlays.js";
 import TomSelect from "tom-select";
 import "tom-select/dist/css/tom-select.css";
@@ -42,7 +42,25 @@ function renderTargetCard(state, translations) {
             return `<a href="${titleToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-link"' : ""}>${title} </a>`;
           })
           .join(" ")
-      : `<span class="target-placeholder">${translations.target_placeholder}</span>`;
+      : "";
+
+  const categories = state.knowledgeTarget.categories;
+  const newCategories = state.knowledgeTarget.newCategories;
+
+  const placeholderHTML =
+    links.length == 0 && categories.length == 0
+      ? `<span class="target-placeholder">${translations.target_placeholder}</span>`
+      : "";
+
+  const categoriesHTML =
+    categories.length > 0
+      ? categories
+          .map((title) => {
+            const isNew = newCategories && newCategories.has(title) && !targetFound;
+            return `<a href="${categoryToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-category"' : ""}># ${title} </a>`;
+          })
+          .join(" ")
+      : "";
 
   card.innerHTML = `
       <div class="guess-card-header">
@@ -50,6 +68,8 @@ function renderTargetCard(state, translations) {
         ${knowsHTML}
       </div>
       <div class="guess-card-links">${linksHTML}</div>
+      <div class="guess-card-categories">${categoriesHTML}</div>
+      ${placeholderHTML}
     `;
 
   return card;
@@ -74,16 +94,31 @@ function renderGuessCard(state, guess, translations) {
   const linksHTML =
     guess.commonLinks.length > 0
       ? `<div class="guess-card-links">${guess.commonLinks.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>`
-      : `<div class="guess-card-nolinks">${translations.no_common_links}</div>`;
+      : "";
+
+  const categoriesHTML =
+    guess.commonCategories.length > 0
+      ? `<div class="guess-card-categories">${guess.commonCategories.map((title) => `<a href="${categoryToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>`
+      : "";
+
+  const noCommonHTML =
+    guess.commonLinks.length == 0 && guess.commonCategories.length == 0
+      ? `<div class="guess-card-noinfo">${translations.no_common_info}</div>`
+      : "";
 
   card.innerHTML = `
     <div class="guess-card-header">
       <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a>${onTargetLabel}</div>
-      <div class="guess-card-score">${guess.score}</div>
+      <div class="guess-card-score">
+        <span class="guess-card-score-links">${guess.commonLinks.length}</span>
+      </div>
     </div>
     ${linksHTML}
+    ${categoriesHTML}
+    ${noCommonHTML}
   `;
-  card.querySelector(".guess-card-score").style.color = scoreToColor(guess.score);
+
+  card.querySelector(".guess-card-score-links").style.color = scoreToColor(guess.score);
 
   // guess is a link on target -> change color
   if (guess.isOnTarget) {
@@ -168,6 +203,21 @@ function updateKnownLinks(state, links) {
     if (!state.knowledgeTarget.links.includes(link)) {
       state.knowledgeTarget.links.push(link);
       state.knowledgeTarget.newLinks.add(link);
+    }
+  }
+}
+
+/**
+ * Updates known categories with new titles
+ * @param {State} state - current application state
+ * @param {str[]} categories - array of categories to add to the known categories
+ */
+function updateKnownCategories(state, categories) {
+  state.knowledgeTarget.newCategories.clear();
+  for (const category of categories) {
+    if (!state.knowledgeTarget.categories.includes(category)) {
+      state.knowledgeTarget.categories.push(category);
+      state.knowledgeTarget.newCategories.add(category);
     }
   }
 }
@@ -270,6 +320,7 @@ async function handleGuessInput(state, tomSelect, translations) {
         id: guessId,
         title: guessTitle,
         commonLinks: data.common_links,
+        commonCategories: data.common_categories,
         score: data.common_links.length,
         isTarget: data.is_target,
         isOnTarget: data.is_on_target,
@@ -280,6 +331,7 @@ async function handleGuessInput(state, tomSelect, translations) {
         linksToAdd.push(guess.title);
       }
       updateKnownLinks(state, linksToAdd);
+      updateKnownCategories(state, [...guess.commonCategories]);
 
       if (guess.isTarget) {
         state.knowledgeTarget.title = guess.title;
@@ -327,24 +379,33 @@ async function loadTranslations(lang) {
 }
 
 /**
- * Fetches a new hint from the API and adds it to the known links, then re-renders the cards.
- * Does nothing if the player already knows all the links.
+ * Fetches a new hint from the API (category or link) and adds it to the known links, then re-renders the cards.
+ * Does nothing if the player already knows all the categories or links.
  * @param {State} state - current application state
  * @param {Object} translations - translations for the current language
  */
 async function addHint(state, translations) {
   const hintBtn = document.getElementById("hint-btn");
+  let hintType = null;
 
-  if (state.knowsAllLinks) {
-    showToast(translations.all_links_found);
+  if (state.knowsAllLinks && !state.knowsAllCategories) {
+    hintType = "category";
+  } else if (state.knowsAllCategories && !state.knowsAllLinks) {
+    hintType = "link";
+  } else if (!state.knowsAllCategories && !state.knowsAllLinks) {
+    hintType = Math.random() < 0.75 ? "link" : "category";
+  } else {
+    showToast(translations.all_hints_found_error);
     hintBtn.classList.add("disabled-btn");
     return;
   }
 
-  await fetch(`${API_URL}/${state.lang}/new-target-link`, {
+  const known = hintType == "link" ? state.knowledgeTarget.links : state.knowledgeTarget.categories;
+
+  await fetch(`${API_URL}/${state.lang}/new-target-${hintType}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(state.knowledgeTarget.links),
+    body: JSON.stringify(known),
   })
     .then((res) => {
       if (!res.ok) {
@@ -359,10 +420,12 @@ async function addHint(state, translations) {
       if (!checkGameDate(state, data.game_date)) return;
 
       if (data.title === null) {
-        state.knowsAllLinks = true;
-        hintBtn.classList.add("disabled-btn");
+        if (hintType == "link") state.knowsAllLinks = true;
+        else state.knowsAllCategories = true;
+        if (state.knowsAllLinks && state.knowsAllCategories) hintBtn.classList.add("disabled-btn");
       } else {
-        updateKnownLinks(state, [data.title]);
+        if (hintType == "link") updateKnownLinks(state, [data.title]);
+        else updateKnownCategories(state, [data.title]);
         state.nbHints += 1;
       }
 
@@ -410,8 +473,11 @@ function createState() {
       title: null,
       links: [],
       newLinks: new Set(),
+      categories: [],
+      newCategories: new Set(),
     },
     knowsAllLinks: false,
+    knowsAllCategories: false,
     gameDate: null,
     lastGuess: null,
     nbHints: 0,
@@ -440,7 +506,14 @@ async function loadOrCreateState() {
     return createState();
   }
 
+  // temporary fix to handle current game states without categories
+  if (!("categories" in state.knowledgeTarget)) {
+    state.knowledgeTarget.categories = [];
+    state.knowsAllCategories = false;
+  }
+
   state.knowledgeTarget.newLinks = new Set();
+  state.knowledgeTarget.newCategories = new Set();
 
   return state;
 }

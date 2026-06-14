@@ -9,6 +9,17 @@ export function titleToUrl(title, lang) {
 }
 
 /**
+ * Returns the URL of a Wikipedia category given its title
+ * @param {string} title - category title
+ * @param {string} lang - active language code
+ * @returns {string} Wikipedia url
+ */
+export function categoryToUrl(title, lang) {
+  const prefix = lang == "fr" ? "Cat%C3%A9gorie" : "Category";
+  return `https://${lang}.wikipedia.org/wiki/${prefix}:${encodeURIComponent(title.replaceAll(" ", "_"))}`;
+}
+
+/**
  * Returns a scoring color function that interpolates from light gray to a target color
  * @param {string} targetHex - target color in hex format, e.g. "#3d5a80"
  * @param {number} [maxScore=20] - score that maps to the target color
