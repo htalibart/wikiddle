@@ -506,7 +506,7 @@ body {
 /* Target card when found */
 
 .found-target-guess-card {
-  border: 3px solid var(--wikipedia-yellow);
+  border: 3px solid var(--dark-gold);
 }
 
 /* Last guess card */
