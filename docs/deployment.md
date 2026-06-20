@@ -267,10 +267,10 @@ sudo systemctl enable wikiddle  # start wikiddle automatically on boot
 sudo systemctl start wikiddle  # start wikiddle now
 ```
 
-Grant the `deploy` user the right to restart wikiddle and caddy without a password:
+Grant the `deploy` user the right to restart wikiddle, daemon-reload and caddy without a password:
 
 ```bash
-echo "deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart wikiddle, /bin/systemctl restart caddy" | sudo tee /etc/sudoers.d/deploy-wikiddle
+echo "deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart wikiddle, /bin/systemctl restart caddy, /bin/systemctl daemon-reload" | sudo tee /etc/sudoers.d/deploy-wikiddle
 ```
 
 ### 10. Auto refresh
