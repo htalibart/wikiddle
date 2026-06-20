@@ -9,8 +9,8 @@ from main import app, _cached_daily_targets, open_wiki_db_con, get_schema_versio
 DATA_DIR = Path(__file__).parent.parent / "data"
 
 os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR / "db" / "wiki"))
-os.environ.setdefault("WIKI_VERSION", "2")
-os.environ.setdefault("GAMES_DB", str(DATA_DIR / "db" / "games" / "v1.db"))
+os.environ.setdefault("WIKI_VERSION", "3")
+os.environ.setdefault("GAMES_DB", str(DATA_DIR / "db" / "games" / "v2.db"))
 
 pytestmark = pytest.mark.integration
 
@@ -18,7 +18,7 @@ pytestmark = pytest.mark.integration
 @pytest.fixture(autouse=True)
 def reset_cache():
     for lang in _cached_daily_targets:
-        _cached_daily_targets[lang].update({"id": None, "title": None, "date": None})
+        _cached_daily_targets[lang].update({"id": None, "title": None, "date": None, "wiki_db_version": None})
 
 
 @pytest.fixture(scope="module")
@@ -41,13 +41,13 @@ class TestDailyArticle:
 class TestArticle:
     def test_known_id(self, client, lang):
         daily = client.get(f"/api/{lang}/daily-article").json()
-        res = client.get(f"/api/{lang}/article-title?id={daily['id']}")
+        res = client.get(f"/api/{lang}/article-title", params={"id": daily["id"]})
         assert res.status_code == 200
         assert res.json()["title"] == daily["title"]
 
     def test_known_title(self, client, lang):
         daily = client.get(f"/api/{lang}/daily-article").json()
-        res = client.get(f"/api/{lang}/article-id?title={daily['title']}")
+        res = client.get(f"/api/{lang}/article-id", params={"title": daily["title"]})
         assert res.status_code == 200
         assert res.json()["id"] == daily["id"]
 
@@ -55,24 +55,24 @@ class TestArticle:
 @pytest.mark.parametrize("lang,query", [("en", "python"), ("fr", "python")])
 class TestSearchArticles:
     def test_returns_results(self, client, lang, query):
-        res = client.get(f"/api/{lang}/articles?query={query}")
+        res = client.get(f"/api/{lang}/articles", params={"query": query})
         assert res.status_code == 200
 
     def test_no_results(self, client, lang, query):
-        res = client.get(f"/api/{lang}/articles?query=bliblablouIdontexisthihihi")
+        res = client.get(f"/api/{lang}/articles", params={"query": "bliblablouIdontexisthihihi"})
         assert res.status_code == 200
         assert res.json() == []
 
     def test_max_results(self, client, lang, query):
-        res = client.get(f"/api/{lang}/articles?query=a")
+        res = client.get(f"/api/{lang}/articles", params={"query": "a"})
         assert res.status_code == 200
         assert len(res.json()) == 30
 
     def test_exact_match_comes_first(self, client, lang, query):
-        daily_title = client.get(f"/api/{lang}/daily-article").json()["title"]
-        res = client.get(f"/api/{lang}/articles?query={daily_title}")
+        title = "Brussels" if lang == "en" else "Bruxelles"
+        res = client.get(f"/api/{lang}/articles", params={"query": title})
         assert res.status_code == 200
-        assert res.json()[0]["title"] == daily_title
+        assert res.json()[0]["title"] == title
 
 
 @pytest.mark.parametrize("lang", ["en", "fr"])
@@ -101,7 +101,8 @@ class TestCommonInfo:
 
 class TestArticleFilters:
     def can_be_daily_target(self, lang: str, title: str):
-        con = open_wiki_db_con(lang)
+        wiki_db_version = int(os.environ["WIKI_VERSION"])
+        con = open_wiki_db_con(lang, wiki_db_version)
         try:
             schema_version = get_schema_version(con)
             article_filter = get_daily_article_filter(schema_version)

@@ -17,6 +17,7 @@ from slowapi.errors import RateLimitExceeded
 
 LANGUAGES = {"en", "fr"}
 MIN_NB_LINKS_FOR_TARGET = 20
+MIN_NB_BACKLINKS_FOR_TARGET = 50
 MIN_ARTICLE_LENGTH_FOR_TARGET = 7_000
 MAX_NB_SEARCH_RESULTS = 30
 MAX_TITLE_LENGTH = 300
@@ -39,7 +40,7 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-_cached_daily_targets = {lang: {"id": None, "title": None, "date": None} for lang in LANGUAGES}
+_cached_daily_targets = {lang: {"id": None, "title": None, "date": None, "wiki_db_version": None} for lang in LANGUAGES}
 _cached_yesterday_targets = {lang: {"id": None, "title": None, "date": None} for lang in LANGUAGES}
 
 
@@ -86,14 +87,11 @@ def open_games_db_con() -> duckdb.DuckDBPyConnection:
     return duckdb.connect(db_path)
 
 
-def open_wiki_db_con(lang: str) -> duckdb.DuckDBPyConnection:
-    """opens a DuckDB connection to the appropriate database depending on language, raises 500 if database file is not found"""
+def open_wiki_db_con(lang: str, db_version: int) -> duckdb.DuckDBPyConnection:
+    """opens a DuckDB connection to the appropriate database depending on language and version, raises 500 if database file is not found"""
     db_dir = os.environ.get("WIKI_DB_DIR")
-    db_version = os.environ.get("WIKI_VERSION")
     if db_dir is None:
         raise HTTPException(status_code=500, detail="WIKI_DB_DIR environment variable is not set")
-    if db_version is None:
-        raise HTTPException(status_code=500, detail="WIKI_VERSION environment variable is not set")
     db_path = Path(db_dir) / f"v{db_version}" / f"{lang}.db"
     if not db_path.is_file():
         raise HTTPException(status_code=500, detail=f"Database not found: {db_path}")
@@ -101,8 +99,9 @@ def open_wiki_db_con(lang: str) -> duckdb.DuckDBPyConnection:
 
 
 def get_wiki_db_con(lang: str = Depends(valid_lang)) -> Iterator[duckdb.DuckDBPyConnection]:
-    """FastAPI dependency to yield a DuckDB connection to the wiki database for the given language, closes it after the request"""
-    con = open_wiki_db_con(lang)
+    """FastAPI dependency to yield a DuckDB connection to the wiki database of the daily article for the given language, closes it after the request"""
+    wiki_db_version_of_target = get_wiki_db_version_of_target(lang)
+    con = open_wiki_db_con(lang, wiki_db_version_of_target)
     try:
         yield con
     finally:
@@ -124,22 +123,23 @@ def get_article_from_date(lang: str, d: date) -> dict[str, Any]:
     date_str = format_date(d)
     try:
         row = con.execute(
-            "SELECT article_id, article_title FROM daily_articles WHERE date = ? AND lang = ?", [date_str, lang]
+            "SELECT article_id, article_title, wiki_db_version FROM daily_articles WHERE date = ? AND lang = ?",
+            [date_str, lang],
         ).fetchone()
         if row is None:
             raise HTTPException(status_code=404, detail=f"No article found at {date_str} in {lang} database")
     finally:
         con.close()
-    return {"date": d, "id": row[0], "title": row[1]}
+    return {"date": d, "id": row[0], "title": row[1], "wiki_db_version": row[2]}
 
 
-def add_article_to_games_db(day: date, lang: str, article_id: int, article_title: str) -> None:
+def add_article_to_games_db(day: date, lang: str, article_id: int, article_title: str, wiki_db_version: int) -> None:
     """add new article to previous games database"""
     con = open_games_db_con()
     try:
         con.execute(
-            "INSERT OR IGNORE INTO daily_articles VALUES (?, ?, ?, ?)",
-            [format_date(day), lang, article_id, article_title],
+            "INSERT OR IGNORE INTO daily_articles VALUES (?, ?, ?, ?, ?)",
+            [format_date(day), lang, article_id, article_title, wiki_db_version],
         )
     finally:
         con.close()
@@ -153,16 +153,27 @@ def get_yesterdays_article_cached(lang: str) -> dict[str, Any]:
     return _cached_yesterday_targets[lang]
 
 
-def get_daily_article_filter(schema_version: int, temp_relax=False) -> str:
+def get_daily_article_filter(schema_version: int) -> str:
     """return SQL filter for the daily article choice"""
     if schema_version == 1:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET}"
-    elif schema_version >= 2:
-        if temp_relax:
-            return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE"
-        else:
-            return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET}"
+    elif schema_version == 2:
+        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET}"
+    elif schema_version >= 3:
+        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET} AND nb_backlinks >= {MIN_NB_BACKLINKS_FOR_TARGET}"
     raise ValueError(f"Unsupported schema version: {schema_version}")
+
+
+def get_current_wiki_db_version() -> int:
+    db_version = os.environ.get("WIKI_VERSION")
+    if db_version is None:
+        raise HTTPException(status_code=500, detail="WIKI_VERSION environment variable is not set")
+    return int(db_version)
+
+
+def get_wiki_db_version_of_target(lang: str) -> int:
+    daily_article = get_daily_article_cached(lang)
+    return daily_article["wiki_db_version"]
 
 
 def get_daily_article_cached(lang: str) -> dict[str, Any]:
@@ -179,7 +190,8 @@ def get_daily_article_cached(lang: str) -> dict[str, Any]:
                 raise
             # if daily article is not in games database, create it
             seed = int(today.strftime("%Y%m%d"))
-            con = open_wiki_db_con(lang)
+            current_wiki_db_version = get_current_wiki_db_version()
+            con = open_wiki_db_con(lang, current_wiki_db_version)
             schema_version = get_schema_version(con)
             article_filter = get_daily_article_filter(schema_version)
             try:
@@ -189,9 +201,13 @@ def get_daily_article_cached(lang: str) -> dict[str, Any]:
                     f"SELECT id, title FROM articles WHERE {article_filter} ORDER BY hash(CAST(id AS BIGINT) * ?) LIMIT 1 OFFSET ?",
                     [seed, offset],
                 ).fetchone()
-                article = {"date": today, "id": row[0], "title": row[1]}
+                article = {"date": today, "id": row[0], "title": row[1], "wiki_db_version": current_wiki_db_version}
                 add_article_to_games_db(
-                    day=article["date"], lang=lang, article_id=article["id"], article_title=article["title"]
+                    day=article["date"],
+                    lang=lang,
+                    article_id=article["id"],
+                    article_title=article["title"],
+                    wiki_db_version=article["wiki_db_version"],
                 )
             finally:
                 con.close()
@@ -231,7 +247,8 @@ def get_article_titles(lang: str, ids: Iterable[int]) -> list[str]:
     """returns the titles of the articles for language @lang with given ids @ids"""
     if not ids:
         return []
-    con = open_wiki_db_con(lang)
+    wiki_db_version_of_target = get_wiki_db_version_of_target(lang)
+    con = open_wiki_db_con(lang, wiki_db_version_of_target)
     try:
         rows = con.execute("SELECT title FROM articles WHERE id IN (SELECT * FROM UNNEST(?))", [list(ids)]).fetchall()
         return [row[0] for row in rows]
@@ -250,7 +267,8 @@ def get_article_title(request: Request, lang: str = Depends(valid_lang), id: int
 
 def get_links(lang: str, article_id: int) -> dict[int, str]:
     """returns a dict {id: title} articles that article with id @article_id links to in language @lang"""
-    con = open_wiki_db_con(lang)
+    wiki_db_version_of_target = get_wiki_db_version_of_target(lang)
+    con = open_wiki_db_con(lang, wiki_db_version_of_target)
     try:
         rows = con.execute(
             "SELECT l.target_id, p.title FROM links l JOIN articles p ON l.target_id = p.id WHERE l.source_id = ?",
@@ -263,7 +281,8 @@ def get_links(lang: str, article_id: int) -> dict[int, str]:
 
 def get_categories(lang: str, article_id: int) -> dict:
     """returns a dict {id: title} of categories that article @article_id belongs to in language @lang"""
-    con = open_wiki_db_con(lang)
+    wiki_db_version_of_target = get_wiki_db_version_of_target(lang)
+    con = open_wiki_db_con(lang, wiki_db_version_of_target)
     try:
         rows = con.execute(
             "SELECT ac.category_id, c.name FROM article_categories ac JOIN categories c ON ac.category_id = c.id WHERE ac.article_id = ?",
@@ -276,7 +295,9 @@ def get_categories(lang: str, article_id: int) -> dict:
 
 @router.get("/{lang}/common-info")
 @limiter.limit("60/minute")
-def get_common_info_with_target(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)) -> dict[str, Any]:
+def get_common_neighbors_with_target(
+    request: Request, lang: str = Depends(valid_lang), id: int = Query(...)
+) -> dict[str, Any]:
     """API route to get the links and categories that are common to the user guess and the target article"""
     article = get_daily_article_cached(lang)
 
@@ -308,7 +329,7 @@ def search_articles(
 ) -> list[dict[str, Any]]:
     """API route to search in the database (called by TomSelect)"""
     schema_version = get_schema_version(con)
-    article_filter = get_daily_article_filter(schema_version, temp_relax=True)
+    article_filter = get_daily_article_filter(schema_version)
     rows = con.execute(
         f"""SELECT id, title FROM articles 
         WHERE {article_filter} AND title ILIKE ?
@@ -325,7 +346,9 @@ def search_articles(
 
 @router.post("/{lang}/new-target-link")
 @limiter.limit("300/minute")
-def get_one_new_link(request: Request, lang: str = Depends(valid_lang), known_titles: list = Body(default=[])) -> dict[str, Any]:
+def get_one_new_neighbor(
+    request: Request, lang: str = Depends(valid_lang), known_titles: list = Body(default=[])
+) -> dict[str, Any]:
     """API route to get one random link target that was not already found"""
     target = get_daily_article_cached(lang)
     link_ids = get_links(lang, target["id"])
