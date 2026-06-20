@@ -98,7 +98,7 @@ function renderGuessCard(state, guess, translations) {
 
   const categoriesHTML =
     guess.commonCategories.length > 0
-      ? `<div class="guess-card-categories">${guess.commonCategories.map((title) => `<a href="${categoryToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>`
+      ? `<div class="guess-card-categories">${guess.commonCategories.map((title) => `<a href="${categoryToUrl(title, state.lang)}" target="_blank"># ${title}</a>`).join(" ")}</div>`
       : "";
 
   const noCommonHTML =
