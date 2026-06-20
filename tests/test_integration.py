@@ -69,10 +69,10 @@ class TestSearchArticles:
         assert len(res.json()) == 30
 
     def test_exact_match_comes_first(self, client, lang, query):
-        daily_title = client.get(f"/api/{lang}/daily-article").json()["title"]
-        res = client.get(f"/api/{lang}/articles", params={"query": daily_title})
+        title = "Brussels" if lang == "en" else "Bruxelles"
+        res = client.get(f"/api/{lang}/articles", params={"query": title})
         assert res.status_code == 200
-        assert res.json()[0]["title"] == daily_title
+        assert res.json()[0]["title"] == title
 
 
 @pytest.mark.parametrize("lang", ["en", "fr"])
