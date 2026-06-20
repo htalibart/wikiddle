@@ -352,9 +352,33 @@ body {
   gap: 0.3rem;
 }
 
-.guess-card-categories {
-  border-top: 1px solid var(--very-light-color);
+.guess-card-categories-separator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-medium);
+  margin-top: var(--space-small);
   padding-top: var(--space-small);
+}
+
+.guess-card-categories-separator span:first-child {
+  flex: 0;
+  border-top: 1px solid var(--very-light-color);
+}
+
+.guess-card-categories-separator span:last-child {
+  flex: 1;
+  border-top: 1px solid var(--very-light-color);
+}
+
+.guess-card-categories-label {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-smallest);
+  color: var(--main-light-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.guess-card-categories {
   margin-top: var(--space-small);
 }
 

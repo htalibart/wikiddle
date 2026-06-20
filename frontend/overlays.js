@@ -13,6 +13,21 @@ export function showToast(message) {
 }
 
 /**
+ * Builds the category separator HTML
+ * @param {Object} translations - translations for the current language
+ * @returns {string} category separator HTML
+ */
+function buildCategoriesSeparator(translations) {
+  return `
+    <div class="guess-card-categories-separator">
+      <span></span>
+      <div class="guess-card-categories-label">${translations.categories}</div>
+      <span></span>
+    </div>
+  `;
+}
+
+/**
  * Builds the "how to play" overlay
  * @param {Object} translations - translations for the current language
  * @param {string} lang - language code
@@ -55,10 +70,17 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
     const card = document.createElement("div");
     card.classList.add("guess-card");
     if (isLastGuess) card.classList.add("last-guess-card");
+
     const categoriesHTML =
       categories.length > 0
-        ? `<div class="guess-card-categories">${categories.map((t) => `<a href="${categoryToUrl(t, lang)}" target="_blank"># ${t}</a>`).join(" ")}</div>`
+        ? `
+          ${buildCategoriesSeparator(translations)}
+          <div class="guess-card-categories">
+            ${categories.map((t) => `<a href="${categoryToUrl(t, lang)}" target="_blank"># ${t}</a>`).join(" ")}
+          </div>
+        `
         : "";
+
     card.innerHTML = `
       <div class="guess-card-header">
         <div class="guess-card-title${isOnTarget ? " guess-card-title-on-target" : ""}">
@@ -110,6 +132,7 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
     <div class="guess-card-links">
       ${mysteryLinks.map((t) => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
     </div>
+    ${buildCategoriesSeparator(translations)}
     <div class="guess-card-categories">
       ${mysteryCategories.map((t) => `<a href="${categoryToUrl(t, lang)}" target="_blank"># ${t}</a>`).join(" ")}
     </div>

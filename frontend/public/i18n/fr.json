@@ -5,6 +5,7 @@
   "hint": "Indice",
   "input_placeholder": "Proposer un article...",
   "target_placeholder": "Les liens et catégories en commun apparaîtront ici.",
+  "categories": "Catégories en commun",
   "on_target_label": "apparaît sur l'article mystère !",
   "no_common_info": "Pas de lien ni de catégorie en commun avec l'article mystère.",
   "section_last_guess": "Votre dernière proposition",

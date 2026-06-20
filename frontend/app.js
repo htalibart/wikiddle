@@ -54,12 +54,21 @@ function renderTargetCard(state, translations) {
 
   const categoriesHTML =
     categories.length > 0
-      ? categories
-          .map((title) => {
-            const isNew = newCategories && newCategories.has(title) && !targetFound;
-            return `<a href="${categoryToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-category"' : ""}># ${title} </a>`;
-          })
-          .join(" ")
+      ? `
+        <div class="guess-card-categories-separator">
+          <span></span>
+          <div class="guess-card-categories-label">${translations.categories}</div>
+          <span></span>
+        </div>
+        <div class="guess-card-categories">
+          ${categories
+            .map((title) => {
+              const isNew = newCategories && newCategories.has(title) && !targetFound;
+              return `<a href="${categoryToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-category"' : ""}># ${title}</a>`;
+            })
+            .join(" ")}
+        </div>
+      `
       : "";
 
   card.innerHTML = `
@@ -68,7 +77,7 @@ function renderTargetCard(state, translations) {
         ${knowsHTML}
       </div>
       <div class="guess-card-links">${linksHTML}</div>
-      <div class="guess-card-categories">${categoriesHTML}</div>
+      ${categoriesHTML}
       ${placeholderHTML}
     `;
 
@@ -98,7 +107,18 @@ function renderGuessCard(state, guess, translations) {
 
   const categoriesHTML =
     guess.commonCategories.length > 0
-      ? `<div class="guess-card-categories">${guess.commonCategories.map((title) => `<a href="${categoryToUrl(title, state.lang)}" target="_blank"># ${title}</a>`).join(" ")}</div>`
+      ? `
+        <div class="guess-card-categories-separator">
+          <span></span>
+          <div class="guess-card-categories-label">${translations.categories}</div>
+          <span></span>
+        </div>
+        <div class="guess-card-categories">
+          ${guess.commonCategories
+            .map((title) => `<a href="${categoryToUrl(title, state.lang)}" target="_blank"># ${title}</a>`)
+            .join(" ")}
+        </div>
+      `
       : "";
 
   const noCommonHTML =
