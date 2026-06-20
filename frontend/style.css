@@ -362,12 +362,16 @@ body {
   display: none;
 }
 
-.guess-card-links a {
+.guess-card-links a,
+.guess-card-categories a {
   padding: var(--space-smallest) var(--space-medium);
   font-size: var(--font-size-smallest);
   background-color: var(--pill-background);
   border-radius: 999px;
   text-decoration: none;
+}
+
+.guess-card-links a {
   color: var(--pill-link-color);
 }
 
@@ -377,13 +381,12 @@ body {
 }
 
 .guess-card-categories a {
-  font-size: var(--font-size-smallest);
-  text-decoration: none;
   color: var(--pill-category-color);
 }
 
 .guess-card-categories a:hover {
-  border-bottom: 1.5px solid var(--pill-category-color);
+  background-color: var(--pill-hover-background);
+  color: var(--pill-category-hover-color);
 }
 
 .guess-card-title-on-target a {
@@ -445,11 +448,13 @@ body {
 }
 
 .target-guess-card .guess-card-categories a {
+  background-color: var(--target-card-pill-background);
   color: var(--target-card-pill-category-color);
 }
 
 .target-guess-card .guess-card-categories a:hover {
-  border-bottom: 1.5px solid var(--target-card-pill-category-color);
+  background-color: var(--target-card-pill-hover-background);
+  color: var(--target-card-pill-category-hover-color);
 }
 
 .target-guess-card .guess-card-categories a.new-category {
@@ -458,7 +463,8 @@ body {
 }
 
 .target-guess-card .guess-card-categories a.new-category:hover {
-  border-bottom: 1.5px solid var(--dark-gold);
+  background-color: var(--target-card-pill-hover-background);
+  color: var(--dark-gold);
 }
 
 .target-placeholder {
