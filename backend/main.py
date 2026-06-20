@@ -17,6 +17,7 @@ from slowapi.errors import RateLimitExceeded
 
 LANGUAGES = {"en", "fr"}
 MIN_NB_LINKS_FOR_TARGET = 20
+MIN_NB_BACKLINKS_FOR_TARGET = 50
 MIN_ARTICLE_LENGTH_FOR_TARGET = 7_000
 MAX_NB_SEARCH_RESULTS = 30
 MAX_TITLE_LENGTH = 300
@@ -156,8 +157,10 @@ def get_daily_article_filter(schema_version: int) -> str:
     """return SQL filter for the daily article choice"""
     if schema_version == 1:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET}"
-    elif schema_version >= 2:
+    elif schema_version == 2:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET}"
+    elif schema_version >= 3:
+        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET} AND nb_backlinks >= {MIN_NB_BACKLINKS_FOR_TARGET}"
     raise ValueError(f"Unsupported schema version: {schema_version}")
 
 
@@ -278,7 +281,9 @@ def get_neighbors(lang: str, article_id: int) -> dict[int, str]:
 
 @router.get("/{lang}/common-neighbors")
 @limiter.limit("60/minute")
-def get_common_neighbors_with_target(request: Request, lang: str = Depends(valid_lang), id: int = Query(...)) -> dict[str, Any]:
+def get_common_neighbors_with_target(
+    request: Request, lang: str = Depends(valid_lang), id: int = Query(...)
+) -> dict[str, Any]:
     """API route to get the links that are common to the user guess and the target article"""
     article = get_daily_article_cached(lang)
     n1 = get_neighbors(lang, article["id"])
@@ -318,7 +323,9 @@ def search_articles(
 
 @router.post("/{lang}/new-target-neighbor")
 @limiter.limit("300/minute")
-def get_one_new_neighbor(request: Request, lang: str = Depends(valid_lang), known_titles: list = Body(default=[])) -> dict[str, Any]:
+def get_one_new_neighbor(
+    request: Request, lang: str = Depends(valid_lang), known_titles: list = Body(default=[])
+) -> dict[str, Any]:
     """API route to get one random link target that was not already found"""
     target = get_daily_article_cached(lang)
     neighbor_ids = get_neighbors(lang, target["id"])

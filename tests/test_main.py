@@ -9,7 +9,6 @@ from main import (
     app,
     get_daily_article_cached,
     get_yesterdays_article_cached,
-    get_wiki_db_con,
     _cached_daily_targets,
     _cached_yesterday_targets,
 )
@@ -153,6 +152,7 @@ class TestDailyArticleCached:
 
         queries = [call.args[0] for call in con.execute.call_args_list]
         assert any("is_target_candidate IS TRUE" in query for query in queries)
+        assert not any("nb_backlinks" in query for query in queries)
 
     def test_refreshes_cache_next_day(self):
         yesterday = date.today() - timedelta(days=1)
@@ -211,7 +211,7 @@ class TestDailyArticleCached:
             patch.dict(os.environ, {"WIKI_VERSION": "3"}),
             patch("main.open_wiki_db_con", return_value=con),
             patch("main.open_games_db_con", return_value=games_con),
-            patch("main.get_schema_version", return_value=2),
+            patch("main.get_schema_version", return_value=3),
         ):
             result = get_daily_article_cached("en")
 
@@ -224,26 +224,6 @@ class TestDailyArticleCached:
         ]
         assert len(insert_calls) == 1
         assert insert_calls[0].args[1][-1] == 3
-
-
-class TestWikiDbVersion:
-    def setup_method(self):
-        for lang in _cached_daily_targets:
-            _cached_daily_targets[lang].update({"id": None, "title": None, "date": None, "wiki_db_version": None})
-
-    def test_get_wiki_db_con_uses_target_wiki_db_version(self):
-        con = make_con_mock()
-
-        with (
-            patch("main.get_wiki_db_version_of_target", return_value=2),
-            patch("main.open_wiki_db_con", return_value=con) as mock_open_wiki_db_con,
-        ):
-            gen = get_wiki_db_con("en")
-            result = next(gen)
-            gen.close()
-
-        assert result == con
-        mock_open_wiki_db_con.assert_called_once_with("en", 2)
 
 
 class TestInvalidLang:
@@ -333,6 +313,22 @@ class TestSearchArticles:
         mock_open_wiki_db_con.assert_called_once_with("en", 2)
         query = con.execute.call_args[0][0]
         assert "nb_links >= 20 AND is_target_candidate IS TRUE" in query
+        assert "nb_backlinks" not in query
+
+    def test_search_articles_v3(self, client):
+        con = make_con_mock(fetchall=[(42, "Toto")])
+        with (
+            patch("main.get_wiki_db_version_of_target", return_value=3),
+            patch("main.open_wiki_db_con", return_value=con) as mock_open_wiki_db_con,
+            patch("main.get_schema_version", return_value=3),
+        ):
+            res = client.get("/api/en/articles?query=To")
+
+        assert res.status_code == 200
+        assert res.json() == [{"id": 42, "title": "Toto"}]
+        mock_open_wiki_db_con.assert_called_once_with("en", 3)
+        query = con.execute.call_args[0][0]
+        assert "nb_backlinks >= 50" in query
 
 
 class TestNewTargetNeighbor:
