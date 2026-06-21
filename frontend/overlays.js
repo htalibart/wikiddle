@@ -38,10 +38,12 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
   const overlay = document.getElementById("howto-overlay");
   box.innerHTML = "";
 
-  const closeBtn = document.createElement("span");
+  const closeBtn = document.createElement("button");
   closeBtn.id = "howto-close-btn";
   closeBtn.classList.add("overlay-close-btn");
+  closeBtn.type = "button";
   closeBtn.textContent = "×";
+  closeBtn.setAttribute("aria-label", translations.close);
   box.appendChild(closeBtn);
 
   const title = document.createElement("h2");
@@ -202,6 +204,7 @@ export function buildWinOverlay(translations) {
     document.getElementById("win-overlay").style.display = "none";
   });
   document.getElementById("win-box").addEventListener("click", (e) => e.stopPropagation());
+  document.getElementById("win-close-btn").setAttribute("aria-label", translations.close);
   document.getElementById("win-close-btn").addEventListener("click", () => {
     document.getElementById("win-overlay").style.display = "none";
   });

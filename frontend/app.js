@@ -283,6 +283,7 @@ function checkGameDate(state, currentDate) {
 async function showYesterdaysAnswer(state, translations) {
   const banner = document.getElementById("yesterdays-banner");
   const dismissBtn = document.getElementById("yesterdays-banner-dismiss");
+  dismissBtn.setAttribute("aria-label", translations.close);
 
   try {
     const res = await fetch(`${API_URL}/${state.lang}/yesterdays-article`);
