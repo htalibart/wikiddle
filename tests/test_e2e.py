@@ -657,6 +657,13 @@ def test_api_error_on_guess(page: Page):
     expect(first_option).to_be_visible(timeout=5000)
     first_option.click()
 
+    toast = page.locator("#toast")
+    expect(toast).to_have_class(re.compile(r".*\bvisible\b.*"))
+    expect(toast).to_have_text(re.compile(r".+"))
+    expect(toast).to_have_attribute("role", "alert")
+    expect(toast).to_have_attribute("aria-live", "assertive")
+    expect(toast).to_have_attribute("aria-atomic", "true")
+
     target_card = get_target_card(page)
     expect(target_card).to_have_count(1)
     expect(target_card.locator(".guess-card-title")).to_have_text("?")
@@ -666,14 +673,6 @@ def test_api_error_on_guess(page: Page):
     expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
     expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
     expect(page.locator("#win-overlay")).to_be_hidden()
-
-    toast = page.locator("#toast")
-
-    expect(toast).to_have_class(re.compile(r".*\bvisible\b.*"))
-    expect(toast).to_have_text(re.compile(r".+"))
-    expect(toast).to_have_attribute("role", "status")
-    expect(toast).to_have_attribute("aria-live", "polite")
-    expect(toast).to_have_attribute("aria-atomic", "true")
 
     assert page.evaluate("Object.keys(localStorage)") == []
 
@@ -700,6 +699,13 @@ def test_api_error_on_hint(page: Page):
 
     page.click("#hint-btn")
 
+    toast = page.locator("#toast")
+    expect(toast).to_have_class(re.compile(r".*\bvisible\b.*"))
+    expect(toast).to_have_text(re.compile(r".+"))
+    expect(toast).to_have_attribute("role", "alert")
+    expect(toast).to_have_attribute("aria-live", "assertive")
+    expect(toast).to_have_attribute("aria-atomic", "true")
+
     target_card = get_target_card(page)
     expect(target_card).to_have_count(1)
     expect(target_card.locator(".guess-card-title")).to_have_text("?")
@@ -710,14 +716,6 @@ def test_api_error_on_hint(page: Page):
     expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
     expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
     expect(page.locator("#win-overlay")).to_be_hidden()
-
-    toast = page.locator("#toast")
-
-    expect(toast).to_have_class(re.compile(r".*\bvisible\b.*"))
-    expect(toast).to_have_text(re.compile(r".+"))
-    expect(toast).to_have_attribute("role", "status")
-    expect(toast).to_have_attribute("aria-live", "polite")
-    expect(toast).to_have_attribute("aria-atomic", "true")
 
     assert page.evaluate("Object.keys(localStorage)") == []
 

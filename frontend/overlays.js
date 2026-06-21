@@ -4,9 +4,12 @@ import confetti from "canvas-confetti";
 /**
  * Shows a toast notification message
  * @param {string} message - message to show
+ * @param {boolean} isError - whether the message to show is an error
  */
-export function showToast(message) {
+export function showToast(message, isError = false) {
   const toast = document.getElementById("toast");
+  toast.setAttribute("role", isError ? "alert" : "status");
+  toast.setAttribute("aria-live", isError ? "assertive" : "polite");
   toast.textContent = message;
   toast.classList.add("visible");
   setTimeout(() => toast.classList.remove("visible"), 3000);
@@ -238,7 +241,7 @@ export function showWinOverlay(state, translations) {
     if (navigator.share) {
       navigator.share({ text: shareText });
     } else {
-      navigator.clipboard.writeText(shareText).then(() => showToast(translations.copied_to_clipboard));
+      navigator.clipboard.writeText(shareText).then(() => showToast(translations.copied_to_clipboard, false));
     }
   });
 

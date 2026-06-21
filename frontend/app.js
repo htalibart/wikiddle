@@ -329,7 +329,7 @@ async function handleGuessInput(state, tomSelect, translations) {
   fetch(`${API_URL}/${state.lang}/common-info?id=${guessId}`)
     .then((res) => {
       if (!res.ok) {
-        showToast(translations.error_message);
+        showToast(translations.error_message, true);
         return;
       }
       return res.json();
@@ -375,7 +375,7 @@ async function handleGuessInput(state, tomSelect, translations) {
       saveState(state);
     })
     .catch(() => {
-      showToast(translations.error_message);
+      showToast(translations.error_message, true);
     });
 }
 
@@ -419,7 +419,7 @@ async function addHint(state, translations) {
   } else if (!state.knowsAllCategories && !state.knowsAllLinks) {
     hintType = Math.random() < 0.75 ? "link" : "category";
   } else {
-    showToast(translations.all_hints_found_error);
+    showToast(translations.all_hints_found_error, false);
     hintBtn.classList.add("disabled-btn");
     hintBtn.disabled = true;
     return;
@@ -434,7 +434,7 @@ async function addHint(state, translations) {
   })
     .then((res) => {
       if (!res.ok) {
-        showToast(translations.error_message);
+        showToast(translations.error_message, true);
         return null;
       }
       return res.json();
@@ -461,7 +461,7 @@ async function addHint(state, translations) {
       saveState(state);
     })
     .catch(() => {
-      showToast(translations.error_message);
+      showToast(translations.error_message, true);
     });
 }
 
