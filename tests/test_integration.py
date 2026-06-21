@@ -154,6 +154,7 @@ class TestArticleFilters:
             ("fr", "Slalom géant parallèle féminin de snowboard aux Jeux olympiques de 2022"),
             ("fr", "14ymedio"),
             ("fr", "Église Saint-Pierre d'Anères"),
+            ("en", "2022 Stockholm Open – Singles"),
         ],
     )
     def test_article_cant_be_daily_target(self, lang: str, title: str):
