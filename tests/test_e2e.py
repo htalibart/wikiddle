@@ -37,6 +37,14 @@ def test_howto_overlay_opens_and_closes(page: Page):
     expect(page.locator("#howto-overlay")).to_be_hidden()
     page.click("#howto-btn")
     expect(page.locator("#howto-overlay")).to_be_visible()
+    howto_overlay = page.locator("#howto-overlay")
+    howto_close_btn = page.locator("#howto-close-btn")
+
+    expect(howto_overlay).to_have_js_property("open", True)
+    expect(howto_overlay).to_have_attribute("aria-labelledby", "howto-title")
+    expect(howto_close_btn).to_be_visible()
+    expect(howto_close_btn).to_be_focused()
+
     page.keyboard.press("Escape")
     expect(page.locator("#howto-overlay")).to_be_hidden()
     page.click("#howto-btn")
