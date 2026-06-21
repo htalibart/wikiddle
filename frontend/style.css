@@ -174,12 +174,17 @@ body {
   border: 1px solid var(--input-border-color);
   background-color: var(--surface-background);
   color: var(--main-dark-color);
-  outline: none;
   border-radius: var(--border-radius);
 }
 
 #guess-input:focus {
   border-color: var(--main-dark-color);
+}
+
+#guess-input:focus-visible,
+.ts-control:focus-within {
+  outline: 3px solid var(--main-dark-color);
+  outline-offset: 3px;
 }
 
 .btn {
