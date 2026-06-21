@@ -577,11 +577,12 @@ body {
 
 #win-article a {
   color: var(--wikipedia-blue);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
 }
 
 #win-article a:hover {
-  text-decoration: underline;
+  text-decoration-thickness: 0.14em;
 }
 
 #win-game-stats {
