@@ -26,7 +26,7 @@ function renderTargetCard(state, translations) {
 
   let titleHTML = `<div class="guess-card-title">?</div>`;
   if (targetFound) {
-    titleHTML = `<div class="guess-card-title"><a href=${titleToUrl(state.knowledgeTarget.title, state.lang)} target="_blank" rel="noopener noreferrer">${state.knowledgeTarget.title}</a></div>`;
+    titleHTML = `<div class="guess-card-title"><a href="${titleToUrl(state.knowledgeTarget.title, state.lang)}" target="_blank" rel="noopener noreferrer">${state.knowledgeTarget.title}</a></div>`;
   }
 
   const knowsHTML = state.knowsAllLinks ? `<div class="guess-card-knows">${translations.all_links_found}</div>` : "";
@@ -131,7 +131,7 @@ function renderGuessCard(state, guess, translations) {
 
   card.innerHTML = `
     <div class="guess-card-header">
-      <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank" rel="noopener noreferrer">${guess.title}</a>${onTargetLabel}</div>
+      <div class="guess-card-title"><a href="${titleToUrl(guess.title, state.lang)}" target="_blank" rel="noopener noreferrer">${guess.title}</a>${onTargetLabel}</div>
       <div class="guess-card-score">
         <span class="guess-card-score-links">${guess.commonLinks.length}</span>
       </div>
