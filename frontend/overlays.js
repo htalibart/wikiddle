@@ -199,17 +199,12 @@ export function buildWinOverlay(translations) {
   document.getElementById("win-share-label").textContent = translations.win_share_label;
 
   document.getElementById("win-overlay").addEventListener("click", () => {
-    document.getElementById("win-overlay").style.display = "none";
+    document.getElementById("win-overlay").close();
   });
   document.getElementById("win-box").addEventListener("click", (e) => e.stopPropagation());
   document.getElementById("win-close-btn").setAttribute("aria-label", translations.close);
   document.getElementById("win-close-btn").addEventListener("click", () => {
-    document.getElementById("win-overlay").style.display = "none";
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      document.getElementById("win-overlay").style.display = "none";
-    }
+    document.getElementById("win-overlay").close();
   });
 }
 
@@ -244,5 +239,6 @@ export function showWinOverlay(state, translations) {
     }
   });
 
-  document.getElementById("win-overlay").style.display = "flex";
+  document.getElementById("win-overlay").showModal();
+  document.getElementById("win-close-btn").focus();
 }
