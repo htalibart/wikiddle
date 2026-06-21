@@ -421,6 +421,7 @@ async function addHint(state, translations) {
   } else {
     showToast(translations.all_hints_found_error);
     hintBtn.classList.add("disabled-btn");
+    hintBtn.disabled = true;
     return;
   }
 
@@ -446,7 +447,10 @@ async function addHint(state, translations) {
       if (data.title === null) {
         if (hintType == "link") state.knowsAllLinks = true;
         else state.knowsAllCategories = true;
-        if (state.knowsAllLinks && state.knowsAllCategories) hintBtn.classList.add("disabled-btn");
+        if (state.knowsAllLinks && state.knowsAllCategories) {
+          hintBtn.classList.add("disabled-btn");
+          hintBtn.disabled = true;
+        }
       } else {
         if (hintType == "link") updateKnownLinks(state, [data.title]);
         else updateKnownCategories(state, [data.title]);
@@ -620,6 +624,7 @@ async function main() {
     hintBtn.blur();
   });
   hintBtn.classList.toggle("disabled-btn", state.knowsAllLinks && state.knowsAllCategories);
+  hintBtn.disabled = state.knowsAllLinks && state.knowsAllCategories;
 
   buildWinOverlay(translations);
 

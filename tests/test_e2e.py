@@ -507,6 +507,7 @@ def test_hint_all_hints_of_type_found_flow(page: Page):
     expect(target_card.locator(".guess-card-links a, .guess-card-categories a")).to_have_count(0)
     expect(target_card.locator(".target-placeholder")).to_be_visible()
     expect(target_card.locator(".guess-card-knows")).to_have_count(0)
+    expect(page.locator("#hint-btn")).to_be_enabled()
 
     page.click("#hint-btn")
 
@@ -531,6 +532,57 @@ def test_hint_all_hints_of_type_found_flow(page: Page):
     assert state["gameDate"] == "2000-01-01"
     assert state["lastGuess"] is None
     assert state["nbHints"] == 0
+
+
+def test_hint_button_is_disabled_only_when_all_hints_are_exhausted(page: Page):
+    page.add_init_script("Math.random = () => 0")
+
+    page.route(
+        "**/api/en/new-target-link",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body="""{
+                "game_date": "2000-01-01",
+                "title": null
+            }""",
+        ),
+    )
+    page.route(
+        "**/api/en/new-target-category",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body="""{
+                "game_date": "2000-01-01",
+                "title": null
+            }""",
+        ),
+    )
+
+    page.goto(BASE_URL)
+
+    hint_btn = page.locator("#hint-btn")
+    expect(hint_btn).to_be_enabled()
+    expect(hint_btn).not_to_have_class(re.compile(r".*\bdisabled-btn\b.*"))
+
+    page.click("#hint-btn")
+
+    expect(hint_btn).to_be_enabled()
+    expect(hint_btn).not_to_have_class(re.compile(r".*\bdisabled-btn\b.*"))
+
+    state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
+    assert state["knowsAllLinks"] is True
+    assert state["knowsAllCategories"] is False
+
+    page.click("#hint-btn")
+
+    expect(hint_btn).to_be_disabled()
+    expect(hint_btn).to_have_class(re.compile(r".*\bdisabled-btn\b.*"))
+
+    state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
+    assert state["knowsAllLinks"] is True
+    assert state["knowsAllCategories"] is True
 
 
 def test_duplicate_known_links_are_not_duplicated(page: Page):
