@@ -1,6 +1,4 @@
-wikiddle.com {
-    tls /etc/caddy/wikiddle.pem /etc/caddy/wikiddle.key
-
+(wikiddle_common) {
     # Restrict sources for scripts, styles, etc. to same origin and jsdelivr CDN
     header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:"
     # Prevent MIME type sniffing
@@ -27,55 +25,25 @@ wikiddle.com {
 
     # Serve assets (JS, CSS) with default caching
     handle /assets/* {
-    	root * /var/www/wikiddle/frontend/dist
-	file_server
+        root * /var/www/wikiddle/frontend/dist
+        file_server
     }
 
     # Don't cache index
     handle {
         root * /var/www/wikiddle/frontend/dist
         try_files {path} /index.html
-	header Cache-Control "no-cache"
+        header Cache-Control "no-cache"
         file_server
     }
 }
 
+wikiddle.com {
+    tls /etc/caddy/wikiddle.pem /etc/caddy/wikiddle.key
+
+    import wikiddle_common
+}
+
 :80 {
-    # Restrict sources for scripts, styles, etc. to same origin and jsdelivr CDN
-    header Content-Security-Policy "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:"
-    # Prevent MIME type sniffing
-    header X-Content-Type-Options "nosniff"
-
-    # API — proxied to FastAPI
-    handle /api/* {
-        reverse_proxy localhost:8000
-    }
-
-    # index.html — entry point, never cache so users always get the latest version after a deployment
-    handle /index.html {
-        header Cache-Control "no-cache"
-        root * /var/www/wikiddle/frontend/dist
-        file_server
-    }
-
-    # Translation files — always revalidate with server so users always get the latest translations
-    handle /i18n/* {
-        header Cache-Control "no-cache"
-        root * /var/www/wikiddle/frontend/dist
-        file_server
-    }
-
-    # Serve assets (JS, CSS) with default caching
-    handle /assets/* {
-    	root * /var/www/wikiddle/frontend/dist
-	file_server
-    }
-
-    # Don't cache index
-    handle {
-        root * /var/www/wikiddle/frontend/dist
-        try_files {path} /index.html
-	header Cache-Control "no-cache"
-        file_server
-    }
+    import wikiddle_common
 }
