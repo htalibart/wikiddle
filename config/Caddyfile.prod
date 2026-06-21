@@ -25,10 +25,17 @@ wikiddle.com {
         file_server
     }
 
-    # Everything else — static files (JS, CSS, images) served with default caching
+    # Serve assets (JS, CSS) with default caching
+    handle /assets/* {
+    	root * /var/www/wikiddle/frontend/dist
+	file_server
+    }
+
+    # Don't cache index
     handle {
         root * /var/www/wikiddle/frontend/dist
         try_files {path} /index.html
+	header Cache-Control "no-cache"
         file_server
     }
 }
@@ -58,10 +65,17 @@ wikiddle.com {
         file_server
     }
 
-    # Everything else — static files (JS, CSS, images) served with default caching
+    # Serve assets (JS, CSS) with default caching
+    handle /assets/* {
+    	root * /var/www/wikiddle/frontend/dist
+	file_server
+    }
+
+    # Don't cache index
     handle {
         root * /var/www/wikiddle/frontend/dist
         try_files {path} /index.html
+	header Cache-Control "no-cache"
         file_server
     }
 }
