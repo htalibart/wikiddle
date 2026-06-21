@@ -12,11 +12,11 @@ html {
   --wikipedia-light-orange: #fbdfc5;
   --wikipedia-green: #308557;
   --main-dark-color: #333333;
-  --main-medium-color: #666666;
+  --main-medium-color: #5c5c5c;
   --main-light-color: #999999;
   --very-light-color: #dddddd;
   --almost-white: #f9f9f9;
-  --dark-gold: #9a6e00;
+  --dark-gold: #946a00;
   --border-radius: 0.375em;
 
   --font-serif: Georgia, serif;
@@ -138,7 +138,7 @@ body {
 }
 
 #yesterdays-article {
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   font-size: var(--font-size-small);
 }
 
@@ -280,7 +280,7 @@ body {
 }
 
 #yesterdays-banner-message {
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   letter-spacing: 0.05em;
 }
 
@@ -299,21 +299,21 @@ body {
   border: none;
   cursor: pointer;
   font-size: var(--font-size-medium);
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   padding: 0;
   line-height: 1;
   flex-shrink: 0;
 }
 
 #yesterdays-banner-dismiss:hover {
-  color: var(--main-dark-color);
+  color: var(--main-light-color);
 }
 
 /* Guess cards */
 
 .section-label {
   font-size: var(--font-size-small);
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: var(--space-small) 0 var(--space-smallest) 0;
@@ -373,7 +373,7 @@ body {
 .guess-card-categories-label {
   font-family: var(--font-sans);
   font-size: var(--font-size-smallest);
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -438,7 +438,7 @@ body {
 
 .guess-card-noinfo {
   font-size: var(--font-size-small);
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   font-style: italic;
 }
 
@@ -493,13 +493,13 @@ body {
 
 .target-placeholder {
   font-size: var(--font-size-medium);
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   font-style: italic;
 }
 
 .target-guess-card .guess-card-knows {
   font-size: var(--font-size-small);
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   font-style: italic;
 }
 
@@ -587,7 +587,7 @@ body {
 #win-game-stats {
   font-size: var(--font-size-small);
   font-family: var(--font-sans);
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   margin-bottom: var(--space-largest);
 }
 
@@ -600,7 +600,7 @@ body {
 
 #win-share-label {
   font-size: var(--font-size-small);
-  color: var(--main-light-color);
+  color: var(--main-medium-color);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-family: var(--font-sans);
