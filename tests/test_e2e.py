@@ -53,6 +53,7 @@ def test_howto_overlay_opens_and_closes(page: Page):
     expect(howto_overlay).to_have_attribute("aria-labelledby", "howto-title")
     expect(howto_close_btn).to_be_visible()
     expect(howto_close_btn).to_be_focused()
+    expect(howto_close_btn).to_have_attribute("aria-label", re.compile(r".+"))
 
     page.keyboard.press("Escape")
     expect(howto_overlay).to_be_hidden()
@@ -257,10 +258,12 @@ def test_win_flow(page: Page):
     win_overlay = page.locator("#win-overlay")
     win_close_btn = page.locator("#win-close-btn")
 
+    expect(win_overlay).to_be_visible()
     expect(win_overlay).to_have_js_property("open", True)
     expect(win_overlay).to_have_attribute("aria-labelledby", "win-message")
     expect(win_close_btn).to_be_visible()
     expect(win_close_btn).to_be_focused()
+    expect(win_close_btn).to_have_attribute("aria-label", re.compile(r".+"))
 
     expect(page.locator("#win-message")).to_be_visible()
     expect(page.locator("#win-article")).to_contain_text(selected_title)
