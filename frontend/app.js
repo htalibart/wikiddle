@@ -619,7 +619,7 @@ async function main() {
     addHint(state, translations);
     hintBtn.blur();
   });
-  hintBtn.classList.toggle("disabled-btn", state.knowsAllLinks);
+  hintBtn.classList.toggle("disabled-btn", state.knowsAllLinks && state.knowsAllCategories);
 
   buildWinOverlay(translations);
 
