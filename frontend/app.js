@@ -26,7 +26,7 @@ function renderTargetCard(state, translations) {
 
   let titleHTML = `<div class="guess-card-title">?</div>`;
   if (targetFound) {
-    titleHTML = `<div class="guess-card-title"><a href=${titleToUrl(state.knowledgeTarget.title, state.lang)} target="_blank">${state.knowledgeTarget.title}</a></div>`;
+    titleHTML = `<div class="guess-card-title"><a href=${titleToUrl(state.knowledgeTarget.title, state.lang)} target="_blank" rel="noopener noreferrer">${state.knowledgeTarget.title}</a></div>`;
   }
 
   const knowsHTML = state.knowsAllLinks ? `<div class="guess-card-knows">${translations.all_links_found}</div>` : "";
@@ -39,7 +39,7 @@ function renderTargetCard(state, translations) {
       ? links
           .map((title) => {
             const isNew = newLinks && newLinks.has(title) && !targetFound;
-            return `<a href="${titleToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-link"' : ""}>${title} </a>`;
+            return `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer" ${isNew ? 'class="new-link"' : ""}>${title} </a>`;
           })
           .join(" ")
       : "";
@@ -64,7 +64,7 @@ function renderTargetCard(state, translations) {
           ${categories
             .map((title) => {
               const isNew = newCategories && newCategories.has(title) && !targetFound;
-              return `<a href="${categoryToUrl(title, state.lang)}" target="_blank" ${isNew ? 'class="new-category"' : ""}># ${title}</a>`;
+              return `<a href="${categoryToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer" ${isNew ? 'class="new-category"' : ""}># ${title}</a>`;
             })
             .join(" ")}
         </div>
@@ -102,7 +102,7 @@ function renderGuessCard(state, guess, translations) {
 
   const linksHTML =
     guess.commonLinks.length > 0
-      ? `<div class="guess-card-links">${guess.commonLinks.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`).join(" ")}</div>`
+      ? `<div class="guess-card-links">${guess.commonLinks.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer">${title}</a>`).join(" ")}</div>`
       : "";
 
   const categoriesHTML =
@@ -115,7 +115,10 @@ function renderGuessCard(state, guess, translations) {
         </div>
         <div class="guess-card-categories">
           ${guess.commonCategories
-            .map((title) => `<a href="${categoryToUrl(title, state.lang)}" target="_blank"># ${title}</a>`)
+            .map(
+              (title) =>
+                `<a href="${categoryToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer"># ${title}</a>`,
+            )
             .join(" ")}
         </div>
       `
@@ -128,7 +131,7 @@ function renderGuessCard(state, guess, translations) {
 
   card.innerHTML = `
     <div class="guess-card-header">
-      <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank">${guess.title}</a>${onTargetLabel}</div>
+      <div class="guess-card-title"><a href=${titleToUrl(guess.title, state.lang)} target="_blank" rel="noopener noreferrer">${guess.title}</a>${onTargetLabel}</div>
       <div class="guess-card-score">
         <span class="guess-card-score-links">${guess.commonLinks.length}</span>
       </div>
@@ -292,7 +295,7 @@ async function showYesterdaysAnswer(state, translations) {
       return;
     }
     const { title } = await res.json();
-    const titleLink = `<a href="${titleToUrl(title, state.lang)}" target="_blank">${title}</a>`;
+    const titleLink = `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer">${title}</a>`;
     document.getElementById("yesterdays-banner-message").innerHTML = translations.yesterdays_answer.replace(
       "{title}",
       titleLink,

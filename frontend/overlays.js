@@ -78,7 +78,7 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
         ? `
           ${buildCategoriesSeparator(translations)}
           <div class="guess-card-categories">
-            ${categories.map((t) => `<a href="${categoryToUrl(t, lang)}" target="_blank"># ${t}</a>`).join(" ")}
+            ${categories.map((t) => `<a href="${categoryToUrl(t, lang)}" target="_blank" rel="noopener noreferrer"># ${t}</a>`).join(" ")}
           </div>
         `
         : "";
@@ -86,14 +86,14 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
     card.innerHTML = `
       <div class="guess-card-header">
         <div class="guess-card-title${isOnTarget ? " guess-card-title-on-target" : ""}">
-          <a href="${titleToUrl(title, lang)}" target="_blank">${title}</a>${isOnTarget ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>` : ""}
+          <a href="${titleToUrl(title, lang)}" target="_blank" rel="noopener noreferrer">${title}</a>${isOnTarget ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>` : ""}
         </div>
         <div class="guess-card-score">
           <span class="guess-card-score-links">${score}</span>
         </div>
       </div>
       <div class="guess-card-links">
-        ${links.map((t) => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
+        ${links.map((t) => `<a href="${titleToUrl(t, lang)}" target="_blank" rel="noopener noreferrer">${t}</a>`).join(" ")}
       </div>
       ${categoriesHTML}
     `;
@@ -132,11 +132,11 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
       <div class="guess-card-title">?</div>
     </div>
     <div class="guess-card-links">
-      ${mysteryLinks.map((t) => `<a href="${titleToUrl(t, lang)}" target="_blank">${t}</a>`).join(" ")}
+      ${mysteryLinks.map((t) => `<a href="${titleToUrl(t, lang)}" target="_blank" rel="noopener noreferrer">${t}</a>`).join(" ")}
     </div>
     ${buildCategoriesSeparator(translations)}
     <div class="guess-card-categories">
-      ${mysteryCategories.map((t) => `<a href="${categoryToUrl(t, lang)}" target="_blank"># ${t}</a>`).join(" ")}
+      ${mysteryCategories.map((t) => `<a href="${categoryToUrl(t, lang)}" target="_blank" rel="noopener noreferrer"># ${t}</a>`).join(" ")}
     </div>
   `;
   box.appendChild(targetCard);
@@ -229,7 +229,7 @@ export function showWinOverlay(state, translations) {
 
   document.getElementById("win-article").innerHTML = translations.win_article.replace(
     "{title}",
-    `<a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank">${mysteryTitle}</a>`,
+    `<a href="${titleToUrl(mysteryTitle, state.lang)}" target="_blank" rel="noopener noreferrer">${mysteryTitle}</a>`,
   );
   document.getElementById("win-game-stats").textContent = translations.win_game_stats
     .replace("{nbGuesses}", nbGuesses)
