@@ -36,22 +36,32 @@ def test_language_switcher(page: Page):
 
 def test_howto_overlay_opens_and_closes(page: Page):
     page.goto(BASE_URL)
-    expect(page.locator("#howto-overlay")).to_be_hidden()
-    page.click("#howto-btn")
-    expect(page.locator("#howto-overlay")).to_be_visible()
+
     howto_overlay = page.locator("#howto-overlay")
+    howto_btn = page.locator("#howto-btn")
     howto_close_btn = page.locator("#howto-close-btn")
 
+    expect(howto_overlay).to_be_hidden()
+
+    page.click("#howto-btn")
+    expect(howto_overlay).to_be_visible()
     expect(howto_overlay).to_have_js_property("open", True)
     expect(howto_overlay).to_have_attribute("aria-labelledby", "howto-title")
     expect(howto_close_btn).to_be_visible()
     expect(howto_close_btn).to_be_focused()
 
     page.keyboard.press("Escape")
-    expect(page.locator("#howto-overlay")).to_be_hidden()
+    expect(howto_overlay).to_be_hidden()
+    expect(howto_btn).to_be_focused()
+
     page.click("#howto-btn")
+    expect(howto_overlay).to_be_visible()
+    expect(howto_close_btn).to_be_focused()
+
     page.click("#howto-close-btn")
-    expect(page.locator("#howto-overlay")).to_be_hidden()
+    expect(howto_overlay).to_be_hidden()
+    expect(howto_btn).to_be_focused()
+
 
 def test_howto_overlay_does_not_change_guess_list(page: Page):
     page.goto(BASE_URL)
