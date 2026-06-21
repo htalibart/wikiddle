@@ -214,7 +214,10 @@ export function buildWinOverlay(translations) {
  * @param {Object} translations - translations for the current language
  */
 export function showWinOverlay(state, translations) {
-  confetti();
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!prefersReducedMotion) {
+    confetti();
+  }
 
   const nbGuesses = 1 + state.guesses.length + (state.lastGuess ? 1 : 0);
   const mysteryTitle = state.knowledgeTarget.title;

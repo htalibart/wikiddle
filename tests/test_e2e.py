@@ -286,6 +286,38 @@ def test_win_flow(page: Page):
     assert state["nbHints"] == 0
 
 
+
+def test_win_flow_respects_reduced_motion(page: Page):
+    page.emulate_media(reduced_motion="reduce")
+
+    page.route(
+        "**/api/en/common-info?id=*",
+        lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body="""{
+                "game_date": "2000-01-01",
+                "common_links": ["Electronic music", "French house"],
+                "common_categories": [],
+                "is_target": true,
+                "is_on_target": false
+            }""",
+        ),
+    )
+
+    page.goto(BASE_URL)
+
+    page.click(".ts-control")
+    page.keyboard.type("Daft Punk")
+    first_option = page.locator(".ts-dropdown .option").first
+    expect(first_option).to_be_visible(timeout=5000)
+    first_option.click()
+
+    expect(page.locator("#win-overlay")).to_be_visible()
+    expect(page.locator("#win-overlay")).to_have_js_property("open", True)
+    expect(page.locator("canvas")).to_have_count(0)
+
+
 def test_guess_on_target_flow(page: Page):
     page.route(
         "**/api/en/common-info?id=*",
