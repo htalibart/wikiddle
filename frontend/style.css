@@ -541,6 +541,19 @@ body {
   display: none;
   align-items: center;
   justify-content: center;
+}
+
+dialog.overlay {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+dialog.overlay[open] {
+  display: flex;
+}
+
+dialog.overlay::backdrop {
   background-color: var(--overlay-background);
 }
 

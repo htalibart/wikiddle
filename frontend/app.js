@@ -572,7 +572,10 @@ async function main() {
 
   const howtoBtn = document.getElementById("howto-btn");
   const howtoOverlay = document.getElementById("howto-overlay");
-  howtoBtn.addEventListener("click", () => (howtoOverlay.style.display = "flex"));
+  howtoBtn.addEventListener("click", () => {
+    howtoOverlay.showModal();
+    document.getElementById("howto-close-btn").focus();
+  });
 
   showYesterdaysAnswer(state, translations);
 

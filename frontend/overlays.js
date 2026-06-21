@@ -47,6 +47,7 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
   box.appendChild(closeBtn);
 
   const title = document.createElement("h2");
+  title.id = "howto-title";
   title.textContent = translations.howto_btn;
   box.appendChild(title);
 
@@ -170,12 +171,7 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
   box.appendChild(textAfter);
 
   // Event listeners
-  closeBtn.addEventListener("click", () => (overlay.style.display = "none"));
-  overlay.addEventListener("click", () => (overlay.style.display = "none"));
-  box.addEventListener("click", (e) => e.stopPropagation());
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") overlay.style.display = "none";
-  });
+  closeBtn.addEventListener("click", () => overlay.close());
 }
 
 /**
