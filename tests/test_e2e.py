@@ -658,7 +658,19 @@ def test_date_change_resets_game_before_next_guess(page: Page):
     expect(second_option).to_be_visible(timeout=5000)
     second_option.click()
 
-    expect(page.locator("#midnight-overlay")).to_be_visible()
+    midnight_overlay = page.locator("#midnight-overlay")
+    midnight_btn = page.locator("#midnight-btn")
+
+    expect(midnight_overlay).to_be_visible()
+    expect(midnight_overlay).to_have_js_property("open", True)
+    expect(midnight_overlay).to_have_attribute("aria-labelledby", "midnight-message")
+    expect(midnight_btn).to_be_visible()
+
+    midnight_btn.focus()
+    expect(midnight_btn).to_be_focused()
+
+    page.keyboard.press("Tab")
+    expect(midnight_btn).to_be_focused()
 
     state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
     assert state["gameDate"] == "2000-01-01"

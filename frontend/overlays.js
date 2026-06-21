@@ -180,8 +180,10 @@ export function buildHowtoExample(translations, lang, scoreToColor) {
  */
 export function showMidnightOverlay() {
   return new Promise((resolve) => {
-    document.getElementById("midnight-overlay").style.display = "flex";
+    const overlay = document.getElementById("midnight-overlay");
+    overlay.showModal();
     document.getElementById("midnight-btn").addEventListener("click", () => {
+      overlay.close();
       resolve();
     });
   });
