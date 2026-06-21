@@ -557,6 +557,12 @@ async function main() {
 
   document.documentElement.lang = state.lang;
 
+  // Set aria-current attribute to current language (for screen readers)
+  document.querySelectorAll("#lang-switcher a").forEach((link) => {
+    link.removeAttribute("aria-current");
+  });
+  document.querySelector(`#lang-switcher a[href="/${state.lang}"]`)?.setAttribute("aria-current", "page");
+
   // Translations
   const translations = await loadTranslations(state.lang);
   document.title = translations.title;

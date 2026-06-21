@@ -28,10 +28,14 @@ def test_language_switcher(page: Page):
     expect(page).to_have_url(f"{BASE_URL}/fr")
     expect(page.locator("#guess-btn")).to_have_text("Proposer")
     expect(page.locator("html")).to_have_attribute("lang", "fr")
+    expect(page.locator("#lang-switcher a[href='/fr']")).to_have_attribute("aria-current", "page")
+    expect(page.locator("#lang-switcher a[href='/en']")).not_to_have_attribute("aria-current", "page")
     page.click("#lang-switcher a[href='/en']")
     expect(page).to_have_url(f"{BASE_URL}/en")
     expect(page.locator("#guess-btn")).to_have_text("Guess")
     expect(page.locator("html")).to_have_attribute("lang", "en")
+    expect(page.locator("#lang-switcher a[href='/en']")).to_have_attribute("aria-current", "page")
+    expect(page.locator("#lang-switcher a[href='/fr']")).not_to_have_attribute("aria-current", "page")
 
 
 def test_howto_overlay_opens_and_closes(page: Page):
