@@ -555,6 +555,8 @@ function saveState(state) {
 async function main() {
   const state = await loadOrCreateState();
 
+  document.documentElement.lang = state.lang;
+
   // Translations
   const translations = await loadTranslations(state.lang);
   document.title = translations.title;
