@@ -9,6 +9,7 @@
   "categories": "Common categories",
   "on_target_label": "on the mystery article!",
   "no_common_info": "No common link or category with mystery article.",
+  "score_label": "{count} common links",
   "section_last_guess": "Your last guess",
   "section_mystery": "Mystery article",
   "section_previous_guesses": "Your previous guesses",

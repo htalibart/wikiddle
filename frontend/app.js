@@ -135,7 +135,7 @@ function renderGuessCard(state, guess, translations) {
     <div class="guess-card-header">
       <h3 class="guess-card-title"><a href="${titleToUrl(guess.title, state.lang)}" target="_blank" rel="noopener noreferrer">${guess.title}</a>${onTargetLabel}</h3>
       <div class="guess-card-score">
-        <span class="guess-card-score-links">${guess.commonLinks.length}</span>
+        <span class="guess-card-score-links" aria-label="${translations.score_label.replace("{count}", guess.commonLinks.length)}">${guess.commonLinks.length}</span>
       </div>
     </div>
     ${linksHTML}

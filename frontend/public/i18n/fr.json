@@ -9,6 +9,7 @@
   "categories": "Catégories en commun",
   "on_target_label": "apparaît sur l'article mystère !",
   "no_common_info": "Pas de lien ni de catégorie en commun avec l'article mystère.",
+  "score_label": "{count} liens en commun",
   "section_last_guess": "Votre dernière proposition",
   "section_mystery": "Article mystère",
   "section_previous_guesses": "Vos propositions précédentes",
