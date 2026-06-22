@@ -323,6 +323,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: var(--space-small) 0 var(--space-smallest) 0;
+  font-weight: normal;
 }
 
 .guess-card {

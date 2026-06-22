@@ -26,9 +26,9 @@ function renderTargetCard(state, translations) {
     card.classList.add("found-target-guess-card");
   }
 
-  let titleHTML = `<div class="guess-card-title">?</div>`;
+  let titleHTML = `<h3 class="guess-card-title">?</h3>`;
   if (targetFound) {
-    titleHTML = `<div class="guess-card-title"><a href="${titleToUrl(state.knowledgeTarget.title, state.lang)}" target="_blank" rel="noopener noreferrer">${state.knowledgeTarget.title}</a></div>`;
+    titleHTML = `<h3 class="guess-card-title"><a href="${titleToUrl(state.knowledgeTarget.title, state.lang)}" target="_blank" rel="noopener noreferrer">${state.knowledgeTarget.title}</a></h3>`;
   }
 
   const knowsHTML = state.knowsAllLinks ? `<div class="guess-card-knows">${translations.all_links_found}</div>` : "";
@@ -133,7 +133,7 @@ function renderGuessCard(state, guess, translations) {
 
   card.innerHTML = `
     <div class="guess-card-header">
-      <div class="guess-card-title"><a href="${titleToUrl(guess.title, state.lang)}" target="_blank" rel="noopener noreferrer">${guess.title}</a>${onTargetLabel}</div>
+      <h3 class="guess-card-title"><a href="${titleToUrl(guess.title, state.lang)}" target="_blank" rel="noopener noreferrer">${guess.title}</a>${onTargetLabel}</h3>
       <div class="guess-card-score">
         <span class="guess-card-score-links">${guess.commonLinks.length}</span>
       </div>
@@ -169,7 +169,7 @@ function renderCards(state, translations) {
 
   // last guess card on top (if any)
   if (state.lastGuess != null) {
-    const label = document.createElement("div");
+    const label = document.createElement("h2");
     label.classList.add("section-label");
     label.textContent = translations.section_last_guess;
     list.appendChild(label);
@@ -178,7 +178,7 @@ function renderCards(state, translations) {
   }
 
   // target card right below
-  const mysteryLabel = document.createElement("div");
+  const mysteryLabel = document.createElement("h2");
   mysteryLabel.classList.add("section-label");
   mysteryLabel.textContent = translations.section_mystery;
   list.appendChild(mysteryLabel);
@@ -187,7 +187,7 @@ function renderCards(state, translations) {
 
   // all other guesses below
   if (state.guesses.length > 0) {
-    const prevLabel = document.createElement("div");
+    const prevLabel = document.createElement("h2");
     prevLabel.classList.add("section-label");
     prevLabel.textContent = translations.section_previous_guesses;
     list.appendChild(prevLabel);
