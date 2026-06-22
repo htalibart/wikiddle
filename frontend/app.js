@@ -216,27 +216,25 @@ function insertSorted(guess, state) {
 }
 
 /**
- * Updates known links with new titles
+ * Updates known categories and links with new titles
  * @param {State} state - current application state
  * @param {str[]} links - array of article titles to add to the known links
+ * @param {str[]} categories - array of categories to add to the known categories
  */
-function updateKnownLinks(state, links) {
+
+function updateKnownInfo(state, links, categories) {
+  state.knowledgeTarget.newCategories.clear();
   state.knowledgeTarget.newLinks.clear();
+
+  // Update links
   for (const link of links) {
     if (!state.knowledgeTarget.links.includes(link)) {
       state.knowledgeTarget.links.push(link);
       state.knowledgeTarget.newLinks.add(link);
     }
   }
-}
 
-/**
- * Updates known categories with new titles
- * @param {State} state - current application state
- * @param {str[]} categories - array of categories to add to the known categories
- */
-function updateKnownCategories(state, categories) {
-  state.knowledgeTarget.newCategories.clear();
+  // Update categories
   for (const category of categories) {
     if (!state.knowledgeTarget.categories.includes(category)) {
       state.knowledgeTarget.categories.push(category);
@@ -354,8 +352,7 @@ async function handleGuessInput(state, tomSelect, translations) {
       if (guess.isOnTarget) {
         linksToAdd.push(guess.title);
       }
-      updateKnownLinks(state, linksToAdd);
-      updateKnownCategories(state, [...guess.commonCategories]);
+      updateKnownInfo(state, linksToAdd, [...guess.commonCategories]);
 
       if (guess.isTarget) {
         state.knowledgeTarget.title = guess.title;
@@ -452,8 +449,8 @@ async function addHint(state, translations) {
           hintBtn.disabled = true;
         }
       } else {
-        if (hintType == "link") updateKnownLinks(state, [data.title]);
-        else updateKnownCategories(state, [data.title]);
+        if (hintType == "link") updateKnownInfo(state, [data.title], []);
+        else updateKnownInfo(state, [], [data.title]);
         state.nbHints += 1;
       }
 
