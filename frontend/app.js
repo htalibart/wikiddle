@@ -222,7 +222,7 @@ function insertSorted(guess, state) {
  * @param {str[]} categories - array of categories to add to the known categories
  */
 
-function updateKnownInfo(state, links, categories) {
+function updateKnownInfo(state, links, categories, translations) {
   state.knowledgeTarget.newCategories.clear();
   state.knowledgeTarget.newLinks.clear();
 
@@ -234,6 +234,13 @@ function updateKnownInfo(state, links, categories) {
     }
   }
 
+  // Announce new links to screen reader users
+  const newLinks = [...state.knowledgeTarget.newLinks];
+  document.getElementById("known-links-status").textContent =
+    newLinks.length > 0
+      ? `${translations.new_links_announcement.replace("{count}", newLinks.length)} ${newLinks.join(", ")}.`
+      : translations.no_new_link_announcement;
+
   // Update categories
   for (const category of categories) {
     if (!state.knowledgeTarget.categories.includes(category)) {
@@ -241,6 +248,12 @@ function updateKnownInfo(state, links, categories) {
       state.knowledgeTarget.newCategories.add(category);
     }
   }
+
+  const newCategories = [...state.knowledgeTarget.newCategories];
+  document.getElementById("known-categories-status").textContent =
+    newCategories.length > 0
+      ? `${translations.new_categories_announcement.replace("{count}", newCategories.length)} ${newCategories.join(", ")}.`
+      : translations.no_new_category_announcement;
 }
 
 /**
@@ -352,7 +365,7 @@ async function handleGuessInput(state, tomSelect, translations) {
       if (guess.isOnTarget) {
         linksToAdd.push(guess.title);
       }
-      updateKnownInfo(state, linksToAdd, [...guess.commonCategories]);
+      updateKnownInfo(state, linksToAdd, [...guess.commonCategories], translations);
 
       if (guess.isTarget) {
         state.knowledgeTarget.title = guess.title;
@@ -449,8 +462,8 @@ async function addHint(state, translations) {
           hintBtn.disabled = true;
         }
       } else {
-        if (hintType == "link") updateKnownInfo(state, [data.title], []);
-        else updateKnownInfo(state, [], [data.title]);
+        if (hintType == "link") updateKnownInfo(state, [data.title], [], translations);
+        else updateKnownInfo(state, [], [data.title], translations);
         state.nbHints += 1;
       }
 

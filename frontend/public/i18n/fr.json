@@ -51,5 +51,9 @@
   "win_share": "Partager",
   "win_share_text": "J'ai trouvé le Wikiddle du jour en {nbGuesses} coups ({nbHints} indices) !\nhttps://wikiddle.com/fr",
   "copied_to_clipboard": "Copié dans le presse-papier",
-  "yesterdays_answer": "L'article mystère d'hier était : {title}."
+  "yesterdays_answer": "L'article mystère d'hier était : {title}.",
+  "new_links_announcement": "Nouveaux liens trouvés : ",
+  "no_new_link_announcement": "Pas de nouveau lien trouvé.",
+  "new_categories_announcement": "Nouvelles catégories trouvées : ",
+  "no_new_category_announcement": "Pas de nouvelle catégorie trouvée."
 }

@@ -176,6 +176,21 @@ def test_guess_flow(page: Page):
     selected_title = first_option.text_content().strip()
     first_option.click()
 
+    known_links_status = page.locator("#known-links-status")
+    known_categories_status = page.locator("#known-categories-status")
+
+    expect(known_links_status).to_have_attribute("role", "status")
+    expect(known_links_status).to_have_attribute("aria-live", "polite")
+    expect(known_links_status).to_have_attribute("aria-atomic", "true")
+    expect(known_links_status).to_contain_text("2")
+    expect(known_links_status).to_contain_text("Electronic music")
+    expect(known_links_status).to_contain_text("French house")
+
+    expect(known_categories_status).to_have_attribute("role", "status")
+    expect(known_categories_status).to_have_attribute("aria-live", "polite")
+    expect(known_categories_status).to_have_attribute("aria-atomic", "true")
+    expect(known_categories_status).to_have_text(re.compile(r".+"))
+
     target_card = get_target_card(page)
     expect(target_card).to_have_count(1)
     expect(target_card.locator(".guess-card-title")).to_have_text("?")
@@ -215,7 +230,6 @@ def test_guess_flow(page: Page):
     assert state["lastGuess"]["isTarget"] is False
     assert state["lastGuess"]["isOnTarget"] is False
     assert state["nbHints"] == 0
-
 
 def test_win_flow(page: Page):
     page.route(
