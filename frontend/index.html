@@ -24,16 +24,16 @@
     <div id="known-links-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
     <div id="known-categories-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
 
-    <div id="top-panel">
+    <header id="top-panel">
       <div id="title-area">
         <h1 id="site-title">
           <img src="wikiddle.svg" alt="Wikiddle" id="title-logo" />
         </h1>
         <button id="howto-btn"></button>
-        <div id="lang-switcher" aria-label="Language">
-          <a href="/en" aria-label="English">EN</a>
-          <a href="/fr" aria-label="Français">FR</a>
-        </div>
+        <nav id="lang-switcher" aria-label="Language">
+          <a href="/en" aria-label="English" lang="en">EN</a>
+          <a href="/fr" aria-label="Français" lang="fr">FR</a>
+        </nav>
       </div>
       <div id="input-area">
         <label for="guess-input" id="guess-input-label" class="visually-hidden"></label>
@@ -41,7 +41,7 @@
         <button id="guess-btn" class="btn btn-primary"></button>
         <button id="hint-btn" class="btn btn-secondary"></button>
       </div>
-    </div>
+    </header>
 
     <aside id="yesterdays-banner">
       <div id="yesterdays-banner-text">
@@ -50,9 +50,9 @@
       <button id="yesterdays-banner-dismiss" type="button">×</button>
     </aside>
 
-    <div id="guesses-panel">
+    <main id="guesses-panel">
       <div id="guesses-list"></div>
-    </div>
+    </main>
 
     <dialog
       id="win-overlay"
@@ -62,7 +62,7 @@
     >
       <div id="win-box" class="overlay-box">
         <button id="win-close-btn" class="overlay-close-btn" type="button">×</button>
-        <div id="win-message"></div>
+        <h2 id="win-message"></h2>
         <div id="win-article"></div>
         <div id="win-game-stats"></div>
         <label id="win-share-label" for="win-share-preview"></label>
