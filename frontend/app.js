@@ -19,6 +19,8 @@ function renderTargetCard(state, translations) {
   const card = document.createElement("div");
   card.classList.add("guess-card");
   card.classList.add("target-guess-card");
+  card.setAttribute("role", "region");
+  card.setAttribute("aria-label", translations.target_info_label);
 
   if (targetFound) {
     card.classList.add("found-target-guess-card");

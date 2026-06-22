@@ -4,6 +4,7 @@
   "guess": "Proposer",
   "hint": "Indice",
   "input_placeholder": "Proposer un article...",
+  "target_info_label": "Information connue sur l'article mystère",
   "target_placeholder": "Les liens et catégories en commun apparaîtront ici.",
   "categories": "Catégories en commun",
   "on_target_label": "apparaît sur l'article mystère !",

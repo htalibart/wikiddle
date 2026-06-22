@@ -4,6 +4,7 @@
   "guess": "Guess",
   "hint": "Hint",
   "input_placeholder": "Guess an article...",
+  "target_info_label": "Known information about the mystery article",
   "target_placeholder": "Common links and categories will appear here.",
   "categories": "Common categories",
   "on_target_label": "on the mystery article!",
