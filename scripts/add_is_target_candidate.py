@@ -22,6 +22,7 @@ def keep_category_fr(c: str) -> bool:
         "Saison",
         "Sport",
         "Tour de",
+        "Tour d'",
         "Tournoi",
         "Album",
         "Discographie",
@@ -30,7 +31,7 @@ def keep_category_fr(c: str) -> bool:
         "Canton électoral",
         "Circonscription",
         "Édition",
-        "Élection ",
+        "Élection",
         "Régiment",
         "Tournée",
         "Épisode",
@@ -133,7 +134,8 @@ def keep_category_fr(c: str) -> bool:
         "volley",
         "vtt",
         "wrestling",
-        "arrondissement de",
+        "arrondissement d",
+        "conseil départemental",
     )):
         return False
 
@@ -147,7 +149,13 @@ def keep_category_fr(c: str) -> bool:
         return False
     if re.search(r"\d{4} en ", c):
         return False
+    if re.search(r"\d{4} à la ", c):
+        return False
     if re.search(r"\d{4}-\d{2,4} en", c):
+        return False
+
+    MONTHS_FR_PATTERN = r"(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)"
+    if re.search(r"^" + MONTHS_FR_PATTERN + r" en ", c, re.IGNORECASE):
         return False
 
     return True
@@ -175,6 +183,7 @@ def keep_category_en(c: str) -> bool:
         "Streets in",
         "Canton of",
         "Cantons of",
+        "Districts of",
     )):
         return False
 
@@ -265,6 +274,10 @@ def keep_category_en(c: str) -> bool:
     if re.search(r"\d{4} in sports", c):
         return False
     if re.search(r"\d{4}-\d{2,4} in", c):
+        return False
+
+    MONTHS_EN_PATTERN = r"(January|February|March|April|May|June|July|August|September|October|November|December)"
+    if re.search(r"^" + MONTHS_EN_PATTERN + r" in ", c, re.IGNORECASE):
         return False
 
     return True
