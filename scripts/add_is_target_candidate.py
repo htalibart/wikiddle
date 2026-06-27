@@ -2,15 +2,18 @@ from pathlib import Path
 import re
 import argparse
 import duckdb
+import shutil
 
 THIS_DIR = Path(__file__).parent
 MAIN_DIR = THIS_DIR.parent
 
-FILTER_VERSION = 1
+FILTER_VERSION = 2
 
 
 def keep_category_fr(c: str) -> bool:
     if c.startswith((
+        "Liste ",
+        "Homonymie",
         "Championnat",
         "Coupe",
         "Grand Prix",
@@ -21,6 +24,8 @@ def keep_category_fr(c: str) -> bool:
         "Tour de",
         "Tournoi",
         "Album",
+        "Discographie",
+        "Récompense musicale par année",
         "Bataillon",
         "Canton électoral",
         "Circonscription",
@@ -28,6 +33,21 @@ def keep_category_fr(c: str) -> bool:
         "Élection ",
         "Régiment",
         "Tournée",
+        "Épisode",
+        "Filmographie",
+        "Chanson",
+        "Gare ",
+        "Station de ",
+        "Autoroute",
+        "Route nationale",
+        "Route départementale",
+        "Route dans",
+        "Voie dans",
+        "Voie à",
+        "Cour (voie)",
+        "Voie piétonnière",
+        "Rue dans",
+        "Canton de",
     )):
         return False
 
@@ -113,6 +133,7 @@ def keep_category_fr(c: str) -> bool:
         "volley",
         "vtt",
         "wrestling",
+        "arrondissement de",
     )):
         return False
 
@@ -124,7 +145,7 @@ def keep_category_fr(c: str) -> bool:
         return False
     if re.search(r"centre .+sport", c, re.IGNORECASE):
         return False
-    if re.search(r"\d{4} en sport", c):
+    if re.search(r"\d{4} en ", c):
         return False
     if re.search(r"\d{4}-\d{2,4} en", c):
         return False
@@ -134,20 +155,34 @@ def keep_category_fr(c: str) -> bool:
 
 def keep_category_en(c: str) -> bool:
     if c.startswith((
+        "Lists",
+        "Disambiguation",
         "Championship",
         "Cup ",
         "Grand Prix",
         "Match",
-        "Season",
         "Tour of",
         "Tournament",
         "Album",
+        "Discography",
         "Battalion",
         "Electoral district",
         "Election ",
         "Regiment",
+        "Television episodes",
+        "Railway stations",
+        "Autoroutes",
+        "Streets in",
+        "Canton of",
+        "Cantons of",
     )):
         return False
+
+    if c.endswith((
+        "songs",
+    )):
+        return False
+
 
     if any(s in c.lower() for s in (
         "athlete",
@@ -205,6 +240,11 @@ def keep_category_en(c: str) -> bool:
         "volleyball",
         "wrestler",
         "wrestling",
+        "filmographies",
+        "season",
+        "highway",
+        "motorway",
+        "county road",
     )):
         return False
 
@@ -260,7 +300,28 @@ def update_metadata(con: duckdb.DuckDBPyConnection):
     con.execute("INSERT INTO metadata VALUES ('category_filter_version', ?)", [str(FILTER_VERSION)])
 
 
-def update_is_target_candidate(db_file: Path, lang: str):
+def bump_db_to_new_version(wiki_db_dir: Path, old_version: int, lang: str) -> Path:
+    new_version = old_version + 1
+    src_db_file = wiki_db_dir / f"v{old_version}" / f"{lang}.db"
+    dst_db_file = wiki_db_dir / f"v{new_version}" / f"{lang}.db"
+
+    if not src_db_file.is_file():
+        raise FileNotFoundError(f"Source database not found: {src_db_file}")
+
+    if dst_db_file.is_file():
+        raise FileExistsError(f"Destination database already exists: {dst_db_file}")
+
+    print(f"Copying {src_db_file} -> {dst_db_file}...")
+    dst_db_file.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(src_db_file, dst_db_file)
+    
+    return dst_db_file
+
+
+
+
+def update_is_target_candidate(wiki_db_dir: Path, old_version: int, lang: str):
+    db_file = bump_db_to_new_version(wiki_db_dir, old_version, lang)
     con = duckdb.connect(str(db_file))
     try:
         add_is_target_candidate(con)
@@ -301,13 +362,9 @@ def update_is_target_candidate(db_file: Path, lang: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("lang", type=str)
-    parser.add_argument("--version", type=int, default=2)
+    parser.add_argument("old_version", type=int)
     args = parser.parse_args()
 
     lang = args.lang
-    db_file = MAIN_DIR/"data"/"db"/"wiki"/f"v{args.version}"/f"{lang}.db"
-
-    if not db_file.is_file():
-        raise FileNotFoundError(f"Database not found: {db_file}")
-
-    update_is_target_candidate(db_file, lang)
+    wiki_db_dir = MAIN_DIR / "data" / "db" / "wiki"
+    update_is_target_candidate(wiki_db_dir, args.old_version, lang)
