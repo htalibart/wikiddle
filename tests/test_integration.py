@@ -191,6 +191,8 @@ class TestArticleFilters:
             #("fr", "Festival international du film documentaire d'Amsterdam"),
             #("fr", "L'Étrange Festival"),
             #("fr", "Hernani (Guipuscoa)"),
+            ("fr", "Crise de 2024 au parti Les Républicains"),
+            ("fr", "Subdivisions du Togo"),
         ],
     )
     def test_article_cant_be_daily_target(self, lang: str, title: str):

@@ -49,6 +49,7 @@ def keep_category_fr(c: str) -> bool:
         "Voie piétonnière",
         "Rue dans",
         "Canton de",
+        "Subdivision",
     )):
         return False
 
@@ -184,6 +185,8 @@ def keep_category_en(c: str) -> bool:
         "Canton of",
         "Cantons of",
         "Districts of",
+        "Subdivisions of",
+        "Administrative division",
     )):
         return False
 
