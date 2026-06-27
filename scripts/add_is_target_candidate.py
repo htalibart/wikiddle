@@ -336,8 +336,12 @@ def bump_db_to_new_version(wiki_db_dir: Path, old_version: int, lang: str) -> Pa
 
 
 
-def update_is_target_candidate(wiki_db_dir: Path, old_version: int, lang: str):
-    db_file = bump_db_to_new_version(wiki_db_dir, old_version, lang)
+def update_is_target_candidate(wiki_db_dir: Path, version: int, lang: str, overwrite: bool):
+    if overwrite:
+        db_file = wiki_db_dir / f"v{version}" / f"{lang}.db"
+    else:
+        db_file = bump_db_to_new_version(wiki_db_dir, version, lang)
+
     con = duckdb.connect(str(db_file))
     try:
         add_is_target_candidate(con)
@@ -378,9 +382,10 @@ def update_is_target_candidate(wiki_db_dir: Path, old_version: int, lang: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("lang", type=str)
-    parser.add_argument("old_version", type=int)
+    parser.add_argument("version", type=int)
+    parser.add_argument("--overwrite", action='store_true', default=False)
     args = parser.parse_args()
 
     lang = args.lang
     wiki_db_dir = MAIN_DIR / "data" / "db" / "wiki"
-    update_is_target_candidate(wiki_db_dir, args.old_version, lang)
+    update_is_target_candidate(wiki_db_dir, args.version, lang, args.overwrite)

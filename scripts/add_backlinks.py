@@ -1,7 +1,8 @@
 from pathlib import Path
-import shutil
 import argparse
 import duckdb
+
+from add_is_target_candidate import bump_db_to_new_version
 
 THIS_DIR = Path(__file__).parent
 MAIN_DIR = THIS_DIR.parent
@@ -35,21 +36,13 @@ def update_metadata(con: duckdb.DuckDBPyConnection, new_version: int):
     con.execute("INSERT INTO metadata VALUES ('schema_version', ?)", [str(new_version)])
 
 
-def update_backlinks(wiki_db_dir: Path, old_version: int):
-    new_version = old_version + 1
-    src_db_file = wiki_db_dir / f"v{old_version}" / f"{lang}.db"
-    dst_db_file = wiki_db_dir / f"v{new_version}" / f"{lang}.db"
-
-    if not src_db_file.is_file():
-        raise FileNotFoundError(f"Source database not found: {src_db_file}")
-
-    if dst_db_file.is_file():
-        raise FileExistsError(f"Destination database already exists: {dst_db_file}")
-
-
-    print(f"Copying {src_db_file} -> {dst_db_file}...")
-    dst_db_file.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(src_db_file, dst_db_file)
+def update_backlinks(wiki_db_dir: Path, version: int, lang: str, overwrite: bool):
+    if overwrite:
+        dst_db_file = wiki_db_dir / f"v{version}" / f"{lang}.db"
+        new_version = version
+    else:
+        dst_db_file = bump_db_to_new_version(wiki_db_dir, version, lang)
+        new_version = version + 1
 
     con = duckdb.connect(str(dst_db_file))
     try:
@@ -80,11 +73,10 @@ def update_backlinks(wiki_db_dir: Path, old_version: int):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("lang", type=str)
-    parser.add_argument("--old_version", type=int, default=2)
+    parser.add_argument("version", type=int)
+    parser.add_argument("--overwrite", action='store_true', default=False)
     args = parser.parse_args()
 
-    lang = args.lang
-    old_version = args.old_version
-
     wiki_db_dir = MAIN_DIR / "data" / "db" / "wiki"
-    update_backlinks(wiki_db_dir, old_version) 
+
+    update_backlinks(wiki_db_dir, args.version, args.lang, args.overwrite) 
