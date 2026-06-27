@@ -158,8 +158,10 @@ def get_daily_article_filter(schema_version: int) -> str:
     if schema_version == 1:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET}"
     elif schema_version == 2:
-        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET}"
-    elif schema_version >= 3:
+        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= 7000"
+    elif schema_version == 3:
+        return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= 7000 AND nb_backlinks >= 50"
+    elif schema_version >= 4:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND article_length >= {MIN_ARTICLE_LENGTH_FOR_TARGET} AND nb_backlinks >= {MIN_NB_BACKLINKS_FOR_TARGET}"
     raise ValueError(f"Unsupported schema version: {schema_version}")
 
