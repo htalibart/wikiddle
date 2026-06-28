@@ -156,11 +156,11 @@ def get_yesterdays_article_cached(lang: str) -> dict[str, Any]:
 def get_daily_article_filter(schema_version: int) -> str:
     """return SQL filter for the daily article choice"""
     if schema_version == 1:
-        return f"nb_links >= 20"
+        return "nb_links >= 20"
     elif schema_version == 2:
-        return f"nb_links >= 20 AND is_target_candidate IS TRUE AND article_length >= 7000"
+        return "nb_links >= 20 AND is_target_candidate IS TRUE AND article_length >= 7000"
     elif schema_version == 3:
-        return f"nb_links >= 20 AND is_target_candidate IS TRUE AND article_length >= 7000 AND nb_backlinks >= 50"
+        return "nb_links >= 20 AND is_target_candidate IS TRUE AND article_length >= 7000 AND nb_backlinks >= 50"
     elif schema_version >= 4:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND nb_words >= {MIN_NB_WORDS_FOR_TARGET} AND nb_backlinks >= {MIN_NB_BACKLINKS_FOR_TARGET}"
     raise ValueError(f"Unsupported schema version: {schema_version}")
