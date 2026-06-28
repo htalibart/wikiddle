@@ -13,7 +13,7 @@ import requests
 THIS_DIR = Path(__file__).parent
 MAIN_DIR = THIS_DIR.parent
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 4
 
 LINK_RE = re.compile(r"\[\[([^|\]#]+)")
 TEMPLATE_RE = re.compile(r'\{\{\s*([^|}]+?)\s*[|}]')
@@ -24,6 +24,49 @@ CATEGORY_PREFIX = {
 }
 
 MIN_PAGE_LENGTH = 200
+
+STRIP_ALL_RE = re.compile(r'\{\{|\{\||\}\}|\|\}|\[\[|\]\]')
+STRIP_REFS_RE = re.compile(r'<ref[^>]*>.*?</ref>', re.DOTALL)
+STRIP_TAGS_RE = re.compile(r'<[^>]+>', re.DOTALL)
+STRIP_HEADERS_RE = re.compile(r'={2,}[^=]*={2,}')
+
+
+def strip_templates_tables_and_links(text: str) -> str:
+    result = []
+    depth = 0
+    mode = None
+    start = 0
+    for m in STRIP_ALL_RE.finditer(text):
+        token = m.group()
+        if depth == 0:
+            if token in ('{{', '{|', '[['):
+                result.append(text[start:m.start()])
+                mode = token
+                depth = 1
+        else:
+            if token == '{{' and mode == '{{':
+                depth += 1
+            elif token == '}}' and mode == '{{':
+                depth -= 1
+                if depth == 0:
+                    start = m.end()
+                    mode = None
+            elif token == '{|' and mode == '{|':
+                depth += 1
+            elif token == '|}' and mode == '{|':
+                depth -= 1
+                if depth == 0:
+                    start = m.end()
+                    mode = None
+            elif token == '[[' and mode == '[[':
+                depth += 1
+            elif token == ']]' and mode == '[[':
+                depth -= 1
+                if depth == 0:
+                    start = m.end()
+                    mode = None
+    result.append(text[start:])
+    return ''.join(result)
 
 
 def get_category_re(language: str) -> re.Pattern:
@@ -121,6 +164,14 @@ def keep_text(text: Optional[str], disambig_templates: set[str]) -> bool:
     return True
 
 
+def count_words(text: str) -> int:
+    text = strip_templates_tables_and_links(text)
+    text = STRIP_REFS_RE.sub('', text)
+    text = STRIP_TAGS_RE.sub('', text)
+    text = STRIP_HEADERS_RE.sub('', text)
+    return sum(1 for w in text.split() if re.search(r'[a-zA-ZÀ-ÿ0-9]', w))
+
+
 def iter_pages(xml_file: Path, namespaces: set[str], disambig_templates: set[str]):
     with bz2.open(xml_file, 'rb') as f:
         for event, elem in ET.iterparse(f, events=("end",)):
@@ -168,7 +219,9 @@ def read_nodes_edges_and_categories(xml_file: Path, articles_writer, links_write
         for category in categories:
             categories_writer.writerow((page_id, category))
 
-        articles_writer.writerow((page_id, title, len(text), len(links)))
+        nb_words = count_words(text)
+
+        articles_writer.writerow((page_id, title, len(text), len(links), nb_words))
         if page_count % 10_000 == 0 and page_count > 0:
             elapsed = time.time() - start_time
             print(f"{page_count} pages in {elapsed:.1f}s ({page_count/elapsed:.0f} pages/s)")
@@ -236,7 +289,8 @@ if __name__ == "__main__":
             id BIGINT,
             title TEXT NOT NULL,
             article_length INTEGER,
-            nb_links INTEGER
+            nb_links INTEGER,
+            nb_words INTEGER
         )
     """)
     con.execute("""
