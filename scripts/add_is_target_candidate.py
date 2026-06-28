@@ -9,6 +9,9 @@ MAIN_DIR = THIS_DIR.parent
 
 FILTER_VERSION = 2
 
+MONTHS_EN_PATTERN = r"(January|February|March|April|May|June|July|August|September|October|November|December)"
+MONTHS_FR_PATTERN = r"(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)"
+
 
 def keep_category_fr(c: str) -> bool:
     if c.startswith((
@@ -28,6 +31,8 @@ def keep_category_fr(c: str) -> bool:
         "Discographie",
         "Récompense musicale par année",
         "Bataillon",
+        "Unité ou formation militaire",
+        "Unité militaire",
         "Canton électoral",
         "Circonscription",
         "Édition",
@@ -49,7 +54,20 @@ def keep_category_fr(c: str) -> bool:
         "Voie piétonnière",
         "Rue dans",
         "Canton de",
+        "Ancien canton",
         "Subdivision",
+        "Palmarès de la FIFA",
+        "Classement mondial en sport",
+        "Réseau de bus",
+        "Ligne ",
+        "Ancienne ligne",
+        "Transport à",
+        "Transport dans",
+        "Projet ferroviaire",
+        "Avion",
+        "Hélicoptère",
+        "Aéroport",
+        "Base aérienne",
     )):
         return False
 
@@ -154,9 +172,13 @@ def keep_category_fr(c: str) -> bool:
         return False
     if re.search(r"\d{4}-\d{2,4} en", c):
         return False
+    if re.search(r"Jeux olympiques.*? de \d{4} par jour", c):
+        return False
 
-    MONTHS_FR_PATTERN = r"(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)"
     if re.search(r"^" + MONTHS_FR_PATTERN + r" en ", c, re.IGNORECASE):
+        return False
+
+    if re.search(rf"\d{{1,2}} {MONTHS_FR_PATTERN}", c, re.IGNORECASE):
         return False
 
     return True
@@ -175,18 +197,29 @@ def keep_category_en(c: str) -> bool:
         "Album",
         "Discography",
         "Battalion",
+        "Armored divisions",
+        "Army group"
+        "Military unit",
         "Electoral district",
         "Election ",
         "Regiment",
         "Television episodes",
         "Railway stations",
+        "Railway locomotives",
         "Autoroutes",
+        "Transport in",
         "Streets in",
         "Canton of",
         "Cantons of",
+        "Former canton",
         "Districts of",
         "Subdivisions of",
         "Administrative division",
+        "Aircraft",
+        "Airport",
+        "Airfield",
+        "Military airbase",
+        "Military transport",
     )):
         return False
 
@@ -239,6 +272,7 @@ def keep_category_en(c: str) -> bool:
         "sailing",
         "ski jumper",
         "skier",
+        "snooker",
         "snowboard",
         "sporting",
         "squash",
@@ -272,15 +306,15 @@ def keep_category_en(c: str) -> bool:
         return False
     if re.search(r"sports? center", c, re.IGNORECASE):
         return False
-    if re.search(r"\d{4} in sport", c):
-        return False
-    if re.search(r"\d{4} in sports", c):
+    if re.search(r"^\d{4} in .+$", c):
         return False
     if re.search(r"\d{4}-\d{2,4} in", c):
         return False
 
-    MONTHS_EN_PATTERN = r"(January|February|March|April|May|June|July|August|September|October|November|December)"
     if re.search(r"^" + MONTHS_EN_PATTERN + r" in ", c, re.IGNORECASE):
+        return False
+
+    if re.search(rf"Days of {MONTHS_EN_PATTERN}", c):
         return False
 
     return True
@@ -291,6 +325,26 @@ def keep_category(lang: str, c: str) -> bool:
         return keep_category_fr(c)
     elif lang == 'en':
         return keep_category_en(c)
+    raise NotImplementedError(lang)
+
+
+def keep_title_fr(t: str) -> bool:
+    if re.search(rf"^\d{{1,2}}(?:er)? {MONTHS_FR_PATTERN}$", t, re.IGNORECASE):
+        return False
+    return True
+
+
+def keep_title_en(t: str) -> bool:
+    if re.search(rf"^{MONTHS_EN_PATTERN} \d{{1,2}}$", t, re.IGNORECASE):
+        return False
+    return True
+
+
+def keep_title(lang: str, t: str) -> bool:
+    if lang == "fr":
+        return keep_title_fr(t)
+    elif lang == "en":
+        return keep_title_en(t)
     raise NotImplementedError(lang)
 
 
@@ -335,13 +389,11 @@ def bump_db_to_new_version(wiki_db_dir: Path, old_version: int, lang: str) -> Pa
 
 
 
-
 def update_is_target_candidate(wiki_db_dir: Path, version: int, lang: str, overwrite: bool):
     if overwrite:
         db_file = wiki_db_dir / f"v{version}" / f"{lang}.db"
     else:
         db_file = bump_db_to_new_version(wiki_db_dir, version, lang)
-
     con = duckdb.connect(str(db_file))
     try:
         add_is_target_candidate(con)
@@ -351,6 +403,12 @@ def update_is_target_candidate(wiki_db_dir: Path, version: int, lang: str, overw
             category_id
             for category_id, category_name in rows
             if not keep_category(lang, category_name)
+        ]
+
+        rejected_article_ids = [
+            article_id
+            for article_id, article_title in con.execute("SELECT id, title FROM articles").fetchall()
+            if not keep_title(lang, article_title)
         ]
 
         con.execute("UPDATE articles SET is_target_candidate = TRUE")
@@ -366,14 +424,23 @@ def update_is_target_candidate(wiki_db_dir: Path, version: int, lang: str, overw
                 )
             """, [rejected_category_ids])
 
+        if rejected_article_ids:
+            con.execute("""
+                UPDATE articles
+                SET is_target_candidate = FALSE
+                WHERE id IN (SELECT * FROM UNNEST(?))
+            """, [rejected_article_ids])
+
         update_metadata(con)
 
         nb_articles = con.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
         nb_candidates = con.execute("SELECT COUNT(*) FROM articles WHERE is_target_candidate").fetchone()[0]
         nb_rejected_categories = len(rejected_category_ids)
+        nb_rejected_titles = len(rejected_article_ids)
 
         print(f"Database: {db_file}")
         print(f"Rejected categories: {nb_rejected_categories}")
+        print(f"Rejected titles: {nb_rejected_titles}")
         print(f"Target candidates: {nb_candidates}/{nb_articles}")
     finally:
         con.close()
