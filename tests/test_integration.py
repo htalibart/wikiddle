@@ -9,7 +9,7 @@ from main import app, _cached_daily_targets, open_wiki_db_con, get_schema_versio
 DATA_DIR = Path(__file__).parent.parent / "data"
 
 os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR / "db" / "wiki"))
-os.environ.setdefault("WIKI_VERSION", "3")
+os.environ.setdefault("WIKI_VERSION", "4")
 os.environ.setdefault("GAMES_DB", str(DATA_DIR / "db" / "games" / "v2.db"))
 
 pytestmark = pytest.mark.integration
@@ -146,6 +146,10 @@ class TestArticleFilters:
             ("fr", "Dire Straits"),
             ("fr", "Peter Jackson"),
             ("en", "Peter Jackson"),
+            ("fr", "Marie Curie"),
+            ("en", "Marie Curie"),
+            ("fr", "Le Parrain (film)"),
+            ("en", "The Godfather"),
         ],
     )
     def test_article_can_be_daily_target(self, lang: str, title: str):
@@ -184,15 +188,39 @@ class TestArticleFilters:
             ("fr", "Élections générales québécoises de 2018"),
             ("fr", "Arrondissement du duché de Lauenbourg"),
             ("en", "District of Duchy of Lauenburg"),
-            ("en", "Rhein-Neckar Löwen"),
-            #("fr", "Rhein-Neckar Löwen"),
-            #("fr", "Arte France Cinéma"),
-            #("fr", "Finales du BWF World Tour"),
-            #("fr", "Festival international du film documentaire d'Amsterdam"),
-            #("fr", "L'Étrange Festival"),
-            #("fr", "Hernani (Guipuscoa)"),
+            ("fr", "Arte France Cinéma"),
+            ("fr", "Finales du BWF World Tour"),
+            ("fr", "Festival international du film documentaire d'Amsterdam"),
+            ("fr", "L'Étrange Festival"),
             ("fr", "Crise de 2024 au parti Les Républicains"),
             ("fr", "Subdivisions du Togo"),
+            ("fr", "Thamnophilidae"),
+            ("fr", "Réseau de bus Massy-Juvisy"),
+            ("fr", "1982 aux échecs"),
+            ("fr", "Ligne de Lyon-Perrache à Genève (frontière)"),
+            ("fr", "Non-inscrit au Parlement européen"),
+            ("en", "Non-attached members"),
+            ("fr", "FK Irtych Pavlodar"),
+            ("fr", "52e cérémonie des Saturn Awards"),
+            ("fr", "21 février aux Jeux olympiques d'hiver de 2026"),
+            ("fr", "Canton de Rennes-Sud-Ouest"),
+            ("fr", "Fiat CR.32"),
+            ("en", "Fiat CR.32"),
+            ("fr", "Agence de l'eau Adour-Garonne"),
+            ("fr", "Palmarès du double messieurs des Internationaux de France"),
+            ("fr", "3e division (France)"),
+            ("en", "3rd Armored Division (France)"),
+            ("fr", "Base aérienne 113 Saint-Dizier-Robinson"),
+            ("fr", "Slalom géant masculin de ski alpin aux Jeux olympiques de 2026"),
+            ("fr", "7e division d'infanterie (France)"),
+            ("fr", "32e cérémonie des Oscars"),
+            ("fr", "13 janvier"),
+            ("en", "January 13"),
+            ("fr", "27 décembre"),
+            ("fr", "1er décembre"),
+            ("fr", "Sikorsky S-92"),
+            ("en", "2023 Northern Ireland Open"),
+
         ],
     )
     def test_article_cant_be_daily_target(self, lang: str, title: str):
