@@ -141,8 +141,6 @@ def keep_title(title: str, namespaces: set[str]) -> bool:
     for ns in namespaces:
         if title.startswith(ns):
             return False
-    if 'talk:' in title.lower():
-        return False
     return True
 
 
