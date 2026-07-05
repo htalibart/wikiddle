@@ -9,7 +9,7 @@ from main import app, _cached_daily_targets, open_wiki_db_con, get_schema_versio
 DATA_DIR = Path(__file__).parent.parent / "data"
 
 os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR / "db" / "wiki"))
-os.environ.setdefault("WIKI_VERSION", "4")
+os.environ.setdefault("WIKI_VERSION", "5")
 os.environ.setdefault("GAMES_DB", str(DATA_DIR / "db" / "games" / "v2.db"))
 
 pytestmark = pytest.mark.integration
@@ -150,6 +150,8 @@ class TestArticleFilters:
             ("en", "Marie Curie"),
             ("fr", "Le Parrain (film)"),
             ("en", "The Godfather"),
+            ("fr", "Station spatiale"),
+            ("en", "Space station"),
         ],
     )
     def test_article_can_be_daily_target(self, lang: str, title: str):
@@ -216,11 +218,33 @@ class TestArticleFilters:
             ("fr", "32e cérémonie des Oscars"),
             ("fr", "13 janvier"),
             ("en", "January 13"),
+            ("fr", "Mars 2025"),
             ("fr", "27 décembre"),
             ("fr", "1er décembre"),
             ("fr", "Sikorsky S-92"),
             ("en", "2023 Northern Ireland Open"),
-
+            ("fr", "Équitation aux Jeux olympiques d'été de 2004"),
+            ("fr", "Prix littéraires 2010"),
+            ("fr", "39e législature du Canada"),
+            ("fr", "Suisse aux Jeux olympiques d'hiver de 2014"),
+            ("fr", "Canon de 20 mm Oerlikon"),
+            ("en", "Oerlikon 20 mm cannon"),
+            ("fr", "U.S. Route 60"),
+            ("fr", "TER Provence-Alpes-Côte d'Azur"),
+            ("fr", "Primetime Emmy Award du meilleur acteur dans une série télévisée dramatique"),
+            ("fr", "Browning BAR M1918"),
+            ("fr", "43e division d'infanterie (France)"),
+            ("fr", "Jeux olympiques d'hiver de 2018"),
+            ("en", "2018 Winter Olympics"),
+            ("fr", "Équipe des États-Unis de soccer"),
+            ("fr", "Ligne H du Transilien"),
+            ("fr", "Festival international du film de comédie de Liège"),
+            ("fr", "Archives départementales des Hauts-de-Seine"),
+            ("en", "2016 Croatian parliamentary election"),
+            ("en", "AR-15–style rifle"),
+            ("en", "2023 French Open – Men's singles qualifying"),
+            ("en", "2017 French Socialist Party presidential primary"),
+            ("fr", "Primaire citoyenne de 2017"),
         ],
     )
     def test_article_cant_be_daily_target(self, lang: str, title: str):

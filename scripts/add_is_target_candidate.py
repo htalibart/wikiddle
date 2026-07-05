@@ -24,6 +24,7 @@ def keep_category_fr(c: str) -> bool:
         "Match",
         "Saison",
         "Sport",
+        "Équipe",
         "Tour de",
         "Tour d'",
         "Tournoi",
@@ -33,17 +34,24 @@ def keep_category_fr(c: str) -> bool:
         "Bataillon",
         "Unité ou formation militaire",
         "Unité militaire",
+        "Artillerie",
+        "Arme ",
+        "Fusil",
         "Canton électoral",
         "Circonscription",
         "Édition",
         "Élection",
+        "Primaire",
+        "Législature",
         "Régiment",
         "Tournée",
         "Épisode",
         "Filmographie",
         "Chanson",
+        "Festival",
         "Gare ",
         "Station de ",
+        "TER ",
         "Autoroute",
         "Route nationale",
         "Route départementale",
@@ -63,6 +71,7 @@ def keep_category_fr(c: str) -> bool:
         "Réseau de bus",
         "Ligne ",
         "Ancienne ligne",
+        "Transilien",
         "Transport à",
         "Transport dans",
         "Projet ferroviaire",
@@ -70,6 +79,7 @@ def keep_category_fr(c: str) -> bool:
         "Hélicoptère",
         "Aéroport",
         "Base aérienne",
+        "Archives départementales",
     )):
         return False
 
@@ -79,6 +89,8 @@ def keep_category_fr(c: str) -> bool:
         "association des sports",
         "athlète",
         "athlétisme",
+        "aux jeux olympiques d'été de",
+        "aux jeux olympiques d'hiver de",
         "automobile",
         "aviron",
         "badminton",
@@ -148,6 +160,7 @@ def keep_category_fr(c: str) -> bool:
         "tennis",
         "tournoi",
         "triathlon",
+        "uefa",
         "união",
         "unione",
         "vainqueur",
@@ -157,6 +170,7 @@ def keep_category_fr(c: str) -> bool:
         "wrestling",
         "arrondissement d",
         "conseil départemental",
+        "infanterie",
     )):
         return False
 
@@ -245,12 +259,15 @@ def keep_category_en(c: str) -> bool:
         "cricketer",
         "darts",
         "equestrian",
+        "events at the summer olympics",
+        "events at the winter olympics",
         "fencer",
         "fencing",
         "field hockey",
         "figure skater",
         "football",
         "formula one",
+        "french open",
         "futsal",
         "golf",
         "golfer",
@@ -285,6 +302,7 @@ def keep_category_en(c: str) -> bool:
         "tennis",
         "tournament",
         "triathlon",
+        "uefa",
         "volleyball",
         "wrestler",
         "wrestling",
@@ -293,6 +311,10 @@ def keep_category_en(c: str) -> bool:
         "highway",
         "motorway",
         "county road",
+        "naval gun",
+        "machine gun",
+        "weapon",
+        "firearm",
     )):
         return False
 
@@ -311,6 +333,8 @@ def keep_category_en(c: str) -> bool:
     if re.search(r"^\d{4} in .+$", c):
         return False
     if re.search(r"\d{4}-\d{2,4} in", c):
+        return False
+    if re.search(r"^\d{4} elections in .+$", c):
         return False
 
     if re.search(r"^" + MONTHS_EN_PATTERN + r" in ", c, re.IGNORECASE):
@@ -333,11 +357,23 @@ def keep_category(lang: str, c: str) -> bool:
 def keep_title_fr(t: str) -> bool:
     if re.search(rf"^\d{{1,2}}(?:er)? {MONTHS_FR_PATTERN}$", t, re.IGNORECASE):
         return False
+    if re.search(rf"^{MONTHS_FR_PATTERN} \d{{4}}$", t, re.IGNORECASE):
+        return False
+    if t.startswith((
+        "Jeux olympiques d'hiver",
+        "Jeux olympiques d'été",
+        )):
+        return False
     return True
 
 
 def keep_title_en(t: str) -> bool:
     if re.search(rf"^{MONTHS_EN_PATTERN} \d{{1,2}}$", t, re.IGNORECASE):
+        return False
+    if t.endswith((
+        "Winter Olympics",
+        "Summer Olympics",
+        )):
         return False
     return True
 
