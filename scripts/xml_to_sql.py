@@ -13,7 +13,7 @@ import requests
 THIS_DIR = Path(__file__).parent
 MAIN_DIR = THIS_DIR.parent
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 LINK_RE = re.compile(r"\[\[([^|\]#]+)")
 TEMPLATE_RE = re.compile(r'\{\{\s*([^|}]+?)\s*[|}]')
