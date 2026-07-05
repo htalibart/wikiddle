@@ -227,6 +227,19 @@ def read_nodes_edges_and_categories(xml_file: Path, articles_writer, links_write
             print(f"{page_count} pages in {elapsed:.1f}s ({page_count/elapsed:.0f} pages/s)")
 
 
+def update_nb_backlinks(con: duckdb.DuckDBPyConnection):
+    con.execute("""
+        UPDATE articles
+        SET nb_backlinks = backlink_counts.cnt
+        FROM (
+            SELECT target_id, COUNT(*) AS cnt
+            FROM links
+            GROUP BY target_id
+        ) AS backlink_counts
+        WHERE articles.id = backlink_counts.target_id
+    """)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("language", type=str, default='en')
@@ -290,7 +303,8 @@ if __name__ == "__main__":
             title TEXT NOT NULL,
             article_length INTEGER,
             nb_links INTEGER,
-            nb_words INTEGER
+            nb_words INTEGER,
+            nb_backlinks INTEGER DEFAULT 0
         )
     """)
     con.execute("""
@@ -305,7 +319,7 @@ if __name__ == "__main__":
             category_name TEXT
         )
     """)
-    con.execute(f"COPY articles FROM '{articles_file}' (DELIMITER '\t')")
+    con.execute(f"COPY articles(id, title, article_length, nb_links, nb_words) FROM '{articles_file}' (DELIMITER '\t')")
     con.execute(f"COPY links_raw FROM '{links_file}' (DELIMITER '\t', QUOTE '\"')")
     con.execute(f"COPY categories_raw FROM '{categories_file}' (DELIMITER '\t', QUOTE '\"')")
 
@@ -318,6 +332,10 @@ if __name__ == "__main__":
     """)
     con.execute("DROP TABLE links_raw")
     print("Done with link targets.")
+
+    print("Computing backlink counts...")
+    update_nb_backlinks(con)
+    print("Done with backlink counts.")
 
     print("Resolving categories...")
     con.execute("""
@@ -342,5 +360,6 @@ if __name__ == "__main__":
     con.execute("CREATE INDEX idx_category_name ON categories(name)")
     con.execute("CREATE INDEX idx_article_category_article ON article_categories(article_id)")
     con.execute("CREATE INDEX idx_article_category_category ON article_categories(category_id)")
+    con.execute("CREATE INDEX idx_nb_backlinks ON articles(nb_backlinks)")
     con.close()
     print("Done.")
