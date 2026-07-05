@@ -139,9 +139,11 @@ def load_or_fetch_json(path: Path, fetch_fn, *args) -> set[str]:
 
 
 def keep_title(title: str, namespaces: set[str]) -> bool:
-    for ns in namespaces:
-        if title.startswith(ns):
-            return False
+    prefix, sep, _ = title.partition(':')
+    if not sep:
+        return True
+    if prefix + sep in namespaces:
+        return False
     return True
 
 
