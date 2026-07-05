@@ -30,6 +30,7 @@ STRIP_REFS_RE = re.compile(r'<ref[^>]*>.*?</ref>', re.DOTALL)
 STRIP_TAGS_RE = re.compile(r'<[^>]+>', re.DOTALL)
 STRIP_HEADERS_RE = re.compile(r'={2,}[^=]*={2,}')
 STRIP_LIST_ITEMS_RE = re.compile(r'^\*.*$', re.MULTILINE)
+WORD_CHAR_RE = re.compile(r'[a-zA-ZÀ-ÿ0-9]')
 
 
 def strip_templates_tables_and_links(text: str) -> str:
@@ -169,7 +170,7 @@ def count_words(text: str) -> int:
     text = STRIP_REFS_RE.sub('', text)
     text = STRIP_TAGS_RE.sub('', text)
     text = STRIP_HEADERS_RE.sub('', text)
-    return sum(1 for w in text.split() if re.search(r'[a-zA-ZÀ-ÿ0-9]', w))
+    return sum(1 for w in text.split() if WORD_CHAR_RE.search(w))
 
 
 def iter_pages(xml_file: Path, namespaces: set[str], disambig_templates: set[str]):
