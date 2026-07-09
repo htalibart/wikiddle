@@ -18,7 +18,7 @@ from slowapi.errors import RateLimitExceeded
 LANGUAGES = {"en", "fr"}
 MIN_NB_LINKS_FOR_TARGET = 20
 MIN_NB_BACKLINKS_FOR_TARGET = 50
-MIN_NB_WORDS_FOR_TARGET = 800
+MIN_NB_WORDS_FOR_TARGET = 1000
 MAX_NB_SEARCH_RESULTS = 30
 MAX_TITLE_LENGTH = 300
 
@@ -161,7 +161,9 @@ def get_daily_article_filter(schema_version: int) -> str:
         return "nb_links >= 20 AND is_target_candidate IS TRUE AND article_length >= 7000"
     elif schema_version == 3:
         return "nb_links >= 20 AND is_target_candidate IS TRUE AND article_length >= 7000 AND nb_backlinks >= 50"
-    elif schema_version >= 4:
+    elif schema_version in {4, 5}:
+        return "nb_links >= 20 AND is_target_candidate IS TRUE AND nb_words >= 800 AND nb_backlinks >= 50"
+    elif schema_version >= 6:
         return f"nb_links >= {MIN_NB_LINKS_FOR_TARGET} AND is_target_candidate IS TRUE AND nb_words >= {MIN_NB_WORDS_FOR_TARGET} AND nb_backlinks >= {MIN_NB_BACKLINKS_FOR_TARGET}"
     raise ValueError(f"Unsupported schema version: {schema_version}")
 

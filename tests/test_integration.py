@@ -9,7 +9,7 @@ from main import app, _cached_daily_targets, open_wiki_db_con, get_schema_versio
 DATA_DIR = Path(__file__).parent.parent / "data"
 
 os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR / "db" / "wiki"))
-os.environ.setdefault("WIKI_VERSION", "5")
+os.environ.setdefault("WIKI_VERSION", "6")
 os.environ.setdefault("GAMES_DB", str(DATA_DIR / "db" / "games" / "v2.db"))
 
 pytestmark = pytest.mark.integration

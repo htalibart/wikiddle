@@ -15,7 +15,7 @@ venv/bin/pip install -r requirements.txt
 Run the development server:
 ```bash
 cd backend/
-ENV=dev WIKI_DB_DIR=../data/db/wiki/ WIKI_VERSION=4 GAMES_DB=../data/db/games/v2.db ADMIN_TOKEN=dev fastapi dev
+ENV=dev WIKI_DB_DIR=../data/db/wiki/ WIKI_VERSION=6 GAMES_DB=../data/db/games/v2.db ADMIN_TOKEN=dev fastapi dev
 ```
 `ENV=dev` opens CORS to all origins. CORS (Cross-Origin Resource Sharing) is a browser security mechanism that prevents a web page from making requests to a different domain than the one that served it. This protects users from malicious websites silently making requests to other sites on their behalf. In development, the frontend and backend run on different ports, which counts as different origins — so CORS needs to be disabled locally.
 
