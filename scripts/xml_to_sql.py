@@ -13,7 +13,7 @@ import requests
 THIS_DIR = Path(__file__).parent
 MAIN_DIR = THIS_DIR.parent
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 
 LINK_RE = re.compile(r"\[\[([^|\]#]+)")
 TEMPLATE_RE = re.compile(r'\{\{\s*([^|}]+?)\s*[|}]')
@@ -32,16 +32,15 @@ STRIP_HEADERS_RE = re.compile(r'={2,}[^=]*={2,}')
 STRIP_LIST_ITEMS_RE = re.compile(r'^\*.*$', re.MULTILINE)
 WORD_CHAR_RE = re.compile(r'[a-zA-ZÀ-ÿ0-9]')
 
-
-def strip_templates_tables_and_links(text: str) -> str:
+def strip_templates_and_tables(text: str) -> str:
     result = []
     depth = 0
     mode = None
     start = 0
-    for m in STRIP_ALL_RE.finditer(text):
+    for m in re.finditer(r'\{\{|\{\||\}\}|\|\}', text):
         token = m.group()
         if depth == 0:
-            if token in ('{{', '{|', '[['):
+            if token in ('{{', '{|'):
                 result.append(text[start:m.start()])
                 mode = token
                 depth = 1
@@ -56,13 +55,6 @@ def strip_templates_tables_and_links(text: str) -> str:
             elif token == '{|' and mode == '{|':
                 depth += 1
             elif token == '|}' and mode == '{|':
-                depth -= 1
-                if depth == 0:
-                    start = m.end()
-                    mode = None
-            elif token == '[[' and mode == '[[':
-                depth += 1
-            elif token == ']]' and mode == '[[':
                 depth -= 1
                 if depth == 0:
                     start = m.end()
@@ -166,8 +158,15 @@ def keep_text(text: Optional[str], disambig_templates: set[str]) -> bool:
     return True
 
 
+def strip_link_markers(text: str) -> str:
+    text = re.sub(r'\[\[([^|\]#]+)(?:#[^|\]]*)?\|([^\]]+)\]\]', r'\2', text)
+    text = re.sub(r'\[\[([^|\]#]+)(?:#[^\]]*)?\]\]', r'\1', text)
+    return text
+
+
 def count_words(text: str) -> int:
-    text = strip_templates_tables_and_links(text)
+    text = strip_templates_and_tables(text)
+    text = strip_link_markers(text)
     text = STRIP_LIST_ITEMS_RE.sub('', text)
     text = STRIP_REFS_RE.sub('', text)
     text = STRIP_TAGS_RE.sub('', text)
