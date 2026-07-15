@@ -9,7 +9,7 @@ from main import app, _cached_daily_targets, open_wiki_db_con, get_schema_versio
 DATA_DIR = Path(__file__).parent.parent / "data"
 
 os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR / "db" / "wiki"))
-os.environ.setdefault("WIKI_VERSION", "6")
+os.environ.setdefault("WIKI_VERSION", "7")
 os.environ.setdefault("GAMES_DB", str(DATA_DIR / "db" / "games" / "v2.db"))
 
 pytestmark = pytest.mark.integration
@@ -152,6 +152,11 @@ class TestArticleFilters:
             ("en", "The Godfather"),
             ("fr", "Station spatiale"),
             ("en", "Space station"),
+            ("fr", "Émile Zola"),
+            ("fr", "Napoléon III"),
+            ("fr", "Stendhal"),
+            ("fr", "Honoré de Balzac"),
+
         ],
     )
     def test_article_can_be_daily_target(self, lang: str, title: str):
@@ -178,7 +183,6 @@ class TestArticleFilters:
             ("en", "County Road 595 (Marquette County, Michigan)"),
             ("fr", "Station Bois-Franc"),
             ("fr", "Billboard Music Awards 2011"),
-            ("fr", "13e arrondissement de Paris"),
             ("en", "Canton of Neuchâtel"),
             ("fr", "Rue Mouffetard"),
             ("fr", "Vallée de la Woluwe"),
