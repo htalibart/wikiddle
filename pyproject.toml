@@ -5,5 +5,8 @@ markers = [
 ]
 
 [tool.ruff]
-include = ["backend/**/*.py"]
+include = ["backend/**/*.py", "tests/**/*.py"]
 line-length = 120
+
+[tool.ruff.lint]
+ignore = ["DTZ011", "B008"]
