@@ -1,16 +1,15 @@
 import os
-import pytest
-from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
-
 from datetime import date, timedelta
+from unittest.mock import MagicMock, patch
 
+import pytest
+from fastapi.testclient import TestClient
 from main import (
+    _cached_daily_targets,
+    _cached_yesterday_targets,
     app,
     get_daily_article_cached,
     get_yesterdays_article_cached,
-    _cached_daily_targets,
-    _cached_yesterday_targets,
 )
 
 

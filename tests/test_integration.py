@@ -3,8 +3,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-
-from main import app, _cached_daily_targets, open_wiki_db_con, get_schema_version, get_daily_article_filter
+from main import _cached_daily_targets, app, get_daily_article_filter, get_schema_version, open_wiki_db_con
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 
