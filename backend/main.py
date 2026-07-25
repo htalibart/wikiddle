@@ -323,6 +323,9 @@ def get_common_neighbors_with_target(
         "game_date": format_date(article["date"]),
     }
 
+def get_search_article_filter(schema_version: int) -> str:
+    """return SQL filter for the article search choice"""
+    return "nb_links >= 20 AND nb_words >= 700 AND nb_backlinks >= 30"
 
 @router.get("/{lang}/articles")
 @limiter.limit("300/minute")
@@ -331,7 +334,7 @@ def search_articles(
 ) -> list[dict[str, Any]]:
     """API route to search in the database (called by TomSelect)"""
     schema_version = get_schema_version(con)
-    article_filter = get_daily_article_filter(schema_version)
+    article_filter = get_search_article_filter(schema_version)
     rows = con.execute(
         f"""SELECT id, title FROM articles 
         WHERE {article_filter} AND title ILIKE ?
