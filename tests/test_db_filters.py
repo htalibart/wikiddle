@@ -5,12 +5,6 @@ import pytest
 
 from main import get_daily_article_filter, get_schema_version, open_wiki_db_con
 
-DATA_DIR = Path(__file__).parent.parent / "data"
-
-os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR / "db" / "wiki"))
-os.environ.setdefault("WIKI_VERSION", "8")
-
-
 class TestArticleFilters:
 
     def can_be_daily_target(self, lang: str, title: str):

@@ -5,14 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 from main import _cached_daily_targets, app
 
-DATA_DIR = Path(__file__).parent.parent / "data"
-
-os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR / "db" / "wiki"))
-os.environ.setdefault("WIKI_VERSION", "8")
-os.environ.setdefault("GAMES_DB", str(DATA_DIR / "db" / "games" / "v2.db"))
-
 pytestmark = pytest.mark.integration
-
 
 @pytest.fixture(autouse=True)
 def reset_cache():
