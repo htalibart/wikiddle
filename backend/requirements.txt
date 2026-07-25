@@ -1,4 +1,4 @@
 duckdb==1.5.2
 fastapi[standard]==0.136.0
 Requests==2.33.1
-slowapi==0.1.9
+slowapi==0.1.10
