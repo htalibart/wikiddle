@@ -8,8 +8,10 @@ BASE_URL = "http://localhost:5173"
 
 pytestmark = pytest.mark.integration
 
+
 def get_target_card(page: Page) -> Locator:
     return page.locator("#guesses-list .target-guess-card")
+
 
 def test_page_loads(page: Page):
     page.goto(BASE_URL)
@@ -90,10 +92,14 @@ def test_initial_game_state(page: Page):
     expect(target_card.locator("#guess-card-links")).to_have_count(0)
     assert page.evaluate("Object.keys(localStorage)") == []
 
+
 def test_hint_reveals_link_or_category(page: Page):
     page.goto(BASE_URL)
     page.click("#hint-btn")
-    expect(page.locator(".target-guess-card .guess-card-links a, .target-guess-card .guess-card-categories a").first).to_be_visible(timeout=5000)
+    expect(
+        page.locator(".target-guess-card .guess-card-links a, .target-guess-card .guess-card-categories a").first
+    ).to_be_visible(timeout=5000)
+
 
 def test_hint_flow(page: Page):
     page.route(
@@ -232,6 +238,7 @@ def test_guess_flow(page: Page):
     assert state["lastGuess"]["isOnTarget"] is False
     assert state["nbHints"] == 0
 
+
 def test_win_flow(page: Page):
     page.route(
         "**/api/en/common-info?id=*",
@@ -299,7 +306,6 @@ def test_win_flow(page: Page):
     assert state["gameDate"] == "2000-01-01"
     assert state["lastGuess"] is None
     assert state["nbHints"] == 0
-
 
 
 def test_win_flow_respects_reduced_motion(page: Page):
@@ -1008,9 +1014,7 @@ def test_saved_state_expires_when_game_date_differs(page: Page):
     )
 
     page.goto(BASE_URL)
-    page.evaluate(
-        f"localStorage.setItem('game-state-en', {json.dumps(json.dumps(expired_state))})"
-    )
+    page.evaluate(f"localStorage.setItem('game-state-en', {json.dumps(json.dumps(expired_state))})")
     page.reload()
 
     target_card = get_target_card(page)

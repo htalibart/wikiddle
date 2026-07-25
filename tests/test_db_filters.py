@@ -5,7 +5,6 @@ from main import get_daily_article_filter, get_schema_version, open_wiki_db_con
 
 
 class TestArticleFilters:
-
     def can_be_daily_target(self, lang: str, title: str):
         wiki_db_version = int(os.environ["WIKI_VERSION"])
         con = open_wiki_db_con(lang, wiki_db_version)

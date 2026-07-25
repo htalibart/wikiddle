@@ -4,6 +4,7 @@ from main import _cached_daily_targets, app
 
 pytestmark = pytest.mark.integration
 
+
 @pytest.fixture(autouse=True)
 def reset_cache():
     for lang in _cached_daily_targets:
