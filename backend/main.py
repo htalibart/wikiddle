@@ -365,7 +365,9 @@ def get_one_new_neighbor(
 
 @router.post("/{lang}/new-target-category")
 @limiter.limit("300/minute")
-def get_one_new_category(request: Request, lang: str = Depends(valid_lang), known_categories: list = Body(default=[])) -> dict[str, Any]:
+def get_one_new_category(
+    request: Request, lang: str = Depends(valid_lang), known_categories: list = Body(default=[])
+) -> dict[str, Any]:
     """API route to get one random category that was not already found"""
     target = get_daily_article_cached(lang)
     categories = get_categories(lang, target["id"])
@@ -375,7 +377,6 @@ def get_one_new_category(request: Request, lang: str = Depends(valid_lang), know
         return {"title": None, "game_date": game_date}
     hint_category = random.choice(list(categories_not_guessed))
     return {"title": hint_category, "game_date": game_date}
-
 
 
 @router.get("/{lang}/game-date")
