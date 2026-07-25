@@ -7,13 +7,30 @@ import shutil
 THIS_DIR = Path(__file__).parent
 MAIN_DIR = THIS_DIR.parent
 
-FILTER_VERSION = 3
+FILTER_VERSION = 4
 
 MONTHS_EN_PATTERN = r"(January|February|March|April|May|June|July|August|September|October|November|December)"
 MONTHS_FR_PATTERN = r"(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)"
 
 
 def keep_category_fr(c: str) -> bool:
+    if c in {
+        "Automobile au cinéma",
+        "Liste de bâtiments",
+        "Liste indicative du patrimoine mondial en France",
+        "Personnalité liée à la motocyclette",
+        "Station de la table de Peutinger",
+        }:
+        return True
+
+    if c.startswith((
+        "Ascension cycliste",
+        "Coupe Volpi",
+        "Acteur de film d'arts martiaux",
+        "Arme biologique",
+        )):
+        return True
+
     if c.startswith((
         "Liste ",
         "Homonymie",
@@ -32,6 +49,7 @@ def keep_category_fr(c: str) -> bool:
         "Discographie",
         "Récompense musicale par année",
         "Bataillon",
+        "Blindé",
         "Unité ou formation militaire",
         "Unité militaire",
         "Artillerie",
@@ -74,12 +92,18 @@ def keep_category_fr(c: str) -> bool:
         "Transilien",
         "Transport à",
         "Transport dans",
+        "Transport en commun à",
         "Projet ferroviaire",
         "Avion",
         "Hélicoptère",
         "Aéroport",
         "Base aérienne",
+        "Véhicule",
         "Archives départementales",
+        "Établissement d'enseignement",
+        "Établissement scolaire",
+        "Université",
+        "École d'ingénieurs",
     )):
         return False
 
@@ -132,7 +156,6 @@ def keep_category_fr(c: str) -> bool:
         "marathon",
         "médaillés aux jeux",
         "moto",
-        "nage ",
         "nageu",
         "natation",
         "paralympique",
@@ -181,25 +204,26 @@ def keep_category_fr(c: str) -> bool:
         return False
     if re.search(r"centre .+sport", c, re.IGNORECASE):
         return False
-    if re.search(r"\d{4} en ", c):
-        return False
-    if re.search(r"\d{4} à la ", c):
-        return False
-    if re.search(r"\d{4}-\d{2,4} en", c):
-        return False
     if re.search(r"Jeux olympiques.*? de \d{4} par jour", c):
         return False
 
     if re.search(r"^" + MONTHS_FR_PATTERN + r" en ", c, re.IGNORECASE):
         return False
 
-    if re.search(rf"\d{{1,2}} {MONTHS_FR_PATTERN}", c, re.IGNORECASE):
-        return False
-
     return True
 
 
 def keep_category_en(c: str) -> bool:
+    if c.startswith((
+        "Fictional"
+        )):
+        return True
+
+    if c.endswith((
+        "alumni",
+        )):
+            return True
+
     if c.startswith((
         "Lists",
         "Disambiguation",
@@ -213,16 +237,24 @@ def keep_category_en(c: str) -> bool:
         "Discography",
         "Battalion",
         "Armored divisions",
-        "Army group"
+        "Army group",
         "Military unit",
         "Electoral district",
+        "Congressional district",
         "Election ",
         "Regiment",
+        "Infantry",
         "Television episodes",
         "Railway stations",
         "Railway locomotives",
+        "Rail transport",
+        "High-speed rail",
         "Autoroutes",
         "Transport in",
+        "Transportation in",
+        "Metropolitan Transportation",
+        "Cars introduced in",
+        "Cars discontinued in",
         "Streets in",
         "Canton of",
         "Cantons of",
@@ -235,6 +267,20 @@ def keep_category_en(c: str) -> bool:
         "Airfield",
         "Military airbase",
         "Military transport",
+        "Motor torpedo",
+        "University",
+        "Universities and colleges",
+        "Educational institution",
+        "Engineering school",
+        "Cabinet departments",
+        "Government departments",
+        "Government ministries",
+        "Government agencies",
+        "Teaching hospitals",
+        "Hospital building",
+        "Trade union",
+        "Parliamentary constituencies",
+        "Constituencies of the Parliament",
     )):
         return False
 
@@ -246,6 +292,7 @@ def keep_category_en(c: str) -> bool:
 
     if any(s in c.lower() for s in (
         "athlete",
+        "atp world tour",
         "badminton",
         "baseball",
         "basketball",
@@ -302,6 +349,8 @@ def keep_category_en(c: str) -> bool:
         "tournament",
         "triathlon",
         "uefa",
+        "us open",
+        "wta tour",
         "volleyball",
         "wrestler",
         "wrestling",
@@ -314,6 +363,8 @@ def keep_category_en(c: str) -> bool:
         "machine gun",
         "weapon",
         "firearm",
+        "representatives elections",
+        "vehicles",
     )):
         return False
 
@@ -354,26 +405,59 @@ def keep_category(lang: str, c: str) -> bool:
 
 
 def keep_title_fr(t: str) -> bool:
+    if t.startswith((
+        "Club ",
+        "Communauté d'agglomération",
+        "Jeux olympiques d'hiver",
+        "Jeux olympiques d'été",
+        "Lignes de bus",
+        "Université",
+        )):
+        return False
+
+    if any(s in t.lower() for s in (
+        "jeux olympiques",
+        )):
+        return False
+
     if re.search(rf"^\d{{1,2}}(?:er)? {MONTHS_FR_PATTERN}$", t, re.IGNORECASE):
         return False
     if re.search(rf"^{MONTHS_FR_PATTERN} \d{{4}}$", t, re.IGNORECASE):
         return False
-    if t.startswith((
-        "Jeux olympiques d'hiver",
-        "Jeux olympiques d'été",
-        )):
+    if re.search(r"\d{4} en ", t):
+        return False
+    if re.search(r"\d{4} à la ", t):
+        return False
+    if re.search(r"\d{4}-\d{2,4} en", t):
         return False
     return True
 
 
 def keep_title_en(t: str) -> bool:
+    if t.startswith((
+        "List of",
+        "Rail transport",
+        "Special administrative",
+        "Sports in",
+        "University of",
+        )):
+        return False
+
     if re.search(rf"^{MONTHS_EN_PATTERN} \d{{1,2}}$", t, re.IGNORECASE):
         return False
+
     if t.endswith((
         "Winter Olympics",
         "Summer Olympics",
         )):
         return False
+
+    if any(s in t.lower() for s in (
+        "olympics",
+        "presidential election in",
+        )):
+        return False
+
     return True
 
 
