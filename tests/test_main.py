@@ -314,52 +314,21 @@ class TestQueryValidation:
 
 
 class TestSearchArticles:
-    def test_search_articles_v1(self, client):
+
+    def test_search_articles(self, client):
         con = make_con_mock(fetchall=[(42, "Toto")])
         with (
-            patch("main.get_wiki_db_version_of_target", return_value=1),
+            patch("main.get_wiki_db_version_of_target", return_value=8),
             patch("main.open_wiki_db_con", return_value=con) as mock_open_wiki_db_con,
-            patch("main.get_schema_version", return_value=1),
+            patch("main.get_schema_version", return_value=8),
         ):
             res = client.get("/api/en/articles?query=To")
 
         assert res.status_code == 200
         assert res.json() == [{"id": 42, "title": "Toto"}]
-        mock_open_wiki_db_con.assert_called_once_with("en", 1)
+        mock_open_wiki_db_con.assert_called_once_with("en", 8)
         query = con.execute.call_args[0][0]
-        assert "nb_links >= 20" in query
-        assert "is_target_candidate" not in query
-
-    def test_search_articles_v2(self, client):
-        con = make_con_mock(fetchall=[(42, "Toto")])
-        with (
-            patch("main.get_wiki_db_version_of_target", return_value=2),
-            patch("main.open_wiki_db_con", return_value=con) as mock_open_wiki_db_con,
-            patch("main.get_schema_version", return_value=2),
-        ):
-            res = client.get("/api/en/articles?query=To")
-
-        assert res.status_code == 200
-        assert res.json() == [{"id": 42, "title": "Toto"}]
-        mock_open_wiki_db_con.assert_called_once_with("en", 2)
-        query = con.execute.call_args[0][0]
-        assert "nb_links >= 20 AND is_target_candidate IS TRUE" in query
-        assert "nb_backlinks" not in query
-
-    def test_search_articles_v3(self, client):
-        con = make_con_mock(fetchall=[(42, "Toto")])
-        with (
-            patch("main.get_wiki_db_version_of_target", return_value=3),
-            patch("main.open_wiki_db_con", return_value=con) as mock_open_wiki_db_con,
-            patch("main.get_schema_version", return_value=3),
-        ):
-            res = client.get("/api/en/articles?query=To")
-
-        assert res.status_code == 200
-        assert res.json() == [{"id": 42, "title": "Toto"}]
-        mock_open_wiki_db_con.assert_called_once_with("en", 3)
-        query = con.execute.call_args[0][0]
-        assert "nb_backlinks >= 50" in query
+        assert "nb_backlinks >= 30" in query
 
 
 class TestNewTargetLink:
