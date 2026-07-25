@@ -25,7 +25,8 @@ jobs:
           node-version: 24
       - run: npm ci
         working-directory: ./frontend
-      - run: npx eslint frontend/
+      - run: npx eslint .
+        working-directory: ./frontend
 
   test-backend:
     runs-on: ubuntu-latest

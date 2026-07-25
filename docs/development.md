@@ -40,9 +40,9 @@ sudo apt-get install -y nodejs
 node -v
 ```
 
-Create `package.json` from the project root:
+Create `package.json` from `frontend/`:
 ```bash
-npm init -y
+cd frontend/ && npm init -y
 ```
 
 Install Vite:
@@ -53,8 +53,8 @@ npm install --save-dev vite
 Add the following scripts to `package.json`:
 ```json
 "scripts": {
-  "dev": "cd frontend && vite",
-  "build": "cd frontend && vite build"
+  "dev": "vite",
+  "build": "vite build"
 }
 ```
 
@@ -80,6 +80,7 @@ export default {
 
 Install packages listed in `package.json` into `node_modules/`:
 ```bash
+cd frontend/
 npm install
 ```
 
@@ -87,6 +88,7 @@ Re-run `npm install` whenever `package.json` changes (e.g. after a `git pull` th
 
 To add a new dependency:
 ```bash
+cd frontend/
 npm install <package>         # runtime dependency
 npm install --save-dev <package>  # dev-only dependency (linters, bundlers, etc.)
 ```
@@ -95,7 +97,7 @@ This updates `package.json` and `package-lock.json` — commit both.
 
 Run the development server:
 ```bash
-npm run dev
+cd frontend/ && npm run dev
 ```
 
 The site will be available at `http://localhost:5173`. Make sure the backend is running first.
@@ -175,6 +177,7 @@ node -v
 ```
 Then:
 ```bash
-npx eslint frontend/
+cd frontend/
+npx eslint .
 ```
 It was added to pre-commit hooks (`.git/hooks/pre-commit`) and to CI (`.github/workflows/ci.yml`).
