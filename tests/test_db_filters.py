@@ -1,9 +1,8 @@
 import os
-from pathlib import Path
 
 import pytest
-
 from main import get_daily_article_filter, get_schema_version, open_wiki_db_con
+
 
 class TestArticleFilters:
 
