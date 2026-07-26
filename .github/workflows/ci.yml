@@ -10,6 +10,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.filter.outputs.frontend_changed }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            frontend_changed:
+              - "frontend/**"
+              - ".github/workflows/ci.yml"
+
   lint-python:
     runs-on: ubuntu-latest
     steps:
@@ -101,7 +115,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: [lint-python, lint-js, test-backend]
+    needs: [detect-changes, lint-python, lint-js, test-backend]
+    if: needs.detect-changes.outputs.frontend_changed == 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
