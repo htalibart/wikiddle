@@ -319,12 +319,8 @@ The script:
 - stops the temporary servers
 - reloads systemd and restarts the Wikiddle service
 - verifies that the service is active
+- restarts Caddy if the file changed
 
-
-also, if Caddyfile.prod changed, do:
-```
-sudo systemctl restart caddy
-```
 
 If changes are not reflected immediately, purge the Cloudflare cache: in the Cloudflare dashboard, click on `wikiddle.com`, then **Caching -> Configuration -> Purge Everything**.
 

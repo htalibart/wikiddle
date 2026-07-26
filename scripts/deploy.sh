@@ -32,6 +32,12 @@ cd "$PROJECT_DIRECTORY"
 
 git fetch origin main
 
+if git diff --quiet HEAD origin/main -- config/Caddyfile.prod; then
+    CADDY_CHANGED=false
+else
+    CADDY_CHANGED=true
+fi
+
 WIKI_VERSION="$(git show origin/main:config/wikiddle.service | sed -n 's/^Environment="WIKI_VERSION=\([^"]*\)"$/\1/p')"
 
 test -n "$WIKI_VERSION"
@@ -87,5 +93,10 @@ echo "Restarting Wikiddle..."
 sudo systemctl daemon-reload
 sudo systemctl restart wikiddle
 sudo systemctl is-active --quiet wikiddle
+
+if [ "$CADDY_CHANGED" = true ]; then
+    echo "Caddy configuration changed, restarting Caddy..."
+    sudo systemctl restart caddy
+fi
 
 echo "Deployment successful"
