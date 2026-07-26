@@ -300,13 +300,30 @@ crontab -e
 
 ## Deploying a new version
 
+Deployments are performed with the versioned script, as deploy user:
+
 ```bash
 cd /var/www/wikiddle
-git pull origin main
-venv/bin/pip install -r backend/requirements.txt  # only if dependencies changed; no need to activate the venv
-cd frontend && npm ci && npm run build && cd ..  # only if frontend changed
-sudo systemctl restart wikiddle
-sudo systemctl restart caddy  # only if Caddyfile.prod changed
+bash scripts/deploy.sh
+```
+
+The script:
+- fetches the latest `main` branch
+- reads the target `WIKI_VERSION`
+- verifies that the required `en.db` and `fr.db` files exist
+- updates the repository with `git pull --ff-only`
+- installs Python and frontend dependencies
+- builds the frontend
+- starts temporary backend and frontend servers
+- runs the end-to-end tests against the target database
+- stops the temporary servers
+- reloads systemd and restarts the Wikiddle service
+- verifies that the service is active
+
+
+also, if Caddyfile.prod changed, do:
+```
+sudo systemctl restart caddy
 ```
 
 If changes are not reflected immediately, purge the Cloudflare cache: in the Cloudflare dashboard, click on `wikiddle.com`, then **Caching -> Configuration -> Purge Everything**.
