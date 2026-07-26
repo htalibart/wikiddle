@@ -42,6 +42,58 @@ jobs:
       - run: pip install -r backend/requirements.txt pytest
       - run: pytest tests/ --ignore=tests/test_e2e.py
 
+  test-e2e:
+    runs-on: ubuntu-latest
+    env:
+      USE_TEST_DATABASES: "1"
+      WIKI_VERSION: "8"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - run: pip install -r backend/requirements.txt pytest pytest-playwright
+      - run: python -m playwright install --with-deps firefox
+
+      - run: npm ci
+        working-directory: frontend
+
+      - name: Start backend
+        run: |
+          ENV=dev \
+          WIKI_DB_DIR=../tests/data/db/wiki/ \
+          WIKI_VERSION=8 \
+          GAMES_DB=../tests/data/db/games/v2.db \
+          ADMIN_TOKEN=dev \
+          fastapi dev > ../backend.log 2>&1 &
+        working-directory: backend
+
+      - name: Start frontend
+        run: npm run dev -- --host 127.0.0.1 > ../frontend.log 2>&1 &
+        working-directory: frontend
+
+      - name: Wait for servers
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8000/openapi.json > /dev/null &&
+               curl --fail --silent http://127.0.0.1:5173 > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat backend.log
+          cat frontend.log
+          exit 1
+
+      - run: python -m pytest tests/test_e2e.py --browser firefox
+
   build:
     runs-on: ubuntu-latest
     needs: [lint-python, lint-js, test-backend]
