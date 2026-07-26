@@ -8,6 +8,7 @@ pytestmark = pytest.mark.skipif(
     reason="Requires the full Wikipedia databases",
 )
 
+
 class TestArticleFilters:
     def can_be_daily_target(self, lang: str, title: str):
         wiki_db_version = int(os.environ["WIKI_VERSION"])
@@ -98,7 +99,6 @@ class TestArticleFilters:
     )
     def test_article_can_be_daily_target(self, lang: str, title: str):
         assert self.can_be_daily_target(lang, title)
-
 
     @pytest.mark.parametrize(
         "lang,title",
