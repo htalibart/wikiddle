@@ -3,6 +3,9 @@
 set -euo pipefail
 
 PROJECT_DIRECTORY="/var/www/wikiddle"
+TEMPORARY_ROOT=""
+TEST_DIRECTORY=""
+WORKTREE_CREATED=false
 BACKEND_PID=""
 BACKEND_PGID=""
 FRONTEND_PID=""
@@ -24,13 +27,41 @@ cleanup() {
     if [ -n "$BACKEND_PID" ]; then
         wait "$BACKEND_PID" 2>/dev/null || true
     fi
+
+    if [ "$WORKTREE_CREATED" = true ]; then
+        git -C "$PROJECT_DIRECTORY" worktree remove --force "$TEST_DIRECTORY" 2>/dev/null || true
+    fi
+
+    if [ -n "$TEMPORARY_ROOT" ]; then
+        rm -rf "$TEMPORARY_ROOT"
+    fi
 }
 
 trap cleanup EXIT
 
 cd "$PROJECT_DIRECTORY"
 
+echo "Fetching origin/main..."
 git fetch origin main
+
+WIKI_VERSION="$(git show origin/main:config/wikiddle.service | sed -n 's/^Environment="WIKI_VERSION=\([^"]*\)"$/\1/p')"
+
+if [ -z "$WIKI_VERSION" ]; then
+    echo "WIKI_VERSION could not be read from config/wikiddle.service"
+    exit 1
+fi
+
+if [ ! -f "$PROJECT_DIRECTORY/data/db/wiki/v${WIKI_VERSION}/en.db" ]; then
+    echo "Missing database: data/db/wiki/v${WIKI_VERSION}/en.db"
+    exit 1
+fi
+
+if [ ! -f "$PROJECT_DIRECTORY/data/db/wiki/v${WIKI_VERSION}/fr.db" ]; then
+    echo "Missing database: data/db/wiki/v${WIKI_VERSION}/fr.db"
+    exit 1
+fi
+
+echo "Database version v${WIKI_VERSION} is available"
 
 if git diff --quiet HEAD origin/main -- config/Caddyfile.prod; then
     CADDY_CHANGED=false
@@ -38,31 +69,41 @@ else
     CADDY_CHANGED=true
 fi
 
-WIKI_VERSION="$(git show origin/main:config/wikiddle.service | sed -n 's/^Environment="WIKI_VERSION=\([^"]*\)"$/\1/p')"
+echo "Creating temporary worktree..."
+TEMPORARY_ROOT="$(mktemp -d /tmp/wikiddle-deploy-XXXXXX)"
+TEST_DIRECTORY="$TEMPORARY_ROOT/worktree"
 
-test -n "$WIKI_VERSION"
-test -f "data/db/wiki/v${WIKI_VERSION}/en.db"
-test -f "data/db/wiki/v${WIKI_VERSION}/fr.db"
+git worktree add --detach "$TEST_DIRECTORY" origin/main
+WORKTREE_CREATED=true
 
-echo "Database version v${WIKI_VERSION} is available"
-echo "Pulling main..."
+echo "Creating temporary Python environment..."
+python3 -m venv "$TEST_DIRECTORY/venv"
+"$TEST_DIRECTORY/venv/bin/pip" install -r "$TEST_DIRECTORY/backend/requirements.txt" pytest pytest-playwright
+"$TEST_DIRECTORY/venv/bin/python" -m playwright install firefox
 
-git pull --ff-only origin main
+echo "Installing and building temporary frontend..."
+npm --prefix "$TEST_DIRECTORY/frontend" ci
+npm --prefix "$TEST_DIRECTORY/frontend" run build
 
-echo "Installing pip requirements..."
-venv/bin/pip install -r backend/requirements.txt
+echo "Starting temporary backend..."
+setsid env \
+    ENV=dev \
+    WIKI_DB_DIR="$PROJECT_DIRECTORY/data/db/wiki/" \
+    WIKI_VERSION="$WIKI_VERSION" \
+    GAMES_DB="$PROJECT_DIRECTORY/data/db/games/v2.db" \
+    ADMIN_TOKEN=dev \
+    bash -c "cd '$TEST_DIRECTORY/backend' && exec '$TEST_DIRECTORY/venv/bin/fastapi' run --port 8001" \
+    > /tmp/wikiddle-backend-e2e.log 2>&1 &
 
-echo "Building frontend..."
-npm --prefix frontend ci
-npm --prefix frontend run build
-
-echo "Running temporary backend for tests..."
-setsid env ENV=dev WIKI_DB_DIR=../data/db/wiki/ WIKI_VERSION="$WIKI_VERSION" GAMES_DB=../data/db/games/v2.db ADMIN_TOKEN=dev bash -c 'cd backend && exec ../venv/bin/fastapi dev --port 8001' > /tmp/wikiddle-backend-e2e.log 2>&1 &
 BACKEND_PID=$!
 BACKEND_PGID="$(ps -o pgid= -p "$BACKEND_PID" | tr -d ' ')"
 
-echo "Running temporary frontend for tests..."
-setsid env VITE_API_TARGET=http://127.0.0.1:8001 npm --prefix frontend run dev -- --host 127.0.0.1 --port 5174 > /tmp/wikiddle-frontend-e2e.log 2>&1 &
+echo "Starting temporary frontend..."
+setsid env \
+    VITE_API_TARGET=http://127.0.0.1:8001 \
+    npm --prefix "$TEST_DIRECTORY/frontend" run dev -- --host 127.0.0.1 --port 5174 \
+    > /tmp/wikiddle-frontend-e2e.log 2>&1 &
+
 FRONTEND_PID=$!
 FRONTEND_PGID="$(ps -o pgid= -p "$FRONTEND_PID" | tr -d ' ')"
 
@@ -85,9 +126,23 @@ for i in {1..30}; do
     sleep 1
 done
 
+echo "Running E2E tests..."
+E2E_BASE_URL=http://127.0.0.1:5174 \
+    "$TEST_DIRECTORY/venv/bin/python" -m pytest \
+    "$TEST_DIRECTORY/tests/test_e2e.py" \
+    --browser firefox
 
-echo "Running end-to-end tests..."
-E2E_BASE_URL=http://127.0.0.1:5174 venv/bin/python -m pytest tests/test_e2e.py --browser firefox
+echo "E2E tests passed"
+
+echo "Updating production code..."
+git pull --ff-only origin main
+
+echo "Installing production Python requirements..."
+venv/bin/pip install -r backend/requirements.txt
+
+echo "Building production frontend..."
+npm --prefix frontend ci
+npm --prefix frontend run build
 
 echo "Restarting Wikiddle..."
 sudo systemctl daemon-reload
@@ -99,9 +154,6 @@ if [ "$CADDY_CHANGED" = true ]; then
     sudo systemctl restart caddy
 fi
 
-echo "Deployment successful"
-
-
 echo "Waiting for production API..."
 
 for i in {1..30}; do
@@ -112,11 +164,10 @@ for i in {1..30}; do
 
     if [ "$i" -eq 30 ]; then
         echo "Production API failed to start"
-        sudo journalctl -u wikiddle -n 50 --no-pager
         exit 1
     fi
 
     sleep 1
 done
 
-echo "Deployment completed successfully!"
+echo "Deployment completed successfully"
