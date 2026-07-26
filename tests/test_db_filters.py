@@ -3,6 +3,10 @@ import os
 import pytest
 from main import get_daily_article_filter, get_schema_version, open_wiki_db_con
 
+pytestmark = pytest.mark.skipif(
+    os.getenv("USE_TEST_DATABASES", "1") == "1",
+    reason="Requires the full Wikipedia databases",
+)
 
 class TestArticleFilters:
     def can_be_daily_target(self, lang: str, title: str):
