@@ -43,6 +43,7 @@ jobs:
       - run: pytest tests/ --ignore=tests/test_e2e.py
 
   test-e2e:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
       USE_TEST_DATABASES: "1"
