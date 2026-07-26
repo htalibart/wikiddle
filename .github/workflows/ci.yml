@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       frontend_changed: ${{ steps.filter.outputs.frontend_changed }}
+      backend_changed: ${{ steps.filter.outputs.backend_changed }}
+      tests_changed: ${{ steps.filter.outputs.tests_changed }}
+      config_changed: ${{ steps.filter.outputs.config_changed }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v4
@@ -22,7 +25,13 @@ jobs:
           filters: |
             frontend_changed:
               - "frontend/**"
-              - ".github/workflows/ci.yml"
+            backend_changed:
+              - "backend/**"
+            tests_changed:
+              - "tests/**"
+            config_changed:
+              - "config/**"
+              - ".github/workflows/**"
 
   lint-python:
     runs-on: ubuntu-latest
@@ -47,6 +56,8 @@ jobs:
         working-directory: ./frontend
 
   test-backend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend_changed == 'true' || needs.detect-changes.outputs.tests_changed == 'true'
     runs-on: ubuntu-latest
     env:
       USE_TEST_DATABASES: "1"
@@ -61,7 +72,8 @@ jobs:
       - run: pytest tests/ --ignore=tests/test_e2e.py
 
   test-e2e:
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    needs: detect-changes
+    if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/main') && (needs.detect-changes.outputs.frontend_changed == 'true' || needs.detect-changes.outputs.backend_changed == 'true' || needs.detect-changes.outputs.tests_changed == 'true' || needs.detect-changes.outputs.config_changed == 'true')
     runs-on: ubuntu-latest
     env:
       USE_TEST_DATABASES: "1"
@@ -114,9 +126,9 @@ jobs:
       - run: python -m pytest tests/test_e2e.py --browser firefox
 
   build:
+    needs: [detect-changes, lint-js]
+    if: needs.detect-changes.outputs.frontend_changed == 'true' || needs.detect-changes.outputs.config_changed == 'true'
     runs-on: ubuntu-latest
-    needs: [detect-changes, lint-python, lint-js, test-backend]
-    if: needs.detect-changes.outputs.frontend_changed == 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
