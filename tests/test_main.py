@@ -101,18 +101,14 @@ class TestCommonInfo:
         )
 
     def test_correct_guess(self, client):
-        daily_patch, links_patch, cats_patch = self._patches(
-            42, {1: "A", 2: "B", 3: "C"}, {1: "A", 2: "B", 3: "C"}
-        )
+        daily_patch, links_patch, cats_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {1: "A", 2: "B", 3: "C"})
         with daily_patch, links_patch, cats_patch:
             res = client.get("/api/en/common-info?id=42")
         assert res.status_code == 200
         assert res.json()["is_target"] is True
 
     def test_wrong_guess(self, client):
-        daily_patch, links_patch, cats_patch = self._patches(
-            42, {1: "A", 2: "B", 3: "C"}, {2: "B", 3: "C", 4: "D"}
-        )
+        daily_patch, links_patch, cats_patch = self._patches(42, {1: "A", 2: "B", 3: "C"}, {2: "B", 3: "C", 4: "D"})
         with daily_patch, links_patch, cats_patch:
             res = client.get("/api/en/common-info?id=12")
         assert res.status_code == 200
@@ -224,7 +220,10 @@ class TestDailyArticleCached:
 
     def test_existing_daily_article_uses_games_db_version(self):
         with (
-            patch("main.open_games_db_con", return_value=make_games_con_mock(article_id=12, title="Titi", wiki_db_version=2)),
+            patch(
+                "main.open_games_db_con",
+                return_value=make_games_con_mock(article_id=12, title="Titi", wiki_db_version=2),
+            ),
             patch("main.open_wiki_db_con") as mock_open_wiki_db_con,
         ):
             result = get_daily_article_cached("en")
@@ -314,7 +313,6 @@ class TestQueryValidation:
 
 
 class TestSearchArticles:
-
     def test_search_articles(self, client):
         con = make_con_mock(fetchall=[(42, "Toto")])
         with (
@@ -382,9 +380,7 @@ class TestNewTargetCategory:
 
     def test_returns_hint(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today(), "wiki_db_version": 2}
-        daily_patch, categories_patch = self._patches(
-            target, {1: "Category 1", 2: "Category 2", 3: "Category 3"}
-        )
+        daily_patch, categories_patch = self._patches(target, {1: "Category 1", 2: "Category 2", 3: "Category 3"})
         with daily_patch, categories_patch:
             res = client.post("/api/en/new-target-category", json=[])
         assert res.status_code == 200
@@ -392,9 +388,7 @@ class TestNewTargetCategory:
 
     def test_excludes_already_guessed(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today(), "wiki_db_version": 2}
-        daily_patch, categories_patch = self._patches(
-            target, {1: "Category 1", 2: "Category 2", 3: "Category 3"}
-        )
+        daily_patch, categories_patch = self._patches(target, {1: "Category 1", 2: "Category 2", 3: "Category 3"})
         with daily_patch, categories_patch:
             res = client.post("/api/en/new-target-category", json=["Category 1", "Category 2", "Category 3"])
         assert res.status_code == 200
@@ -406,9 +400,7 @@ class TestNewTargetCategory:
 
     def test_empty_body(self, client):
         target = {"id": 42, "title": "Toto", "date": date.today(), "wiki_db_version": 2}
-        daily_patch, categories_patch = self._patches(
-            target, {1: "Category 1", 2: "Category 2", 3: "Category 3"}
-        )
+        daily_patch, categories_patch = self._patches(target, {1: "Category 1", 2: "Category 2", 3: "Category 3"})
         with daily_patch, categories_patch:
             res = client.post("/api/en/new-target-category")
         assert res.status_code == 200
@@ -420,7 +412,9 @@ class TestYesterdaysArticle:
             _cached_yesterday_targets[lang].update({"id": None, "title": None, "date": None})
 
     def test_returns_yesterdays_article(self, client):
-        with patch("main.open_games_db_con", return_value=make_games_con_mock(article_id=12, title="Titi", wiki_db_version=2)):
+        with patch(
+            "main.open_games_db_con", return_value=make_games_con_mock(article_id=12, title="Titi", wiki_db_version=2)
+        ):
             res = client.get("/api/en/yesterdays-article")
         assert res.status_code == 200
         data = res.json()
