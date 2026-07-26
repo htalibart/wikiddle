@@ -101,5 +101,20 @@ fi
 
 echo "Deployment successful"
 
-curl --fail --silent http://127.0.0.1:8000/openapi.json > /dev/null
-echo "Production API is responding"
+
+echo "Waiting for production API..."
+
+for i in {1..30}; do
+    if curl --fail --silent http://127.0.0.1:8000/openapi.json > /dev/null; then
+        echo "Production API is responding"
+        break
+    fi
+
+    if [ "$i" -eq 30 ]; then
+        echo "Production API failed to start"
+        sudo journalctl -u wikiddle -n 50 --no-pager
+        exit 1
+    fi
+
+    sleep 1
+done
