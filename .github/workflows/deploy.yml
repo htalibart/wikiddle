@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-production:
+  deploy:
+    environment: production
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Deployment workflow started"
+      - run: echo "Deployment workflow started on production environment"
