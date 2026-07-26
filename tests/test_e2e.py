@@ -1,10 +1,11 @@
 import json
+import os
 import re
 
 import pytest
 from playwright.sync_api import Locator, Page, expect
 
-BASE_URL = "http://localhost:5173"
+BASE_URL = os.environ.get("E2E_BASE_URL", "http://localhost:5173")
 
 pytestmark = pytest.mark.integration
 
