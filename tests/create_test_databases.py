@@ -238,7 +238,7 @@ if __name__ == "__main__":
     en_con = create_empty_wiki_database("en")
 
     try:
-        en_article_ids = copy_articles_by_titles(en_con, ["Brussels", "Daft Punk", "Justice"])
+        en_article_ids = copy_articles_by_titles(en_con, ["Brussels", "Daft Punk", "Justice", "Electronic music"])
         en_article_ids.update(copy_search_results(en_con, "python"))
         en_article_ids.update(copy_search_results(en_con, "a"))
         en_article_ids.add(copy_article_by_id(en_con, 12))
