@@ -89,6 +89,7 @@ function renderTargetCard(state, translations) {
   card.classList.add("target-guess-card");
   card.setAttribute("role", "region");
   card.setAttribute("aria-label", translations.target_info_label);
+  card.setAttribute("tabindex", "-1"); // make card focusable but not reachable by tab
 
   if (targetFound) {
     card.classList.add("found-target-guess-card");
@@ -117,10 +118,12 @@ function updateTargetCard(state, translations) {
  */
 function goToTargetCard() {
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  document.getElementById("target-card").scrollIntoView({
+  const targetCard = document.getElementById("target-card");
+  targetCard.scrollIntoView({
     block: "nearest",
     behavior: prefersReducedMotion ? "auto" : "smooth",
   });
+  targetCard.focus({ preventScroll: true });
 }
 
 /**
