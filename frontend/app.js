@@ -8,23 +8,13 @@ const LANGUAGES = ["en", "fr"];
 const scoreToColor = makeScoreColorFn("#0C57A8");
 
 /**
- * Renders the target article card
+ * Builds the inner HTML for the target article card
  * @param {State} state - current application state
  * @param {Object} translations - translations for the current language
- * @returns {HTMLElement} the target article card
+ * @returns {string} inner HTML for the target article card
  */
-function renderTargetCard(state, translations) {
+function buildTargetCardHTML(state, translations) {
   const targetFound = state.knowledgeTarget.title !== null;
-
-  const card = document.createElement("div");
-  card.classList.add("guess-card");
-  card.classList.add("target-guess-card");
-  card.setAttribute("role", "region");
-  card.setAttribute("aria-label", translations.target_info_label);
-
-  if (targetFound) {
-    card.classList.add("found-target-guess-card");
-  }
 
   let titleHTML = `<h3 class="guess-card-title">?</h3>`;
   if (targetFound) {
@@ -73,7 +63,7 @@ function renderTargetCard(state, translations) {
       `
       : "";
 
-  card.innerHTML = `
+  return `
       <div class="guess-card-header">
         ${titleHTML}
         ${knowsHTML}
@@ -82,8 +72,58 @@ function renderTargetCard(state, translations) {
       ${categoriesHTML}
       ${placeholderHTML}
     `;
+}
+
+/**
+ * Renders the target article card
+ * @param {State} state - current application state
+ * @param {Object} translations - translations for the current language
+ * @returns {HTMLElement} the target article card
+ */
+function renderTargetCard(state, translations) {
+  const targetFound = state.knowledgeTarget.title !== null;
+
+  const card = document.createElement("div");
+  card.id = "target-card";
+  card.classList.add("guess-card");
+  card.classList.add("target-guess-card");
+  card.setAttribute("role", "region");
+  card.setAttribute("aria-label", translations.target_info_label);
+  card.setAttribute("tabindex", "-1"); // make card focusable but not reachable by tab
+
+  if (targetFound) {
+    card.classList.add("found-target-guess-card");
+  }
+
+  card.innerHTML = buildTargetCardHTML(state, translations);
 
   return card;
+}
+
+/**
+ * Updates the existing target article card in place, without touching the rest of the guesses list
+ * @param {State} state - current application state
+ * @param {Object} translations - translations for the current language
+ */
+function updateTargetCard(state, translations) {
+  const card = document.getElementById("target-card");
+  const targetFound = state.knowledgeTarget.title !== null;
+
+  card.classList.toggle("found-target-guess-card", targetFound);
+  card.innerHTML = buildTargetCardHTML(state, translations);
+}
+
+/**
+ * Scrolls target card into view
+ */
+function goToTargetCard() {
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const targetCard = document.getElementById("target-card");
+  targetCard.scrollIntoView({
+    block: "nearest",
+    behavior: prefersReducedMotion ? "auto" : "smooth",
+  });
+  targetCard.focus({ preventScroll: true });
 }
 
 /**
@@ -469,8 +509,9 @@ async function addHint(state, translations) {
         state.nbHints += 1;
       }
 
-      renderCards(state, translations);
+      updateTargetCard(state, translations);
       saveState(state);
+      goToTargetCard();
     })
     .catch(() => {
       showToast(translations.error_message, true);
