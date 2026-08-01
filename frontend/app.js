@@ -113,6 +113,17 @@ function updateTargetCard(state, translations) {
 }
 
 /**
+ * Scrolls target card into view
+ */
+function goToTargetCard() {
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.getElementById("target-card").scrollIntoView({
+    block: "nearest",
+    behavior: prefersReducedMotion ? "auto" : "smooth",
+  });
+}
+
+/**
  * Renders a guessed article card
  * @param {State} state - current application state
  * @param {Guess} guess - the guess to render
@@ -497,6 +508,7 @@ async function addHint(state, translations) {
 
       updateTargetCard(state, translations);
       saveState(state);
+      goToTargetCard();
     })
     .catch(() => {
       showToast(translations.error_message, true);
