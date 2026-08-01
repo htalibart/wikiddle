@@ -91,7 +91,7 @@ jobs:
           node-version: 24
 
       - run: pip install -r backend/requirements.txt pytest pytest-playwright
-      - run: python -m playwright install --with-deps firefox
+      - run: python -m playwright install --with-deps firefox chromium
 
       - run: npm ci
         working-directory: frontend
@@ -123,7 +123,7 @@ jobs:
           cat frontend.log
           exit 1
 
-      - run: python -m pytest tests/test_e2e.py --browser firefox
+      - run: python -m pytest tests/test_e2e.py --browser firefox --browser chromium
 
   build:
     needs: [detect-changes, lint-js]

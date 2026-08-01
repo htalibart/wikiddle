@@ -79,7 +79,7 @@ WORKTREE_CREATED=true
 echo "Creating temporary Python environment..."
 python3 -m venv "$TEST_DIRECTORY/venv"
 "$TEST_DIRECTORY/venv/bin/pip" install -r "$TEST_DIRECTORY/backend/requirements.txt" pytest pytest-playwright
-"$TEST_DIRECTORY/venv/bin/python" -m playwright install firefox
+"$TEST_DIRECTORY/venv/bin/python" -m playwright install firefox chromium
 
 echo "Installing and building temporary frontend..."
 npm --prefix "$TEST_DIRECTORY/frontend" ci
@@ -130,7 +130,8 @@ echo "Running E2E tests..."
 E2E_BASE_URL=http://127.0.0.1:5174 \
     "$TEST_DIRECTORY/venv/bin/python" -m pytest \
     "$TEST_DIRECTORY/tests/test_e2e.py" \
-    --browser firefox
+    --browser firefox \
+    --browser chromium
 
 echo "E2E tests passed"
 
