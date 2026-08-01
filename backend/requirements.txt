@@ -2,5 +2,5 @@ duckdb==1.5.5
 fastapi[standard]==0.140.0
 Requests==2.34.2
 slowapi==0.1.10
-pytest==9.0.3
+pytest==9.1.1
 pytest-playwright==0.8.0
