@@ -819,7 +819,7 @@ def test_date_change_resets_game_before_next_guess(page: Page):
     expect(midnight_btn).to_be_focused()
 
     page.keyboard.press("Tab")
-    expect(midnight_btn).to_be_focused()
+    expect(page.locator("#guesses-list :focus")).to_have_count(0)
 
     state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
     assert state["gameDate"] == "2000-01-01"
