@@ -90,7 +90,7 @@ jobs:
         with:
           node-version: 24
 
-      - run: pip install -r backend/requirements.txt pytest pytest-playwright
+      - run: pip install -r backend/requirements.txt -r tests/requirements.txt
       - run: python -m playwright install --with-deps firefox chromium
 
       - run: npm ci
