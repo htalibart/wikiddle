@@ -542,6 +542,8 @@ def test_hint_all_hints_of_type_found_flow(page: Page):
     expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
     expect(page.locator("#win-overlay")).to_be_hidden()
 
+    page.wait_for_function("localStorage.getItem('game-state-en') !== null")
+
     storage_keys = page.evaluate("Object.keys(localStorage)")
     assert storage_keys == ["game-state-en"]
 
@@ -593,6 +595,8 @@ def test_hint_button_is_disabled_only_when_all_hints_are_exhausted(page: Page):
 
     expect(hint_btn).to_be_enabled()
     expect(hint_btn).not_to_have_class(re.compile(r".*\bdisabled-btn\b.*"))
+
+    page.wait_for_function("JSON.parse(localStorage.getItem('game-state-en') || '{}').knowsAllLinks === true")
 
     state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
     assert state["knowsAllLinks"] is True
@@ -795,6 +799,8 @@ def test_date_change_resets_game_before_next_guess(page: Page):
     expect(first_option).to_be_visible(timeout=5000)
     first_guess_title = first_option.text_content().strip()
     first_option.click()
+
+    page.wait_for_function("JSON.parse(localStorage.getItem('game-state-en') || '{}').gameDate === '2000-01-01'")
 
     state = page.evaluate("JSON.parse(localStorage.getItem('game-state-en'))")
     assert state["gameDate"] == "2000-01-01"
