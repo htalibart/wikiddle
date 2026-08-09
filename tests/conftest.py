@@ -12,5 +12,5 @@ else:
 
 
 os.environ.setdefault("WIKI_DB_DIR", str(DATA_DIR / "db" / "wiki"))
-os.environ.setdefault("WIKI_VERSION", "8")
+os.environ.setdefault("WIKI_VERSION", "9")
 os.environ.setdefault("GAMES_DB", str(DATA_DIR / "db" / "games" / "v2.db"))

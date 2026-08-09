@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       USE_TEST_DATABASES: "1"
-      WIKI_VERSION: "8"
+      WIKI_VERSION: "9"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       USE_TEST_DATABASES: "1"
-      WIKI_VERSION: "8"
+      WIKI_VERSION: "9"
     steps:
       - uses: actions/checkout@v4
 
@@ -105,7 +105,7 @@ jobs:
         run: |
           ENV=dev \
           WIKI_DB_DIR=../tests/data/db/wiki/ \
-          WIKI_VERSION=8 \
+          WIKI_VERSION=9 \
           GAMES_DB=../tests/data/db/games/v2.db \
           ADMIN_TOKEN=dev \
           fastapi dev > ../backend.log 2>&1 &

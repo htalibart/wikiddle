@@ -7,7 +7,7 @@ import shutil
 THIS_DIR = Path(__file__).parent
 MAIN_DIR = THIS_DIR.parent
 
-FILTER_VERSION = 4
+FILTER_VERSION = 5
 
 MONTHS_EN_PATTERN = r"(January|February|March|April|May|June|July|August|September|October|November|December)"
 MONTHS_FR_PATTERN = r"(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)"
@@ -193,6 +193,8 @@ def keep_category_fr(c: str) -> bool:
         "wrestling",
         "conseil départemental",
         "infanterie",
+        "sexuel",
+        "bdsm",
     )):
         return False
 
@@ -365,6 +367,8 @@ def keep_category_en(c: str) -> bool:
         "firearm",
         "representatives elections",
         "vehicles",
+        "sexual",
+        "bdsm",
     )):
         return False
 
