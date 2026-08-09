@@ -161,3 +161,20 @@ jobs:
         working-directory: ./frontend
       - run: npm run build
         working-directory: ./frontend
+
+  ci-success:
+    needs: [detect-changes, read-config, lint-python, lint-js, test-backend, test-e2e, build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check CI results
+        run: |
+          if [[ "${{ needs.detect-changes.result }}" != "success" ||
+                "${{ needs.read-config.result }}" != "success" ||
+                "${{ needs.lint-python.result }}" != "success" ||
+                "${{ needs.lint-js.result }}" != "success" ||
+                ! "${{ needs.test-backend.result }}" =~ ^(success|skipped)$ ||
+                ! "${{ needs.test-e2e.result }}" =~ ^(success|skipped)$ ||
+                ! "${{ needs.build.result }}" =~ ^(success|skipped)$ ]]; then
+            exit 1
+          fi
