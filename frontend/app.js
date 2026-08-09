@@ -114,16 +114,17 @@ function updateTargetCard(state, translations) {
 }
 
 /**
- * Scrolls target card into view
+ * Scrolls card into view
  */
-function goToTargetCard() {
+function goToCard(selector) {
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const targetCard = document.getElementById("target-card");
-  targetCard.scrollIntoView({
+  const card = document.querySelector(selector);
+  if (!card) return;
+  card.scrollIntoView({
     block: "nearest",
     behavior: prefersReducedMotion ? "auto" : "smooth",
   });
-  targetCard.focus({ preventScroll: true });
+  card.focus({ preventScroll: true });
 }
 
 /**
@@ -137,6 +138,7 @@ function renderGuessCard(state, guess, translations) {
   const card = document.createElement("div");
 
   card.classList.add("guess-card");
+  card.setAttribute("tabindex", "-1");
 
   const onTargetLabel = guess.isOnTarget
     ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>`
@@ -425,6 +427,7 @@ async function handleGuessInput(state, tomSelect, translations) {
       }
       renderCards(state, translations);
       saveState(state);
+      goToCard(".last-guess-card");
     })
     .catch(() => {
       showToast(translations.error_message, true);
@@ -511,7 +514,7 @@ async function addHint(state, translations) {
 
       updateTargetCard(state, translations);
       saveState(state);
-      goToTargetCard();
+      goToCard("#target-card");
     })
     .catch(() => {
       showToast(translations.error_message, true);
