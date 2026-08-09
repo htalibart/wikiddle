@@ -33,6 +33,22 @@ jobs:
               - "config/**"
               - ".github/workflows/**"
 
+  read-config:
+    runs-on: ubuntu-latest
+    outputs:
+      wiki_version: ${{ steps.config.outputs.wiki_version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: config
+        run: |
+          WIKI_VERSION="$(sed -nE 's/^Environment="WIKI_VERSION=([^"]+)"$/\1/p' config/wikiddle.service)"
+          if [ -z "$WIKI_VERSION" ]; then
+            echo "WIKI_VERSION could not be read from config/wikiddle.service"
+            exit 1
+          fi
+          echo "wiki_version=$WIKI_VERSION" >> "$GITHUB_OUTPUT"
+
   lint-python:
     runs-on: ubuntu-latest
     steps:
@@ -58,12 +74,12 @@ jobs:
         working-directory: ./frontend
 
   test-backend:
-    needs: detect-changes
+    needs: [detect-changes, read-config]
     if: needs.detect-changes.outputs.backend_changed == 'true' || needs.detect-changes.outputs.tests_changed == 'true'
     runs-on: ubuntu-latest
     env:
       USE_TEST_DATABASES: "1"
-      WIKI_VERSION: "9"
+      WIKI_VERSION: ${{ needs.read-config.outputs.wiki_version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -75,12 +91,12 @@ jobs:
       - run: pytest tests/ --ignore=tests/test_e2e.py
 
   test-e2e:
-    needs: detect-changes
+    needs: [detect-changes, read-config]
     if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/main') && (needs.detect-changes.outputs.frontend_changed == 'true' || needs.detect-changes.outputs.backend_changed == 'true' || needs.detect-changes.outputs.tests_changed == 'true' || needs.detect-changes.outputs.config_changed == 'true')
     runs-on: ubuntu-latest
     env:
       USE_TEST_DATABASES: "1"
-      WIKI_VERSION: "9"
+      WIKI_VERSION: ${{ needs.read-config.outputs.wiki_version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -105,7 +121,7 @@ jobs:
         run: |
           ENV=dev \
           WIKI_DB_DIR=../tests/data/db/wiki/ \
-          WIKI_VERSION=9 \
+          WIKI_VERSION="$WIKI_VERSION" \
           GAMES_DB=../tests/data/db/games/v2.db \
           ADMIN_TOKEN=dev \
           fastapi dev > ../backend.log 2>&1 &
