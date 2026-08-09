@@ -6,7 +6,7 @@ After=network.target
 User=deploy
 WorkingDirectory=/var/www/wikiddle/backend
 Environment="WIKI_DB_DIR=/var/www/wikiddle/data/db/wiki"
-Environment="WIKI_VERSION=8"
+Environment="WIKI_VERSION=9"
 Environment="GAMES_DB=/var/www/wikiddle/data/db/games/v2.db"
 EnvironmentFile=/etc/wikiddle/secrets
 ExecStart=/var/www/wikiddle/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
