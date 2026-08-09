@@ -5,10 +5,10 @@ import duckdb
 
 MAIN_DIR = Path(__file__).parent.parent
 SOURCE_WIKI_DB_DIR = MAIN_DIR / "data" / "db" / "wiki" / "v8"
-TEST_WIKI_DB_DIR = MAIN_DIR / "tests" / "data" / "db" / "wiki" / "v8"
+TEST_WIKI_DB_DIR = MAIN_DIR / "tests" / "data" / "db" / "wiki" / "v9"
 TEST_GAMES_DB_FILE = MAIN_DIR / "tests" / "data" / "db" / "games" / "v2.db"
 
-WIKI_VERSION = 8
+WIKI_VERSION = 9
 SEARCH_FILTER = "nb_links >= 20 AND nb_words >= 700 AND nb_backlinks >= 30"
 
 
