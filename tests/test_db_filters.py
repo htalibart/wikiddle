@@ -226,6 +226,7 @@ class TestArticleFilters:
             ("en", "2020 United States presidential election in New York"),
             ("en", "2017 Western & Southern Open – Men's singles"),
             ("en", "Cirencester (UK Parliament constituency)"),
+            ("fr", "Bondage et discipline, domination et soumission, sado-masochisme"),
         ],
     )
     def test_article_cant_be_daily_target(self, lang: str, title: str):
