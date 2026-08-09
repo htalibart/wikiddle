@@ -1,6 +1,7 @@
 {
   "name": "wikiddle",
   "version": "1.0.0",
+  "type": "module",
   "description": "Wikiddle is a daily Wikipedia puzzle game. The player has to guess a random mystery page by finding out the links that are on it.",
   "directories": {
     "doc": "docs"
