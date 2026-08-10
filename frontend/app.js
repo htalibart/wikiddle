@@ -121,7 +121,7 @@ function goToCard(selector) {
   const card = document.querySelector(selector);
   if (!card) return;
   card.scrollIntoView({
-    block: "nearest",
+    block: "end",
     behavior: prefersReducedMotion ? "auto" : "smooth",
   });
   card.focus({ preventScroll: true });
