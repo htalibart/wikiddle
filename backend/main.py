@@ -224,10 +224,9 @@ def get_yesterdays_article(request: Request, lang: str = Depends(valid_lang)) ->
     return {"id": article["id"], "title": article["title"]}
 
 
-@router.get("/{lang}/daily-article")
+@router.get("/admin/{lang}/daily-article", include_in_schema=False)
 @limiter.limit("10/minute")
 def get_daily_article(request: Request, lang: str = Depends(valid_lang)) -> dict[str, Any]:
-    # for debugging purposes: will be deleted
     article = get_daily_article_cached(lang)
     return {"id": article["id"], "title": article["title"]}
 
