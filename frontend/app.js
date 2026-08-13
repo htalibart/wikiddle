@@ -124,7 +124,6 @@ function goToCard(selector) {
     block: "end",
     behavior: prefersReducedMotion ? "auto" : "smooth",
   });
-  card.focus({ preventScroll: true });
 }
 
 /**
