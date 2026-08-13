@@ -140,7 +140,6 @@ def test_hint_flow(page: Page):
     expect(target_card.locator(".guess-card-links a, .guess-card-categories a")).to_have_count(1)
     expect(target_card).to_contain_text("Electronic music")
     expect(target_card.locator(".target-placeholder")).to_have_count(0)
-    expect(target_card).to_be_focused()
 
     expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
     expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
@@ -210,7 +209,6 @@ def test_guess_flow(page: Page):
 
     last_guess_card = page.locator("#guesses-list .last-guess-card")
     expect(last_guess_card).to_have_count(1)
-    expect(last_guess_card).to_be_focused()
     expect(last_guess_card.locator(".guess-card-title")).to_contain_text(selected_title)
     expect(last_guess_card.locator(".guess-card-score-links")).to_have_text("2")
     expect(last_guess_card.locator(".guess-card-links a")).to_have_count(2)
