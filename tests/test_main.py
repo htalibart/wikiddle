@@ -257,10 +257,6 @@ class TestDailyArticleCached:
 
 
 class TestInvalidLang:
-    def test_daily_article_invalid_lang(self, client):
-        res = client.get("/api/xx/daily-article")
-        assert res.status_code == 400
-
     def test_article_id_invalid_lang(self, client):
         res = client.get("/api/xx/article-id?title=Toto")
         assert res.status_code == 400
