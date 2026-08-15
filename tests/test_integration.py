@@ -20,7 +20,7 @@ def client():
 @pytest.mark.parametrize("lang", ["en", "fr"])
 class TestDailyArticle:
     def test_returns_id_and_title(self, client, lang):
-        res = client.get(f"/api/{lang}/daily-article")
+        res = client.get(f"/api/admin/{lang}/daily-article")
         assert res.status_code == 200
         data = res.json()
         assert "id" in data
@@ -30,13 +30,13 @@ class TestDailyArticle:
 @pytest.mark.parametrize("lang", ["en", "fr"])
 class TestArticle:
     def test_known_id(self, client, lang):
-        daily = client.get(f"/api/{lang}/daily-article").json()
+        daily = client.get(f"/api/admin/{lang}/daily-article").json()
         res = client.get(f"/api/{lang}/article-title", params={"id": daily["id"]})
         assert res.status_code == 200
         assert res.json()["title"] == daily["title"]
 
     def test_known_title(self, client, lang):
-        daily = client.get(f"/api/{lang}/daily-article").json()
+        daily = client.get(f"/api/admin/{lang}/daily-article").json()
         res = client.get(f"/api/{lang}/article-id", params={"title": daily["title"]})
         assert res.status_code == 200
         assert res.json()["id"] == daily["id"]
@@ -68,7 +68,7 @@ class TestSearchArticles:
 @pytest.mark.parametrize("lang", ["en", "fr"])
 class TestCommonInfo:
     def test_correct_guess(self, client, lang):
-        daily_id = client.get(f"/api/{lang}/daily-article").json()["id"]
+        daily_id = client.get(f"/api/admin/{lang}/daily-article").json()["id"]
         res = client.get(f"/api/{lang}/common-info?id={daily_id}")
         assert res.status_code == 200
         assert res.json()["is_target"] is True
@@ -82,7 +82,7 @@ class TestCommonInfo:
         assert "common_categories" in data
 
     def test_daily_target_has_categories(self, client, lang):
-        daily_id = client.get(f"/api/{lang}/daily-article").json()["id"]
+        daily_id = client.get(f"/api/admin/{lang}/daily-article").json()["id"]
         res = client.get(f"/api/{lang}/common-info?id={daily_id}")
         assert res.status_code == 200
         # the daily target should share categories with itself
