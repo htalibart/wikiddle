@@ -78,6 +78,7 @@ html {
   --font-size-small: 0.7rem;
   --font-size-medium: 0.75rem;
   --font-size-control: 0.875rem;
+  --font-size-big: 1.1rem;
   --font-size-title: 1.875rem;
   --font-size-overlay: 1.5rem;
 
@@ -332,7 +333,7 @@ body {
 }
 
 .section-btn {
-  font-size: var(--font-size-medium);
+  font-size: var(--font-size-big);
   color: var(--main-medium-color);
   text-transform: uppercase;
   letter-spacing: 0.05em;
