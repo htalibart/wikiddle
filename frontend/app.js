@@ -248,7 +248,7 @@ function renderCards(state, translations) {
 
     const foldUnfoldBtn = document.createElement("button");
     foldUnfoldBtn.classList.add("section-btn");
-    foldUnfoldBtn.textContent = "fold";
+    foldUnfoldBtn.textContent = state.cardsFolded ? "<<" : ">>";
     foldUnfoldBtn.addEventListener("click", () => {
       state.cardsFolded = !state.cardsFolded;
       renderCards(state, translations);
