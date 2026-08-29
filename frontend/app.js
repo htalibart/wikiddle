@@ -205,6 +205,15 @@ function renderGuessCard(state, guess, translations) {
   if (isLastGuess) {
     card.classList.add("last-guess-card");
   }
+  // if cards are folded, clicking on one unfolds them
+  else {
+    if (state.cardsFolded) {
+      card.addEventListener("click", () => {
+        state.cardsFolded = false;
+        renderCards(state, translations);
+      });
+    }
+  }
 
   return card;
 }
