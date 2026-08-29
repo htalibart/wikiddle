@@ -26,6 +26,8 @@ function buildTargetCardHTML(state, translations) {
   const links = state.knowledgeTarget.links;
   const newLinks = state.knowledgeTarget.newLinks;
 
+  links.sort();
+
   const linksHTML =
     links.length > 0
       ? links
@@ -38,6 +40,8 @@ function buildTargetCardHTML(state, translations) {
 
   const categories = state.knowledgeTarget.categories;
   const newCategories = state.knowledgeTarget.newCategories;
+
+  categories.sort();
 
   const placeholderHTML =
     links.length == 0 && categories.length == 0
@@ -148,13 +152,17 @@ function renderGuessCard(state, guess, translations) {
   var cardContent = ``;
 
   if (!state.cardsFolded || isLastGuess) {
+    const links = guess.commonLinks;
+    links.sort();
     const linksHTML =
-      guess.commonLinks.length > 0
-        ? `<div class="guess-card-links">${guess.commonLinks.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer">${title}</a>`).join(" ")}</div>`
+      links.length > 0
+        ? `<div class="guess-card-links">${links.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer">${title}</a>`).join(" ")}</div>`
         : "";
 
+    const categories = guess.commonCategories;
+    categories.sort();
     const categoriesHTML =
-      guess.commonCategories.length > 0
+      categories.length > 0
         ? `
 		<div class="guess-card-categories-separator">
 		  <span></span>
@@ -162,7 +170,7 @@ function renderGuessCard(state, guess, translations) {
 		  <span></span>
 		</div>
 		<div class="guess-card-categories">
-		  ${guess.commonCategories
+		  ${categories
         .map(
           (title) =>
             `<a href="${categoryToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer"># ${title}</a>`,

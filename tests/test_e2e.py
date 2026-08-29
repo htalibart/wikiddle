@@ -394,7 +394,7 @@ def test_guess_on_target_flow(page: Page):
     assert state["lang"] == "en"
     assert state["guesses"] == []
     assert state["knowledgeTarget"]["title"] is None
-    assert state["knowledgeTarget"]["links"] == ["Electronic music", "French house", selected_title]
+    assert state["knowledgeTarget"]["links"] == ["Daft Punk", "Electronic music", "French house"]
     assert state["knowsAllLinks"] is False
     assert state["gameDate"] == "2002-01-01"
     assert state["lastGuess"]["title"] == selected_title
