@@ -136,6 +136,8 @@ function goToCard(selector) {
 function renderGuessCard(state, guess, translations) {
   const card = document.createElement("div");
 
+  const isLastGuess = guess.id == state.lastGuess?.id;
+
   card.classList.add("guess-card");
   card.setAttribute("tabindex", "-1");
 
@@ -145,7 +147,7 @@ function renderGuessCard(state, guess, translations) {
 
   var cardContent = ``;
 
-  if (!state.cardsFolded) {
+  if (!state.cardsFolded || isLastGuess) {
     const linksHTML =
       guess.commonLinks.length > 0
         ? `<div class="guess-card-links">${guess.commonLinks.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer">${title}</a>`).join(" ")}</div>`
@@ -200,7 +202,7 @@ function renderGuessCard(state, guess, translations) {
   }
 
   // guess is latest guess -> change style
-  if (guess.id == state.lastGuess?.id) {
+  if (isLastGuess) {
     card.classList.add("last-guess-card");
   }
 
