@@ -78,6 +78,7 @@ html {
   --font-size-small: 0.7rem;
   --font-size-medium: 0.75rem;
   --font-size-control: 0.875rem;
+  --font-size-big: 1.1rem;
   --font-size-title: 1.875rem;
   --font-size-overlay: 1.5rem;
 
@@ -324,6 +325,27 @@ body {
   letter-spacing: 0.05em;
   padding: var(--space-small) 0 var(--space-smallest) 0;
   font-weight: normal;
+}
+
+.section-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.section-btn {
+  font-size: var(--font-size-big);
+  color: var(--main-medium-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-small) 0 var(--space-smallest) 0;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transform: rotate(90deg);
+}
+
+.section-btn:hover {
+  color: var(--main-dark-color);
 }
 
 .guess-card {

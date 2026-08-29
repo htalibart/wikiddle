@@ -1033,3 +1033,68 @@ def test_saved_state_expires_when_game_date_differs(page: Page):
     expect(page.locator("#guesses-list .guess-card")).to_have_count(1)
     expect(page.locator("#guesses-list .last-guess-card")).to_have_count(0)
     expect(page.locator("#win-overlay")).to_be_hidden()
+
+
+def test_fold_unfold_button(page: Page):
+    common_info_responses = [
+        {
+            "game_date": "2000-01-01",
+            "common_links": ["Electronic music", "French house"],
+            "common_categories": [],
+            "is_target": False,
+            "is_on_target": False,
+        },
+        {
+            "game_date": "2000-01-01",
+            "common_links": ["Electronic music", "House music", "Synth-pop"],
+            "common_categories": [],
+            "is_target": False,
+            "is_on_target": False,
+        },
+    ]
+
+    def handle_common_info(route):
+        response = common_info_responses.pop(0)
+        route.fulfill(
+            status=200,
+            content_type="application/json",
+            json=response,
+        )
+
+    page.route("**/api/en/common-info?id=*", handle_common_info)
+
+    page.goto(BASE_URL)
+
+    page.click(".ts-control")
+    page.keyboard.type("Daft Punk")
+    first_option = page.locator(".ts-dropdown .option").first
+    expect(first_option).to_be_visible(timeout=5000)
+    first_guess_title = first_option.text_content().strip()
+    first_option.click()
+
+    page.click(".ts-control")
+    page.keyboard.type("Justice")
+    second_option = page.locator(".ts-dropdown .option").first
+    expect(second_option).to_be_visible(timeout=5000)
+    second_option.click()
+
+    fold_btn = page.locator(".section-btn")
+    previous_guess_card = page.locator("#guesses-list .guess-card:not(.target-guess-card):not(.last-guess-card)")
+
+    expect(fold_btn).to_be_visible()
+    expect(previous_guess_card.locator(".guess-card-title")).to_contain_text(first_guess_title)
+    expect(previous_guess_card.locator(".guess-card-links a")).to_have_count(2)
+
+    fold_btn.click()
+
+    expect(previous_guess_card.locator(".guess-card-title")).to_contain_text(first_guess_title)
+    expect(previous_guess_card.locator(".guess-card-links a")).to_have_count(0)
+    expect(previous_guess_card.locator(".guess-card-categories a")).to_have_count(0)
+    expect(previous_guess_card.locator(".guess-card-noinfo")).to_have_count(0)
+
+    last_guess_card = page.locator("#guesses-list .last-guess-card")
+    expect(last_guess_card.locator(".guess-card-links a")).to_have_count(3)
+
+    previous_guess_card.click()
+
+    expect(previous_guess_card.locator(".guess-card-links a")).to_have_count(2)

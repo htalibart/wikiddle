@@ -136,6 +136,8 @@ function goToCard(selector) {
 function renderGuessCard(state, guess, translations) {
   const card = document.createElement("div");
 
+  const isLastGuess = guess.id == state.lastGuess?.id;
+
   card.classList.add("guess-card");
   card.setAttribute("tabindex", "-1");
 
@@ -143,34 +145,44 @@ function renderGuessCard(state, guess, translations) {
     ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>`
     : "";
 
-  const linksHTML =
-    guess.commonLinks.length > 0
-      ? `<div class="guess-card-links">${guess.commonLinks.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer">${title}</a>`).join(" ")}</div>`
-      : "";
+  var cardContent = ``;
 
-  const categoriesHTML =
-    guess.commonCategories.length > 0
-      ? `
-        <div class="guess-card-categories-separator">
-          <span></span>
-          <div class="guess-card-categories-label">${translations.categories}</div>
-          <span></span>
-        </div>
-        <div class="guess-card-categories">
-          ${guess.commonCategories
-            .map(
-              (title) =>
-                `<a href="${categoryToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer"># ${title}</a>`,
-            )
-            .join(" ")}
-        </div>
-      `
-      : "";
+  if (!state.cardsFolded || isLastGuess) {
+    const linksHTML =
+      guess.commonLinks.length > 0
+        ? `<div class="guess-card-links">${guess.commonLinks.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer">${title}</a>`).join(" ")}</div>`
+        : "";
 
-  const noCommonHTML =
-    guess.commonLinks.length == 0 && guess.commonCategories.length == 0
-      ? `<div class="guess-card-noinfo">${translations.no_common_info}</div>`
-      : "";
+    const categoriesHTML =
+      guess.commonCategories.length > 0
+        ? `
+		<div class="guess-card-categories-separator">
+		  <span></span>
+		  <div class="guess-card-categories-label">${translations.categories}</div>
+		  <span></span>
+		</div>
+		<div class="guess-card-categories">
+		  ${guess.commonCategories
+        .map(
+          (title) =>
+            `<a href="${categoryToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer"># ${title}</a>`,
+        )
+        .join(" ")}
+		</div>
+	      `
+        : "";
+
+    const noCommonHTML =
+      guess.commonLinks.length == 0 && guess.commonCategories.length == 0
+        ? `<div class="guess-card-noinfo">${translations.no_common_info}</div>`
+        : "";
+
+    cardContent = `
+	   ${linksHTML}
+	   ${categoriesHTML}
+	   ${noCommonHTML}
+	   `;
+  }
 
   card.innerHTML = `
     <div class="guess-card-header">
@@ -179,9 +191,7 @@ function renderGuessCard(state, guess, translations) {
         <span class="guess-card-score-links" aria-label="${translations.score_label.replace("{count}", guess.commonLinks.length)}">${guess.commonLinks.length}</span>
       </div>
     </div>
-    ${linksHTML}
-    ${categoriesHTML}
-    ${noCommonHTML}
+    ${cardContent}
   `;
 
   card.querySelector(".guess-card-score-links").style.color = scoreToColor(guess.score);
@@ -192,8 +202,17 @@ function renderGuessCard(state, guess, translations) {
   }
 
   // guess is latest guess -> change style
-  if (guess.id == state.lastGuess?.id) {
+  if (isLastGuess) {
     card.classList.add("last-guess-card");
+  }
+  // if cards are folded, clicking on one unfolds them
+  else {
+    if (state.cardsFolded) {
+      card.addEventListener("click", () => {
+        state.cardsFolded = false;
+        renderCards(state, translations);
+      });
+    }
   }
 
   return card;
@@ -228,10 +247,30 @@ function renderCards(state, translations) {
 
   // all other guesses below
   if (state.guesses.length > 0) {
+    const prevRow = document.createElement("div");
+    prevRow.classList.add("section-row");
+
     const prevLabel = document.createElement("h2");
     prevLabel.classList.add("section-label");
     prevLabel.textContent = translations.section_previous_guesses;
-    list.appendChild(prevLabel);
+    prevRow.appendChild(prevLabel);
+
+    const foldUnfoldBtn = document.createElement("button");
+    foldUnfoldBtn.classList.add("section-btn");
+    if (state.cardsFolded) {
+      foldUnfoldBtn.textContent = "<<";
+      foldUnfoldBtn.setAttribute("aria-label", translations.unfold_btn);
+    } else {
+      foldUnfoldBtn.textContent = ">>";
+      foldUnfoldBtn.setAttribute("aria-label", translations.fold_btn);
+    }
+    foldUnfoldBtn.addEventListener("click", () => {
+      state.cardsFolded = !state.cardsFolded;
+      renderCards(state, translations);
+    });
+    prevRow.appendChild(foldUnfoldBtn);
+
+    list.appendChild(prevRow);
     for (const guess of state.guesses) {
       const card = renderGuessCard(state, guess, translations);
       list.appendChild(card);
@@ -597,6 +636,7 @@ async function loadOrCreateState() {
 
   state.knowledgeTarget.newLinks = new Set();
   state.knowledgeTarget.newCategories = new Set();
+  state.cardsFolded = false;
 
   return state;
 }
