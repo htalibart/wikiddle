@@ -326,6 +326,11 @@ body {
   font-weight: normal;
 }
 
+.section-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
 .guess-card {
   padding: var(--space-large) var(--space-larger);
   background-color: var(--card-background);

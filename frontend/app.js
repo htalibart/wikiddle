@@ -236,10 +236,24 @@ function renderCards(state, translations) {
 
   // all other guesses below
   if (state.guesses.length > 0) {
+    const prevRow = document.createElement("div");
+    prevRow.classList.add("section-row");
+
     const prevLabel = document.createElement("h2");
     prevLabel.classList.add("section-label");
     prevLabel.textContent = translations.section_previous_guesses;
-    list.appendChild(prevLabel);
+    prevRow.appendChild(prevLabel);
+
+    const foldUnfoldBtn = document.createElement("button");
+    foldUnfoldBtn.classList.add("section-btn");
+    foldUnfoldBtn.textContent = "fold";
+    foldUnfoldBtn.addEventListener("click", () => {
+      state.cardsFolded = !state.cardsFolded;
+      renderCards(state, translations);
+    });
+    prevRow.appendChild(foldUnfoldBtn);
+
+    list.appendChild(prevRow);
     for (const guess of state.guesses) {
       const card = renderGuessCard(state, guess, translations);
       list.appendChild(card);
