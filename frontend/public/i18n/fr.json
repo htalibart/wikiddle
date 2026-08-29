@@ -13,6 +13,8 @@
   "section_last_guess": "Votre dernière proposition",
   "section_mystery": "Article mystère",
   "section_previous_guesses": "Vos propositions précédentes",
+  "fold_btn": "Déplier",
+  "unfold_btn": "Replier",
   "howto_btn": "Comment jouer ?",
   "howto_text_before": "Chaque jour, un article Wikipédia est choisi aléatoirement comme <strong>article mystère</strong>. Votre but est de le trouver.<br><br>Chaque article Wikipédia contient des liens vers d'autres articles et appartient à des catégories. Lorsque vous proposez un article, le jeu vous montre les liens et catégories qu'il a en commun avec l'article mystère. Utilisez-les comme indices pour trouver l'article mystère.<br><br>Voici un exemple de partie en cours, après 3 propositions :",
   "howto_text_after": "Si vous bloquez, utilisez le bouton indice : <button class=\"btn btn-secondary no-pointer-events\">Indice</button> pour révéler un lien ou une catégorie aléatoire de l'article mystère.<br><br>Wikipédia contient des milliers d'articles qui seraient trop difficiles à deviner, pour cette raison beaucoup de filtres ont été ajoutés. Si vous ne voyez pas un article dans les suggestions, c'est tout simplement qu'il ne peut pas être l'article mystère.<br><br>Il n'y a pas de limite sur le nombre de tentatives, pas de chronomètre : jouez à votre rythme, perdez-vous sur Wikipédia et amusez-vous.",

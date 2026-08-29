@@ -257,7 +257,13 @@ function renderCards(state, translations) {
 
     const foldUnfoldBtn = document.createElement("button");
     foldUnfoldBtn.classList.add("section-btn");
-    foldUnfoldBtn.textContent = state.cardsFolded ? "<<" : ">>";
+    if (state.cardsFolded) {
+      foldUnfoldBtn.textContent = "<<";
+      foldUnfoldBtn.setAttribute("aria-label", translations.unfold_btn);
+    } else {
+      foldUnfoldBtn.textContent = ">>";
+      foldUnfoldBtn.setAttribute("aria-label", translations.fold_btn);
+    }
     foldUnfoldBtn.addEventListener("click", () => {
       state.cardsFolded = !state.cardsFolded;
       renderCards(state, translations);
