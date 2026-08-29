@@ -143,34 +143,44 @@ function renderGuessCard(state, guess, translations) {
     ? ` <span class="guess-card-on-target-label">— ${translations.on_target_label}</span>`
     : "";
 
-  const linksHTML =
-    guess.commonLinks.length > 0
-      ? `<div class="guess-card-links">${guess.commonLinks.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer">${title}</a>`).join(" ")}</div>`
-      : "";
+  var cardContent = ``;
 
-  const categoriesHTML =
-    guess.commonCategories.length > 0
-      ? `
-        <div class="guess-card-categories-separator">
-          <span></span>
-          <div class="guess-card-categories-label">${translations.categories}</div>
-          <span></span>
-        </div>
-        <div class="guess-card-categories">
-          ${guess.commonCategories
-            .map(
-              (title) =>
-                `<a href="${categoryToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer"># ${title}</a>`,
-            )
-            .join(" ")}
-        </div>
-      `
-      : "";
+  if (!state.cardsFolded) {
+    const linksHTML =
+      guess.commonLinks.length > 0
+        ? `<div class="guess-card-links">${guess.commonLinks.map((title) => `<a href="${titleToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer">${title}</a>`).join(" ")}</div>`
+        : "";
 
-  const noCommonHTML =
-    guess.commonLinks.length == 0 && guess.commonCategories.length == 0
-      ? `<div class="guess-card-noinfo">${translations.no_common_info}</div>`
-      : "";
+    const categoriesHTML =
+      guess.commonCategories.length > 0
+        ? `
+		<div class="guess-card-categories-separator">
+		  <span></span>
+		  <div class="guess-card-categories-label">${translations.categories}</div>
+		  <span></span>
+		</div>
+		<div class="guess-card-categories">
+		  ${guess.commonCategories
+        .map(
+          (title) =>
+            `<a href="${categoryToUrl(title, state.lang)}" target="_blank" rel="noopener noreferrer"># ${title}</a>`,
+        )
+        .join(" ")}
+		</div>
+	      `
+        : "";
+
+    const noCommonHTML =
+      guess.commonLinks.length == 0 && guess.commonCategories.length == 0
+        ? `<div class="guess-card-noinfo">${translations.no_common_info}</div>`
+        : "";
+
+    cardContent = `
+	   ${linksHTML}
+	   ${categoriesHTML}
+	   ${noCommonHTML}
+	   `;
+  }
 
   card.innerHTML = `
     <div class="guess-card-header">
@@ -179,9 +189,7 @@ function renderGuessCard(state, guess, translations) {
         <span class="guess-card-score-links" aria-label="${translations.score_label.replace("{count}", guess.commonLinks.length)}">${guess.commonLinks.length}</span>
       </div>
     </div>
-    ${linksHTML}
-    ${categoriesHTML}
-    ${noCommonHTML}
+    ${cardContent}
   `;
 
   card.querySelector(".guess-card-score-links").style.color = scoreToColor(guess.score);
@@ -597,6 +605,7 @@ async function loadOrCreateState() {
 
   state.knowledgeTarget.newLinks = new Set();
   state.knowledgeTarget.newCategories = new Set();
+  state.cardsFolded = false;
 
   return state;
 }
