@@ -28,12 +28,12 @@
     "@eslint/json": "^2.1.1",
     "@eslint/markdown": "^8.0.3",
     "eslint": "^10.13.0",
-    "globals": "^17.13.0",
+    "globals": "^17.14.0",
     "prettier": "^3.9.10",
     "vite": "^8.3.5"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
-    "tom-select": "^2.6.2"
+    "tom-select": "^2.7.0"
   }
 }
