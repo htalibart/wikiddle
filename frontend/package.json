@@ -30,7 +30,7 @@
     "eslint": "^10.15.0",
     "globals": "^17.14.0",
     "prettier": "^3.9.10",
-    "vite": "^8.3.5"
+    "vite": "^8.3.8"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
